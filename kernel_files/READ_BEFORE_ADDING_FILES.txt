@@ -1,0 +1,5 @@
+For the scripts to work, any file added (to the backup/ or edited/ dir)
+must be added with the correct leading path from linux-2.4.18-14custom
+(not including linux-2.4.18-14custom/).
+For example, sched.h is in /usr/src/linux-2.4.18-14custom/include/linux/,
+so it should be in edited/include/linux/ and backup/include/linux/
