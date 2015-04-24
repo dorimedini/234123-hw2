@@ -47,9 +47,6 @@ void hw2_log_switch(hw2_switch_log* logger, int prev_pid, int next_pid, int prev
 	// If we don't need to log any more, do nothing
 	if (!logger->remaining_switches) return;
 	
-	// If we've passed 150 logs then restart
-	logger->next_index %= 150;
-	
 	// Update switch fields:
 	hw2_switch_info* info = logger->arr;
 	int index = logger->next_index;
@@ -62,6 +59,7 @@ void hw2_log_switch(hw2_switch_log* logger, int prev_pid, int next_pid, int prev
 	
 	// Update outer fields:
 	logger->next_index++;
+	logger->next_index %= 150;
 	if (logger->logged < 150)
 		logger->logged++;
 	if (logger->remaining_switches > 0)

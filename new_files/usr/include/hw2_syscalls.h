@@ -33,7 +33,8 @@ int remaining_trials(int);
 
 
 /**
- * 
+ * Call this function to get the switch logging info from
+ * the kernel.
  */
 int get_scheduling_statistic(struct switch_info *);
 
@@ -55,6 +56,7 @@ long convert_to_errno(long res) {
 int is_SHORT_wrapper(int);
 int remaining_time_wrapper(int);
 int remaining_trials_wrapper(int);
+int get_scheduling_statistic_wrapper(struct switch_info *);
 
 
 /**
@@ -84,6 +86,14 @@ int remaining_trials(int pid) {
 	}
 	return x;
 }
+int get_scheduling_statistic(struct switch_info* info) {
+	int x = get_scheduling_statistic_wrapper(info);
+	if (x<0) {
+		errno = -x;	// EINVAL may not be the only error returned...
+		return -1;
+	}
+	return x;
+}
 
 
 
@@ -98,7 +108,7 @@ int is_SHORT_wrapper(int pid) {
 		"int $0x80;"					// System interrupt
 		"movl %%eax,%0"					// Store the returned value
 		: "=m" (__res)					// in __res
-		: "m" ((long)limit)				// Input (%1 in the stack)
+		: "m" ((long)pid)				// Input (%1 in the stack)
 		: "%eax","%ebx"					// Registers used
 	);
 	return (int)convert_to_errno(__res);
@@ -111,7 +121,7 @@ int remaining_time_wrapper(int pid) {
 		"int $0x80;"					// System interrupt
 		"movl %%eax,%0"					// Store the returned value
 		: "=m" (__res)					// in __res
-		: "m" ((long)limit)				// Input (%1 in the stack)
+		: "m" ((long)pid)				// Input (%1 in the stack)
 		: "%eax","%ebx"					// Registers used
 	);
 	return (int)convert_to_errno(__res);
@@ -124,7 +134,20 @@ int remaining_trials_wrapper(int pid) {
 		"int $0x80;"					// System interrupt
 		"movl %%eax,%0"					// Store the returned value
 		: "=m" (__res)					// in __res
-		: "m" ((long)limit)				// Input (%1 in the stack)
+		: "m" ((long)pid)				// Input (%1 in the stack)
+		: "%eax","%ebx"					// Registers used
+	);
+	return (int)convert_to_errno(__res);
+}
+int get_scheduling_statistic_wrapper(struct switch_info* info) {
+	long __res;
+	__asm__ volatile (
+		"movl $245, %%eax;"				// System call number
+		"movl %1, %%ebx;"				// Send "limit" as a parameter
+		"int $0x80;"					// System interrupt
+		"movl %%eax,%0"					// Store the returned value
+		: "=m" (__res)					// in __res
+		: "m" ((long)info)				// Input (%1 in the stack)
 		: "%eax","%ebx"					// Registers used
 	);
 	return (int)convert_to_errno(__res);
