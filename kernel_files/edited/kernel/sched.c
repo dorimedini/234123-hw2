@@ -1302,9 +1302,9 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 *    into a SCHED_SHORT
 	 */
 	/** START HW2 */
-	if (policy == SCHED_SHORT && (lp.sched_policy != SCHED_OTHER && lp.sched_policy != SCHED_SHORT))
+	if (policy == SCHED_SHORT && (p->policy != SCHED_OTHER && p->policy != SCHED_SHORT))
 		goto out_unlock;
-	if (policy != SCHED_SHORT && lp.sched_policy == SCHED_SHORT)
+	if (policy != SCHED_SHORT && p->policy == SCHED_SHORT)
 		goto out_unlock;
 	/** END HW2 */
 

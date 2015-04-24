@@ -525,18 +525,8 @@ struct hw2_switch_log_struct {
 	int next_index;			// Where should we log the next switch
 	int logged;				// How many processes were logged (caps at 150)
 	int remaining_switches;	// How many more switches should this logger log? Max 30
-}
+};
 typedef struct hw2_switch_log_struct hw2_switch_log;
-
-
-/**
- * HW2:
- *
- * Declare a logger to be used with any function requiring it,
- * and initialize it's fields.
- */
-hw2_switch_log hw2_logger;
-hw2_logger.next_index = hw2_logger.logged = hw2_logger.remaining_switches = 0;
 
 
 /**

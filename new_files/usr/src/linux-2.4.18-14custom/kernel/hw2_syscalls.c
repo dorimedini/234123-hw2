@@ -1,11 +1,31 @@
 
+#include <asm/uaccess.h>	// Need this for copy_to_user()
 #include <linux/sched.h>	// Need this for definition of hw2_switch_info
 #include <linux/errno.h>	// Need this for the definition of EINVAL etc.
-
-#define NO_SUCH_PROC
+#define NO_SUCH_PROC -EINVAL// At the time I didn't know the required error if no such process exists
 
 /**
- * For function declarations see hw2_syscalls.h
+ * Declare a logger to be used with any function requiring it,
+ * and initialize it's fields.
+ * To use it in another file write:
+ *
+ * <code>extern hw2_switch_log hw2_logger;</code>
+ *
+ */
+hw2_switch_log hw2_logger = { .next_index = 0, .logged = 0, .remaining_switches = 0};
+
+
+/**
+ * Declare the functions.
+ * For function declarations and documentation see hw2_syscalls.h
+ */
+int sys_is_SHORT(int);
+int sys_remaining_time(int);
+int sys_remaining_trials(int);
+int sys_get_scheduling_statistic(hw2_switch_info*);
+
+/**
+ * Implementation:
  */
 int sys_is_SHORT(int pid) {
 
@@ -24,12 +44,12 @@ int sys_remaining_time(int pid) {
 	if (!task) return NO_SUCH_PROC;
 	
 	// Test input
-	if (p->policy != SCHED_SHORT) return -EINVAL;
+	if (task->policy != SCHED_SHORT) return -EINVAL;
 	
 	// Return the data
 	// NOTE: This depends on the fact that overdue processes
 	// have a time-slice of zero!
-	return p->time_slice;
+	return task->time_slice;
 	
 }
 
@@ -42,10 +62,10 @@ int sys_remaining_trials(int pid) {
 	if (!task) return NO_SUCH_PROC;
 	
 	// Test input
-	if (p->policy != SCHED_SHORT) return -EINVAL;
+	if (task->policy != SCHED_SHORT) return -EINVAL;
 	
 	// Return data
-	return p->remaining_trials;
+	return task->remaining_trials;
 	
 }
 

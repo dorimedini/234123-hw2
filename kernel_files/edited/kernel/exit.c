@@ -19,6 +19,7 @@
 
 /** START HW2 */
 #include <linux/sched.h>	// Needed for hw2_logger
+extern hw2_switch_log hw2_logger;
 /** END HW2 */
 
 #include <asm/uaccess.h>
