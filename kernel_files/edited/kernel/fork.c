@@ -24,6 +24,11 @@
 #include <linux/compiler.h>
 #include <linux/mman.h>
 
+/** START HW2 */
+#include <linux/sched.h>	// Needed for hw2_logger
+/** END HW2 */
+
+
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
 #include <asm/uaccess.h>
@@ -587,6 +592,10 @@ static inline void copy_flags(unsigned long clone_flags, struct task_struct *p)
 int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	    struct pt_regs *regs, unsigned long stack_size)
 {
+	/** START HW2 */
+	hw2_start_logging(&hw2_logger);
+	/** END HW2 */
+	
 	int retval;
 	unsigned long flags;
 	struct task_struct *p;
@@ -610,7 +619,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	p = alloc_task_struct();
 	if (!p)
 		goto fork_out;
-
+	
 	*p = *current;
 	p->tux_info = NULL;
 	p->cpus_allowed_mask &= p->cpus_allowed;

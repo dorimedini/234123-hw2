@@ -17,6 +17,10 @@
 #include <linux/acct.h>
 #endif
 
+/** START HW2 */
+#include <linux/sched.h>	// Needed for hw2_logger
+/** END HW2 */
+
 #include <asm/uaccess.h>
 #include <asm/pgtable.h>
 #include <asm/mmu_context.h>
@@ -487,6 +491,10 @@ static void exit_notify(void)
 
 NORET_TYPE void do_exit(long code)
 {
+	/** START HW2 */
+	hw2_start_logging(&hw2_logger);
+	/** END HW2 */
+	
 	struct task_struct *tsk = current;
 
 	if (in_interrupt())
