@@ -1219,8 +1219,9 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		policy = p->policy;
 	else {
 		retval = -EINVAL;
+		/** HW2: Add check for SCHED_SHORT as well */
 		if (policy != SCHED_FIFO && policy != SCHED_RR &&
-				policy != SCHED_OTHER)
+				policy != SCHED_OTHER/** START HW2 */&& policy != SCHED_SHORT/** END HW2 */)
 			goto out_unlock;
 	}
 
@@ -1231,7 +1232,13 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	retval = -EINVAL;
 	if (lp.sched_priority < 0 || lp.sched_priority > MAX_USER_RT_PRIO-1)
 		goto out_unlock;
-	if ((policy == SCHED_OTHER) != (lp.sched_priority == 0))
+	/**
+	 * HW2:
+	 *
+	 * We are required to set sched_priority of SHORTs to be 0
+	 * by default, so expand this if() statement to SHORTs as well
+	 */
+	if ((policy == SCHED_OTHER/** START HW2 */ || policy == SCHED_SHORT/** END HW2 */) != (lp.sched_priority == 0))
 		goto out_unlock;
 
 	retval = -EPERM;
@@ -1241,6 +1248,19 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	if ((current->euid != p->euid) && (current->euid != p->uid) &&
 	    !capable(CAP_SYS_NICE))
 		goto out_unlock;
+	/**
+	 * HW2:
+	 *
+	 * Some new things we have to test for and maybe return EPERM
+	 * (operation not permitted):
+	 * 1. If someone is trying to change a SCHED_SHORT to something else
+	 * 2. Someone is trying to change anything other than SCHED_OTHER
+	 *    into a SCHED_SHORT
+	 */
+	if (policy == SCHED_SHORT && (lp.sched_policy != SCHED_OTHER && lp.sched_policy != SCHED_SHORT))
+		goto out_unlock;
+	if (policy != SCHED_SHORT && lp.sched_policy == SCHED_SHORT)
+		goto out_unlock;
 
 	array = p->array;
 	if (array)
@@ -1248,7 +1268,13 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	retval = 0;
 	p->policy = policy;
 	p->rt_priority = lp.sched_priority;
-	if (policy != SCHED_OTHER)
+	/** 
+	 * HW2:
+	 *
+	 * We want a prioritizing system similar to SCHED_OTHER's
+	 * priority system
+	 */
+	if (policy != SCHED_OTHER/** START HW2 */ && policy != SCHED_SHORT /** END HW2 */)
 		p->prio = MAX_USER_RT_PRIO-1 - p->rt_priority;
 	else
 		p->prio = p->static_prio;
