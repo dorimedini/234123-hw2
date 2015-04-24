@@ -50,15 +50,6 @@ long convert_to_errno(long res) {
 	return res;
 }
 
-// Use this to quickly set return values and errno
-int positive_or_errno(int res) {
-	if (res<0) {
-		errno = -res;
-		return -1;
-	}
-	return res;
-}
-
 
 /**
  * Function wrappers
@@ -70,19 +61,19 @@ int get_scheduling_statistic_wrapper(hw2_switch_info*);
 
 
 /**
- * Implementation
+ * Implementation (errno value is taken care of in convert_to_errno)
  */
 int is_SHORT(int pid) {
-	return positive_or_errno(is_SHORT_wrapper(pid));
+	return is_SHORT_wrapper(pid);
 }
 int remaining_time(int pid) {
-	return positive_or_errno(remaining_time_wrapper(pid));
+	return remaining_time_wrapper(pid);
 }
 int remaining_trials(int pid) {
-	return positive_or_errno(remaining_trials_wrapper(pid));
+	return remaining_trials_wrapper(pid);
 }
 int get_scheduling_statistic(hw2_switch_info* info) {
-	return positive_or_errno(get_scheduling_statistic_wrapper(info));
+	return get_scheduling_statistic_wrapper(info);
 }
 
 
@@ -132,7 +123,7 @@ int remaining_trials_wrapper(int pid) {
 int get_scheduling_statistic_wrapper(hw2_switch_info* info) {
 	long __res;
 	__asm__ volatile (
-		"movl $245, %%eax;"				// System call number
+		"movl $246, %%eax;"				// System call number
 		"movl %1, %%ebx;"				// Send "limit" as a parameter
 		"int $0x80;"					// System interrupt
 		"movl %%eax,%0"					// Store the returned value
