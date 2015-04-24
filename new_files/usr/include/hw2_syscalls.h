@@ -49,6 +49,15 @@ long convert_to_errno(long res) {
 	return res;
 }
 
+// Use this to quickly set return values and errno
+int positive_or_errno(int res) {
+	if (res<0) {
+		errno = -res;
+		return -1;
+	}
+	return res;
+}
+
 
 /**
  * Function wrappers
@@ -63,36 +72,16 @@ int get_scheduling_statistic_wrapper(struct switch_info *);
  * Implementation
  */
 int is_SHORT(int pid) {
-	int x = is_SHORT_wrapper(pid);
-	if (x<0) {
-		errno = EINVAL;
-		return -1;
-	}
-	return x;
+	return positive_or_errno(is_SHORT_wrapper(pid));
 }
 int remaining_time(int pid) {
-	int x = remaining_time_wrapper(pid);
-	if (x<0) {
-		errno = EINVAL;
-		return -1;
-	}
-	return x;
+	return positive_or_errno(remaining_time_wrapper(pid));
 }
 int remaining_trials(int pid) {
-	int x = remaining_trials_wrapper(pid);
-	if (x<0) {
-		errno = EINVAL;
-		return -1;
-	}
-	return x;
+	return positive_or_errno(remaining_trials_wrapper(pid));
 }
 int get_scheduling_statistic(struct switch_info* info) {
-	int x = get_scheduling_statistic_wrapper(info);
-	if (x<0) {
-		errno = -x;	// EINVAL may not be the only error returned...
-		return -1;
-	}
-	return x;
+	return positive_or_errno(get_scheduling_statistic_wrapper(info));
 }
 
 
