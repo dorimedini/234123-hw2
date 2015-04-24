@@ -1219,7 +1219,11 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		policy = p->policy;
 	else {
 		retval = -EINVAL;
-		/** HW2: Add check for SCHED_SHORT as well */
+		/**
+		 * HW2:
+		 *
+		 * Add check for SCHED_SHORT as well
+		 */
 		if (policy != SCHED_FIFO && policy != SCHED_RR &&
 				policy != SCHED_OTHER/** START HW2 */&& policy != SCHED_SHORT/** END HW2 */)
 			goto out_unlock;
@@ -1257,15 +1261,32 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 * 2. Someone is trying to change anything other than SCHED_OTHER
 	 *    into a SCHED_SHORT
 	 */
+	/** START HW2 */
 	if (policy == SCHED_SHORT && (lp.sched_policy != SCHED_OTHER && lp.sched_policy != SCHED_SHORT))
 		goto out_unlock;
 	if (policy != SCHED_SHORT && lp.sched_policy == SCHED_SHORT)
 		goto out_unlock;
+	/** END HW2 */
 
 	array = p->array;
 	if (array)
 		deactivate_task(p, task_rq(p));
 	retval = 0;
+	
+	/**
+	 * HW2:
+	 *
+	 * Update requested_time and if this is an OTHER process
+	 * turning into a SHORT, update trial_num
+	 */
+	/** START HW2 */
+	if (policy == SCHED_SHORT) {
+		p->requested_time = lp.requested_time;
+		if (p->policy == SCHED_OTHER)	// The only case this value can be changed: OTHER-->SHORT
+			p->trial_num = p->remaining_trials = lp.trial_num;
+	}
+	/** END HW2 */
+	
 	p->policy = policy;
 	p->rt_priority = lp.sched_priority;
 	/** 
@@ -1280,7 +1301,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		p->prio = p->static_prio;
 	if (array)
 		activate_task(p, task_rq(p));
-
+	
 out_unlock:
 	task_rq_unlock(rq, &flags);
 out_unlock_tasklist:
