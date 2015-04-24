@@ -37,11 +37,16 @@ extern hw2_switch_log hw2_logger;
 /**
  * HW2:
  *
- * Implementation of the switch logger.
- * Store the switch data in the hw2_switch_log
+ * Implementation of the switch logger functions (declared in sched.h).
  */
+void hw2_start_logging(hw2_switch_log* logger) {
+	logger->remaining_switches = 30;
+}
 void hw2_log_switch(hw2_switch_log* logger, int prev_pid, int next_pid, int prev_pol, int next_pol, unsigned long time, int reason) {
 
+	// If we don't need to log any more, do nothing
+	if (!logger->remaining_switches) return;
+	
 	// If we've passed 150 logs then restart
 	logger->next_index %= 150;
 	
@@ -59,6 +64,8 @@ void hw2_log_switch(hw2_switch_log* logger, int prev_pid, int next_pid, int prev
 	logger->next_index++;
 	if (logger->logged < 150)
 		logger->logged++;
+	if (logger->remaining_switches > 0)
+		logger->remaining_switches--;
 }
 
 

@@ -498,6 +498,61 @@ struct task_struct {
 
 };
 
+
+/**
+ * HW2:
+ *
+ * This struct represents a logged task as a result of switching.
+ * It's used by the switch logger for this assignment.
+ */
+struct hw2_switch_info_struct {
+	int previous_pid;
+	int next_pid;
+	int previous_policy;
+	int next_policy;
+	unsigned long time;	// The value of jiffies at moment of switch
+	int reason;
+};
+typedef struct hw2_switch_info_struct hw2_switch_info;
+
+/**
+ * HW2:
+ *
+ * This stores 150 switch logs
+ */
+struct hw2_switch_log_struct {
+	hw2_switch_info arr[150];
+	int next_index;			// Where should we log the next switch
+	int logged;				// How many processes were logged (caps at 150)
+	int remaining_switches;	// How many more switches should this logger log? Max 30
+}
+typedef struct hw2_switch_log_struct hw2_switch_log;
+
+
+/**
+ * HW2:
+ *
+ * Declare a logger to be used with any function requiring it,
+ * and initialize it's fields.
+ */
+hw2_switch_log hw2_logger;
+hw2_logger.next_index = hw2_logger.logged = hw2_logger.remaining_switches = 0;
+
+
+/**
+ * HW2:
+ *
+ * Tell the system it needs to start logging the next 30 switches
+ */
+void hw2_start_logging(hw2_switch_log*);
+
+/**
+ * HW2:
+ *
+ * Store the switch data in the switch_log
+ */
+void hw2_log_switch(hw2_switch_log*, int prev_pid, int next_pid, int prev_pol, int next_pol, unsigned long time, int reason);
+
 /*
  * Per process flags
  */
