@@ -120,11 +120,31 @@ extern unsigned long nr_uninterruptible(void);
 #define SCHED_FIFO		1
 #define SCHED_RR		2
 
-/** HW2: Define new scheduling policy SCHED_SHORT */
+/**
+ * HW2:
+ *
+ * Define new scheduling policy SCHED_SHORT
+ */
 #define SCHED_SHORT		4
 
 struct sched_param {
 	int sched_priority;
+
+	/**
+	 * HW2:
+	 *
+	 * The initial requested time for the process.
+	 * This may be changed by setscheduler()
+	 */
+	int requested_time;
+
+	/**
+	 * HW2:
+	 *
+	 * The number of trials a SHORT process should have.
+	 * This value CONNOT be changed after it's initialized!
+	 */
+	int trial_num;
 };
 
 struct completion;
@@ -454,6 +474,28 @@ struct task_struct {
 
 /* journalling filesystem info */
 	void *journal_info;
+	
+	/**
+	 * HW2:
+	 *
+	 * Save the original number of trials
+	 */
+	int trial_num;
+	
+	/**
+	 * HW2:
+	 *
+	 * Keep track of the number of trials left
+	 */
+	int remaining_trials;
+	
+	/**
+	 * HW2
+	 *
+	 * Save the requested time
+	 */
+	int requested_time;
+
 };
 
 /*
