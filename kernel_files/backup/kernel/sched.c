@@ -142,6 +142,59 @@ struct runqueue {
 	int prev_nr_running[NR_CPUS];
 	task_t *migration_thread;
 	list_t migration_queue;
+	
+	/**
+	 * HW2:
+	 *
+	 * active_SHORT:
+	 * Behaves like the *active queue, only it
+	 * contains SHORT processes only. Allows us to run prioritized
+	 * SHORT processes round-robin style.
+	 */
+	prio_array_t *active_SHORT;
+	 
+	/**
+	 * HW2:
+	 *
+	 * expired_SHORT:
+	 * As the particular way SHORT processes handle
+	 * round-robin scheduling, only members of the same priority
+	 * group should go around in round-robin. Thus, when deciding
+	 * on which SHORT to run, we must check:
+	 *    Is the highest non-empty priority group P in active_SHORT
+	 *    a higher/equal priority to all non-empty priority groups
+	 *    in expired_SHORT?
+	 *    ---> If so, choose a process of priority P from the 
+	 *         active_SHORT queue.
+	 *    ---> Otherwise, switch pointers from the highest priority
+	 *         non-empty priority group Q in expired_SHORT with it's
+	 *         corresponding pointer in active_SHORT. Then, choose
+	 *         a process to run from the Q group in the new active_SHORT
+	 *         queue.
+	 */
+	prio_array_t *expired_SHORT;
+	
+	/**
+	 * HW2:
+	 *
+	 * overdue_SHORT[]:
+	 * As the overdue processes only need to run
+	 * FIFO-style, all we need is a regular queue. Insert newly
+	 * overdue SHORT processes at the start of the list, and when
+	 * running them (no OTHER, SHORT or real-time process to run)
+	 * start with the last process in the list.
+	 */
+	list_t overdue_SHORT[MAX_PRIO];
+	
+	/**
+	 * HW2:
+	 *
+	 * next_overdue_SHORT:
+	 * A pointer to the last overdue-SHORT process in overdue_SHORT[]
+	 * (which is in fact the next overdue-SHORT process to run)
+	 */
+	task_t *next_overdue_SHORT;
+	
 } ____cacheline_aligned;
 
 static struct runqueue runqueues[NR_CPUS] __cacheline_aligned;
