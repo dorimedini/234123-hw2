@@ -2,6 +2,7 @@
 #define _HW2_SYSCALLS_H
 
 #include <errno.h>
+#include <linux/sched.h>	// Need this for definition of hw2_switch_info
 extern int errno;
 
 /**
@@ -36,7 +37,7 @@ int remaining_trials(int);
  * Call this function to get the switch logging info from
  * the kernel.
  */
-int get_scheduling_statistic(struct switch_info *);
+int get_scheduling_statistic(hw2_switch_info*);
 
 
 // Use this to get the correct return value from a system call.
@@ -65,7 +66,7 @@ int positive_or_errno(int res) {
 int is_SHORT_wrapper(int);
 int remaining_time_wrapper(int);
 int remaining_trials_wrapper(int);
-int get_scheduling_statistic_wrapper(struct switch_info *);
+int get_scheduling_statistic_wrapper(hw2_switch_info*);
 
 
 /**
@@ -80,7 +81,7 @@ int remaining_time(int pid) {
 int remaining_trials(int pid) {
 	return positive_or_errno(remaining_trials_wrapper(pid));
 }
-int get_scheduling_statistic(struct switch_info* info) {
+int get_scheduling_statistic(hw2_switch_info* info) {
 	return positive_or_errno(get_scheduling_statistic_wrapper(info));
 }
 
@@ -128,7 +129,7 @@ int remaining_trials_wrapper(int pid) {
 	);
 	return (int)convert_to_errno(__res);
 }
-int get_scheduling_statistic_wrapper(struct switch_info* info) {
+int get_scheduling_statistic_wrapper(hw2_switch_info* info) {
 	long __res;
 	__asm__ volatile (
 		"movl $245, %%eax;"				// System call number
