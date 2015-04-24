@@ -15,7 +15,7 @@
  *  		and per-CPU runqueues.  Additional code by Davide
  *  		Libenzi, Robert Love, and Rusty Russell.
  */
-
+ 
 #include <linux/mm.h>
 #include <linux/nmi.h>
 #include <linux/init.h>
@@ -26,6 +26,41 @@
 #include <linux/interrupt.h>
 #include <linux/completion.h>
 #include <linux/kernel_stat.h>
+
+/**
+ * HW2:
+ *
+ * Declare the global logger (declared in sched.h)
+ */
+extern hw2_switch_log hw2_logger;
+
+/**
+ * HW2:
+ *
+ * Implementation of the switch logger.
+ * Store the switch data in the hw2_switch_log
+ */
+void hw2_log_switch(hw2_switch_log* logger, int prev_pid, int next_pid, int prev_pol, int next_pol, unsigned long time, int reason) {
+
+	// If we've passed 150 logs then restart
+	logger->next_index %= 150;
+	
+	// Update switch fields:
+	hw2_switch_info* info = logger->arr;
+	int index = logger->next_index;
+	info[index].previous_pid = prev_pid;
+	info[index].next_pid = next_pid;
+	info[index].previous_policy = prev_pol;
+	info[index].next_policy = next_pol;
+	info[index].time = time;
+	info[index].reason = reason;
+	
+	// Update outer fields:
+	logger->next_index++;
+	if (logger->logged < 150)
+		logger->logged++;
+}
+
 
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
