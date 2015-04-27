@@ -178,7 +178,7 @@ struct runqueue {
 	unsigned long nr_running, nr_switches, expired_timestamp;
 	signed long nr_uninterruptible;
 	task_t *curr, *idle;
-	prio_array_t *active, *expired, arrays[2];
+	prio_array_t *active, *expired, arrays[/*2*/4];	// We need two extra prio_arrays
 	int prev_nr_running[NR_CPUS];
 	task_t *migration_thread;
 	list_t migration_queue;
@@ -1789,10 +1789,20 @@ void __init sched_init(void)
 		rq = cpu_rq(i);
 		rq->active = rq->arrays;
 		rq->expired = rq->arrays + 1;
+		
+		/**
+		 * HW2:
+		 *
+		 * Initialize the new arrays
+		 */
+		/** START HW2 */
+		rq->active_SHORT = rq->arrays + 2;
+		rq->expired_SHORT = rq->arrays + 3;
+		/** END HW2 */
 		spin_lock_init(&rq->lock);
 		INIT_LIST_HEAD(&rq->migration_queue);
 
-		for (j = 0; j < 2; j++) {
+		for (j = 0; j < /*2*/4; j++) {	/** HW2: from 0 to 4, not 2 */
 			array = rq->arrays + j;
 			for (k = 0; k < MAX_PRIO; k++) {
 				INIT_LIST_HEAD(array->queue + k);
