@@ -192,7 +192,7 @@ struct runqueue {
 	 * SHORT processes round-robin style.
 	 */
 	prio_array_t *active_SHORT;
-	 
+	
 	/**
 	 * HW2:
 	 *
@@ -949,6 +949,26 @@ pick_next_task:
 	}
 
 	idx = sched_find_first_bit(array->bitmap);
+	
+	/**
+	 * HW2:
+	 *
+	 * Check if there are no real-time tasks to run.
+	 * If this is the case, we need to check if there are SHORT
+	 * tasks to run instead of OTHER tasks.
+	 */
+	/** START HW2 */
+	if (idx > 99) {
+		
+		// Define this int for debug purposes
+		int hw2_debug = 1;
+		
+		// First, check to see if there are any SHORT tasks.
+		
+		
+	}
+	/** END HW2 */
+	
 	queue = array->queue + idx;
 	next = list_entry(queue->next, task_t, run_list);
 
@@ -956,12 +976,13 @@ switch_tasks:
 	prefetch(next);
 	clear_tsk_need_resched(prev);
 
-	if (likely(prev != next)) {
+	if (likely(prev != next)) {						// If we've switched the task: do this.
+													// We need to try to log this switch here
 		rq->nr_switches++;
 		rq->curr = next;
 	
-		prepare_arch_switch(rq);
-		prev = context_switch(prev, next);
+		prepare_arch_switch(rq);					// Architecture shit
+		prev = context_switch(prev, next);			// Switch context
 		barrier();
 		rq = this_rq();
 		finish_arch_switch(rq);
@@ -970,7 +991,7 @@ switch_tasks:
 	finish_arch_schedule(prev);
 
 	reacquire_kernel_lock(current);
-	if (need_resched())
+	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
 		goto need_resched;
 }
 
