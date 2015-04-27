@@ -1321,7 +1321,12 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 */
 	/** START HW2 */
 	if (policy == SCHED_SHORT) {
+		
 		p->requested_time = lp.requested_time;
+
+		// Requested time is also the first time slice
+		p->time_slice = lp.requested_time;
+		
 		if (p->policy == SCHED_OTHER)	// The only case this value can be changed: OTHER-->SHORT
 			p->trial_num = p->remaining_trials = lp.trial_num;
 	}
