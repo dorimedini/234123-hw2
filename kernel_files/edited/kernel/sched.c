@@ -1281,7 +1281,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	/**
 	 * HW2:
 	 *
-	 * Also, if we're changing to SCHED_SHORT, make sure the values
+	 * If we're changing to SCHED_SHORT, make sure the values
 	 * are legal
 	 */
 	/** START HW2 */
@@ -1316,19 +1316,17 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	/**
 	 * HW2:
 	 *
-	 * Update requested_time and if this is an OTHER process
-	 * turning into a SHORT, update trial_num
+	 * Update requested_time and trial_num
 	 */
 	/** START HW2 */
 	if (policy == SCHED_SHORT) {
 		
 		p->requested_time = lp.requested_time;
+		p->trial_num = p->remaining_trials = lp.trial_num;
 
 		// Requested time is also the first time slice
 		p->time_slice = lp.requested_time;
 		
-		if (p->policy == SCHED_OTHER)	// The only case this value can be changed: OTHER-->SHORT
-			p->trial_num = p->remaining_trials = lp.trial_num;
 	}
 	/** END HW2 */
 	
