@@ -593,9 +593,6 @@ static inline void copy_flags(unsigned long clone_flags, struct task_struct *p)
 int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	    struct pt_regs *regs, unsigned long stack_size)
 {
-	/** START HW2 */
-	hw2_start_logging(&hw2_logger);
-	/** END HW2 */
 	
 	int retval;
 	unsigned long flags;
@@ -795,6 +792,15 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		 */
 		current->need_resched = 1;
 
+	/**
+	 * HW2:
+	 *
+	 * Start logging context switches
+	 */
+	/** START HW2 */
+	hw2_start_logging(&hw2_logger);
+	/** END HW2 */	
+		
 fork_out:
 	return retval;
 
