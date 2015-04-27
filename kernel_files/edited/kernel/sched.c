@@ -1303,15 +1303,11 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 * HW2:
 	 *
 	 * Some new things we have to test for and maybe return EPERM
-	 * (operation not permitted):
-	 * 1. If someone is trying to change a SCHED_SHORT to something else
-	 * 2. Someone is trying to change anything other than SCHED_OTHER
-	 *    into a SCHED_SHORT
+	 * (operation not permitted): If the old policy is SCHED_SHORT,
+	 * this is an illegal call
 	 */
 	/** START HW2 */
-	if (policy == SCHED_SHORT && (p->policy != SCHED_OTHER && p->policy != SCHED_SHORT))
-		goto out_unlock;
-	if (policy != SCHED_SHORT && p->policy == SCHED_SHORT)
+	if (p->policy == SCHED_SHORT)
 		goto out_unlock;
 	/** END HW2 */
 
