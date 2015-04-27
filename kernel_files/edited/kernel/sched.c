@@ -233,7 +233,7 @@ struct runqueue {
 	 * A pointer to the last overdue-SHORT process in overdue_SHORT[]
 	 * (which is in fact the next overdue-SHORT process to run)
 	 */
-	task_t *next_overdue_SHORT;
+	list_t *next_overdue_SHORT;
 	
 } ____cacheline_aligned;
 
