@@ -1281,9 +1281,16 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 *
 	 * We are required to set sched_priority of SHORTs to be 0
 	 * by default, so expand this if() statement to SHORTs as well
+	 *
+	 * Also, if we're changing to SCHED_SHORT, make sure the values
+	 * are legal
 	 */
 	if ((policy == SCHED_OTHER/** START HW2 */ || policy == SCHED_SHORT/** END HW2 */) != (lp.sched_priority == 0))
 		goto out_unlock;
+	/** START HW2 */
+	if (policy == SCHED_SHORT && (lp.requested_time > 5000 || lp.requested_time < 1 || lp.trial_num > 50 || lp.trial_num < 1))
+		goto out_unlock;
+	/** END HW2 */
 
 	retval = -EPERM;
 	if ((policy == SCHED_FIFO || policy == SCHED_RR) &&
