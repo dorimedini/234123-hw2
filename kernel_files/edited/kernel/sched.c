@@ -902,29 +902,29 @@ asmlinkage void schedule(void)
 		BUG();
 
 need_resched:
-	prev = current;
-	rq = this_rq();
+	prev = current;									// Assume we're going to switch the current process to something else
+	rq = this_rq();									// Get a pointer to the runqueue
 
-	release_kernel_lock(prev, smp_processor_id());
-	prepare_arch_schedule(prev);
-	prev->sleep_timestamp = jiffies;
-	spin_lock_irq(&rq->lock);
+	release_kernel_lock(prev, smp_processor_id());	// Lock something
+	prepare_arch_schedule(prev);					// Just architecture things
+	prev->sleep_timestamp = jiffies;				// This is to help decide if the process is interactive or calculative
+	spin_lock_irq(&rq->lock);						// Lock another thing
 
-	switch (prev->state) {
-	case TASK_INTERRUPTIBLE:
-		if (unlikely(signal_pending(prev))) {
-			prev->state = TASK_RUNNING;
+	switch (prev->state) {							// Check what kind of process we were
+	case TASK_INTERRUPTIBLE:						// If we were interruptible...
+		if (unlikely(signal_pending(prev))) {		// ...and the thing we were waiting for happened...
+			prev->state = TASK_RUNNING;				// ...become running
 			break;
 		}
 	default:
-		deactivate_task(prev, rq);
-	case TASK_RUNNING:
+		deactivate_task(prev, rq);					// If we're uninterruptible, deactivate the task
+	case TASK_RUNNING:								// Otherwise no one cares so shut up
 		;
 	}
 #if CONFIG_SMP
 pick_next_task:
 #endif
-	if (unlikely(!rq->nr_running)) {
+	if (unlikely(!rq->nr_running)) {				// If there's nothing to run, run the IDLE task
 #if CONFIG_SMP
 		load_balance(rq, 1);
 		if (rq->nr_running)
@@ -935,7 +935,9 @@ pick_next_task:
 		goto switch_tasks;
 	}
 
-	array = rq->active;
+	array = rq->active;								// Get a pointer to the active array.
+													// We may need to change thins because there are other runnable tasks
+													// not in rq->active
 	if (unlikely(!array->nr_active)) {
 		/*
 		 * Switch the active and expired arrays.
