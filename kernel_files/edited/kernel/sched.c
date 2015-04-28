@@ -814,7 +814,7 @@ static inline void idle_tick(void)
 void scheduler_tick(int user_tick, int system)
 {
 	int cpu = smp_processor_id();
-	runqueue_t *rq = this_rq();
+	runqueue_t *rq = this_rq();									// The current run queue
 	task_t *p = current;
 
 	if (p == rq->idle) {
@@ -824,7 +824,7 @@ void scheduler_tick(int user_tick, int system)
 		idle_tick();
 #endif
 		return;
-	}
+	}															// Idle shit :)
 	if (TASK_NICE(p) > 0)
 		kstat.per_cpu_nice[cpu] += user_tick;
 	else
@@ -832,9 +832,28 @@ void scheduler_tick(int user_tick, int system)
 	kstat.per_cpu_system[cpu] += system;
 
 	/* Task might have expired already, but not scheduled off yet */
-	if (p->array != rq->active) {
-		set_tsk_need_resched(p);
-		return;
+
+	/** 
+	 * HW2: 
+	 * If the current proc's policy is different
+	 * from SCHED_SHORT , so continue with the regular check.  
+	 */
+	if (p->policy != SCHED_SHORT) {
+		if (p->array != rq->active) {																								// array but still running.
+			set_tsk_need_resched(p);								 
+			return;
+		}
+	/** 
+	 * HW2: 
+	 * The current proc's policy is SCHED_SHORT so we need to deal with it. 
+	 */
+	} else {
+		// Like in SCHED_OTHER if a proc is in the expired array but still running 
+		// it needed to be resched.
+		if (p->array != rq->active_SHORT && p->remaining_trials) {																								// array but still running.
+			set_tsk_need_resched(p);								 
+			return;
+		}
 	}
 	spin_lock(&rq->lock);
 	if (unlikely(rt_task(p))) {
@@ -842,7 +861,7 @@ void scheduler_tick(int user_tick, int system)
 		 * RR tasks need a special form of timeslice management.
 		 * FIFO tasks have no timeslices.
 		 */
-		if ((p->policy == SCHED_RR) && !--p->time_slice) {
+		if ((p->policy == SCHED_RR) && !--p->time_slice) {		// handle RR policy. Not interesting
 			p->time_slice = TASK_TIMESLICE(p);
 			p->first_time_slice = 0;
 			set_tsk_need_resched(p);
@@ -861,21 +880,46 @@ void scheduler_tick(int user_tick, int system)
 	 * it possible for interactive tasks to use up their
 	 * timeslices at their highest priority levels.
 	 */
-	if (p->sleep_avg)
-		p->sleep_avg--;
+	if (p->sleep_avg)									
+		p->sleep_avg--;								// The procces isn't sleeping so decrease its sleep avg
 	if (!--p->time_slice) {
-		dequeue_task(p, rq->active);
-		set_tsk_need_resched(p);
-		p->prio = effective_prio(p);
-		p->first_time_slice = 0;
-		p->time_slice = TASK_TIMESLICE(p);
+		
+	/** 
+	 * HW2: 
+	 * If the current proc's policy is different
+	 * from SCHED_SHORT , so continue with the regular check.  
+	 */		
+		if (p->policy != SCHED_SHORT) {
+			dequeue_task(p, rq->active);
+			set_tsk_need_resched(p);
 
-		if (!TASK_INTERACTIVE(p) || EXPIRED_STARVING(rq)) {
-			if (!rq->expired_timestamp)
-				rq->expired_timestamp = jiffies;
-			enqueue_task(p, rq->expired);
-		} else
-			enqueue_task(p, rq->active);
+			p->prio = effective_prio(p);
+			p->first_time_slice = 0;
+			p->time_slice = TASK_TIMESLICE(p);
+
+			if (!TASK_INTERACTIVE(p) || EXPIRED_STARVING(rq)) {
+				if (!rq->expired_timestamp)
+					rq->expired_timestamp = jiffies;
+				enqueue_task(p, rq->expired);
+			} else
+				enqueue_task(p, rq->active);
+	/** 
+	 * HW2: 
+	 * Dealing with SCHED_SHORT policy.  
+	 */
+		} else if (p->remaining_trials) {
+			dequeue_task(p, rq->active_SHORT);    			// Get the proc out from our active array
+			set_tsk_need_resched(p);
+
+			p->first_time_slice = 0; 
+			if (!--p->remaining_trials) {					// If it became overdue
+				p->time_slice = 1;
+				// enqueue to overdue list
+			} else {
+				p->time_slice = (p->requested_time) / ((p->trial_num - p->remaining_trials) + 1);
+				enqueue_task(p, rq->expired_SHORT);
+			}
+		}
 	}
 out:
 #if CONFIG_SMP
