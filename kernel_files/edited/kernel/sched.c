@@ -42,7 +42,7 @@ extern hw2_switch_log hw2_logger;
  * should we switch
  */
 #define UPDATE_REASON(tsk,res) \
-	if ((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason < (res)) \
+	if ((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason > (res)) \
 		(tsk)->switch_reason = (res);
 
 /**
@@ -70,7 +70,7 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 	
 	// Reset the switch reason so we don't log
 	// the same reason twice by accident...
-	prev->switch_reason = SWITCH_UNKNOWN;
+	UPDATE_REASON(prev,SWITCH_UNKNOWN);
 	
 	// Update outer fields:
 	logger->next_index++;
@@ -1096,6 +1096,14 @@ switch_tasks:
 		rq->curr = next;
 	
 		prepare_arch_switch(rq);					// Architecture shit
+		/**
+		 * HW2:
+		 *
+		 * Now's the time to log the context switch
+		 */
+		/** START HW2 */
+		hw2_log_switch(&hw2_logger, prev, next);
+		/** END HW2 */
 		prev = context_switch(prev, next);			// Switch context
 		barrier();
 		rq = this_rq();
@@ -1104,6 +1112,17 @@ switch_tasks:
 		spin_unlock_irq(&rq->lock);
 	finish_arch_schedule(prev);
 
+	/**
+	 * HW2:
+	 *
+	 * Even if no context switch happened, the bit has been cleared
+	 * and if the switch will happen it will be for a different reason.
+	 */
+	/** START HW2 */
+	UPDATE_REASON(prev,SWITCH_UNKNOWN);
+	/** END HW2 */
+
+	
 	reacquire_kernel_lock(current);
 	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
 		goto need_resched;
