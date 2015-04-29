@@ -82,6 +82,32 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 }
 
 
+/**
+ * HW2:
+ *
+ * Before calls to enqueue or dequeue, we need
+ * to decide which prio_array or list_t to add
+ * the process to.
+ * Call this instead of enqueue() for enqueueing
+ *
+ * Before enqueueing the task we need to check where
+ * to enqueue it.
+ * If it's an OTHER process, just enqueue it in rq->active.
+ * If it's a non-overdue SHORT, enqueue in rq->active_SHORT
+ * If it's overdue, add to the head of the overdue_SHORT list
+ */
+void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
+	if (p->policy != SCHED_SHORT) {	// Regular process
+		enqueue_task(p, make_active ? rq->active : rq->expired);
+	}
+	else if (p->remaining_trials) {	// Non-overdue SHORT
+		enqueue_task(p, make_active ? rq->active_SHORT : rq->expired_SHORT);
+	}
+	else {							// Overdue SHORT. make_active is irrelevant
+		list_add(&p->run_list, &rq->overdue_SHORT);
+	}
+}
+
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
  * to static priority [ MAX_RT_PRIO..MAX_PRIO-1 ],
@@ -394,7 +420,8 @@ static inline void activate_task(task_t *p, runqueue_t *rq)
 			p->sleep_avg = MAX_SLEEP_AVG;
 		p->prio = effective_prio(p);
 	}
-	enqueue_task(p, array);
+	
+	hw2_enqueue(p, rq, 1);
 	rq->nr_running++;
 }
 
@@ -945,10 +972,10 @@ void scheduler_tick(int user_tick, int system)
 			p->first_time_slice = 0; 
 			if (!--p->remaining_trials) {					// If it became overdue
 				p->time_slice = 1;
-				// enqueue to overdue list
+				hw2_enqueue(p,rq,1);
 			} else {
 				p->time_slice = (p->requested_time) / ((p->trial_num - p->remaining_trials) + 1);
-				enqueue_task(p, rq->expired_SHORT);
+				hw2_enqueue(p,rq,0);
 			}
 		}
 	}
@@ -1288,6 +1315,20 @@ void set_user_nice(task_t *p, long nice)
 
 	if (TASK_NICE(p) == nice || nice < -20 || nice > 19)
 		return;
+	
+	/**
+	 * HW2:
+	 *
+	 * If the process is overdue, it's NICE doesn't matter.
+	 * If we keep running this function, there will be bugs
+	 * because an overdue process doesn't have a valid p->array
+	 * value.
+	 */
+	/** START HW2 */
+	if (p->policy == SCHED_SHORT && !p->remaining_trials)
+		return;
+	/** END HW2 */
+	
 	/*
 	 * We have to be careful, if called from sys_setpriority(),
 	 * the task might be in the middle of scheduling on another CPU.
@@ -1299,11 +1340,11 @@ void set_user_nice(task_t *p, long nice)
 	}
 	array = p->array;
 	if (array)
-		dequeue_task(p, array);
+		dequeue_task(p, array);	/** HW2: This is OK for shorts as well */
 	p->static_prio = NICE_TO_PRIO(nice);
 	p->prio = NICE_TO_PRIO(nice);
 	if (array) {
-		enqueue_task(p, array);
+		enqueue_task(p, array);	/** HW2: This is OK for shorts as well */
 		/*
 		 * If the task is running and lowered its priority,
 		 * or increased its priority then reschedule its CPU:

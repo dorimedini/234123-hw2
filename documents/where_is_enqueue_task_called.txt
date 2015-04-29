@@ -1,8 +1,8 @@
-x	./kernel/sched.c:314:static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
-x	./kernel/sched.c:366:	enqueue_task(p, array);
-x	./kernel/sched.c:760:	enqueue_task(next, this_rq->active);
-x	./kernel/sched.c:852:			enqueue_task(p, rq->active);
-x	./kernel/sched.c:876:			enqueue_task(p, rq->expired);
-x	./kernel/sched.c:878:			enqueue_task(p, rq->active);
-x	./kernel/sched.c:1209:		enqueue_task(p, array);
-x	./tags:233214:enqueue_task	kernel/sched.c	/^static inline void enqueue_task(struct task_struct *p, prio_array_t *array)$/;"	f	file:
+v	./kernel/sched.c:314:static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
+v	./kernel/sched.c:366:	enqueue_task(p, array);
+v	./kernel/sched.c:760:	enqueue_task(next, this_rq->active);
+v	./kernel/sched.c:852:			enqueue_task(p, rq->active);
+v	./kernel/sched.c:876:			enqueue_task(p, rq->expired);
+v	./kernel/sched.c:878:			enqueue_task(p, rq->active);
+v	./kernel/sched.c:1209:		enqueue_task(p, array);
+v	./tags:233214:enqueue_task	kernel/sched.c	/^static inline void enqueue_task(struct task_struct *p, prio_array_t *array)$/;"	f	file:

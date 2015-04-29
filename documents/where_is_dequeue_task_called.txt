@@ -1,4 +1,4 @@
-x	./kernel/sched.c:306:static inline void dequeue_task(struct task_struct *p, prio_array_t *array)
+v	./kernel/sched.c:306:static inline void dequeue_task(struct task_struct *p, prio_array_t *array)
 x	./kernel/sched.c:375:	dequeue_task(p, p->array);
 x	./kernel/sched.c:756:	dequeue_task(next, array);
 x	./kernel/sched.c:851:			dequeue_task(p, rq->active);
