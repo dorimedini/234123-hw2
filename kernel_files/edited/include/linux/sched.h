@@ -569,7 +569,7 @@ void hw2_start_logging(hw2_switch_log*);
  *
  * Store the switch data in the switch_log
  */
-void hw2_log_switch(hw2_switch_log*, int prev_pid, int next_pid, int prev_pol, int next_pol, unsigned long time, int reason);
+void hw2_log_switch(hw2_switch_log*, task_t* prev, task_t* next);
 
 /*
  * Per process flags

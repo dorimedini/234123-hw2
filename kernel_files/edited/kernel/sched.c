@@ -42,7 +42,7 @@ extern hw2_switch_log hw2_logger;
 void hw2_start_logging(hw2_switch_log* logger) {
 	logger->remaining_switches = 30;
 }
-void hw2_log_switch(hw2_switch_log* logger, int prev_pid, int next_pid, int prev_pol, int next_pol, unsigned long time, int reason) {
+void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 
 	// If we don't need to log any more, do nothing
 	if (!logger->remaining_switches) return;
@@ -50,12 +50,12 @@ void hw2_log_switch(hw2_switch_log* logger, int prev_pid, int next_pid, int prev
 	// Update switch fields:
 	hw2_switch_info* info = logger->arr;
 	int index = logger->next_index;
-	info[index].previous_pid = prev_pid;
-	info[index].next_pid = next_pid;
-	info[index].previous_policy = prev_pol;
-	info[index].next_policy = next_pol;
-	info[index].time = time;
-	info[index].reason = reason;
+	info[index].previous_pid = prev->pid;
+	info[index].next_pid = next->pid;
+	info[index].previous_policy = prev->policy;
+	info[index].next_policy = next->policy;
+	info[index].time = jiffies;
+	info[index].reason = prev->switch_reason;
 	
 	// Update outer fields:
 	logger->next_index++;
