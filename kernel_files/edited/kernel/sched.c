@@ -1357,9 +1357,26 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 * runqueue lock must be held.
 	 */
 	rq = task_rq_lock(p, &flags);
-
-	if (policy < 0)
+	
+	/**
+	 * HW2:
+	 *
+	 * We should allow calls to setscheduler if we promise not
+	 * to change the policy, even if the current policy is
+	 * SHORT.
+	 *
+	 * Keep a variable telling us if the scheduler promises
+	 * not to change policies
+	 */
+	/** START HW2*/
+	int no_change = 0;
+	/** END HW2 */
+	if (policy < 0) {
 		policy = p->policy;
+		/** START HW2 */
+		no_change = 1;
+		/** END HW2 */
+	}
 	else {
 		retval = -EINVAL;
 		/**
@@ -1405,9 +1422,15 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 * Some new things we have to test for and maybe return EPERM
 	 * (operation not permitted): If the old policy is SCHED_SHORT,
 	 * this is an illegal call
+	 *
+	 * Note that if the caller promises not to change policies,
+	 * this should be a legal call! This is because setscheduler()
+	 * is also called by setparam() (which should be a legal call,
+	 * even for SHORT processes), and setparam can promise setscheduler
+	 * not to change policies
 	 */
 	/** START HW2 */
-	if (p->policy == SCHED_SHORT)
+	if (p->policy == SCHED_SHORT && !no_change)
 		goto out_unlock;
 	/** END HW2 */
 
