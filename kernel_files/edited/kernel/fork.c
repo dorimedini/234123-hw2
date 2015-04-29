@@ -817,7 +817,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		 * it know why, for logging purposes
 		 */
 		/** START HW2 */
-		current->switch_reason = SWITCH_CREATED;
+		UPDATE_REASON(current, SWITCH_CREATED);
 		/** END HW2 */	
 	}
 

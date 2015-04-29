@@ -37,6 +37,17 @@ extern hw2_switch_log hw2_logger;
 /**
  * HW2:
  *
+ * Update the switch reason of a task.
+ * Only if the new reason is of lower numerical value
+ * should we switch
+ */
+#define UPDATE_REASON(tsk,res) \
+	if ((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason < (res)) \
+		(tsk)->switch_reason = (res);
+
+/**
+ * HW2:
+ *
  * Implementation of the switch logger functions (declared in sched.h).
  */
 void hw2_start_logging(hw2_switch_log* logger) {
