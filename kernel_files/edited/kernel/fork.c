@@ -795,12 +795,22 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	++total_forks;
 	if (clone_flags & CLONE_VFORK)
 		wait_for_completion(&vfork);
-	else
+	else {
 		/*
 		 * Let the child process run first, to avoid most of the
 		 * COW overhead when the child exec()s afterwards.
 		 */
 		current->need_resched = 1;
+		/**
+		 * HW2:
+		 *
+		 * If the parent is being rescheduled, we need to let
+		 * it know why, for logging purposes
+		 */
+		/** START HW2 */
+		current->switch_reason = SWITCH_CREATED;
+		/** END HW2 */	
+	}
 
 	/**
 	 * HW2:
