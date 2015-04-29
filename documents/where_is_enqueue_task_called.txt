@@ -1,0 +1,8 @@
+./kernel/sched.c:314:static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
+./kernel/sched.c:366:	enqueue_task(p, array);
+./kernel/sched.c:760:	enqueue_task(next, this_rq->active);
+./kernel/sched.c:852:			enqueue_task(p, rq->active);
+./kernel/sched.c:876:			enqueue_task(p, rq->expired);
+./kernel/sched.c:878:			enqueue_task(p, rq->active);
+./kernel/sched.c:1209:		enqueue_task(p, array);
+./tags:233214:enqueue_task	kernel/sched.c	/^static inline void enqueue_task(struct task_struct *p, prio_array_t *array)$/;"	f	file:
