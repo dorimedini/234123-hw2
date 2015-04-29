@@ -341,6 +341,24 @@ extern struct user_struct root_user;
 
 typedef struct prio_array prio_array_t;
 
+/**
+ * HW2:
+ *
+ * Add an enum list for context switch reasons
+ */
+/** START HW2 */
+enum SWITCH_REASONS {
+	SWITCH_UNKNOWN = 0,	// 0: Reason unknown - should cause error
+	SWITCH_CREATED,		// 1: Switched due to creation of another task
+	SWITCH_ENDED,		// 2: A task ended
+	SWITCH_YIELD,		// 3: A task gave up the CPU
+	SWITCH_OVERDUE,		// 4: A SHORT task became overdue
+	SWITCH_PREV_WAIT,	// 5: The task switched from has yielded the CPU because it started waiting
+	SWITCH_PRIO,		// 6: A task with a higher priority returned from waiting
+	SWITCH_SLICE		// 7: The previous task ran out of time
+};
+/** END HW2 */
+
 struct task_struct {
 	/*
 	 * offsets of these are hardcoded elsewhere - touch with care
