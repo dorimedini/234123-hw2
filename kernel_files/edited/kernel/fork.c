@@ -732,6 +732,16 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	__cli();
 	if (!current->time_slice)
 		BUG();
+	/**
+	 * HW2:
+	 *
+	 * This time_slice calculation is still correct for
+	 * SHORT processes, so keep it.
+	 *
+	 * This should also correctly handle the parent
+	 * becoming overdue, because scheduler_tick knows
+	 * what to do.
+	 */
 	p->time_slice = (current->time_slice + 1) >> 1;
 	p->first_time_slice = 1;
 	current->time_slice >>= 1;
