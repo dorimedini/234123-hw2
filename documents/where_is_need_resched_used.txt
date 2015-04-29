@@ -1,46 +1,46 @@
-./arch/i386/kernel/entry.S:78:need_resched	= 20
-./arch/i386/kernel/entry.S:208:	cmpl $0,need_resched(%ebx)
-./arch/i386/kernel/process.c:109:	oldval = xchg(&current->need_resched, -1);
-./arch/i386/kernel/process.c:122:				: :"m" (current->need_resched));
-./include/linux/sched.h:356:	volatile long need_resched;
-./include/linux/sched.h:1067:static inline void set_need_resched(void)
-./include/linux/sched.h:1069:	current->need_resched = 1;
-./include/linux/sched.h:1072:static inline void clear_need_resched(void)
-./include/linux/sched.h:1074:	current->need_resched = 0;
-./include/linux/sched.h:1077:static inline void set_tsk_need_resched(struct task_struct *tsk)
-./include/linux/sched.h:1079:	tsk->need_resched = 1;
-./include/linux/sched.h:1082:static inline void clear_tsk_need_resched(struct task_struct *tsk)
-./include/linux/sched.h:1084:	tsk->need_resched = 0;
-./include/linux/sched.h:1087:static inline int need_resched(void)
-./kernel/fork.c:793:		current->need_resched = 1;
-./kernel/sched.c:384:	need_resched = p->need_resched;
-./kernel/sched.c:386:	set_tsk_need_resched(p);
-./kernel/sched.c:390:	set_tsk_need_resched(p);
-./kernel/sched.c:762:		set_need_resched();
-./kernel/sched.c:836:		set_tsk_need_resched(p);
-./kernel/sched.c:848:			set_tsk_need_resched(p);
-./kernel/sched.c:868:		set_tsk_need_resched(p);
-./kernel/sched.c:904:need_resched:
-./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
-./kernel/sched.c:1030:	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
-./kernel/sched.c:1031:		goto need_resched;
-./kernel/sched.c:1808:	set_tsk_need_resched(idle);
+x	./arch/i386/kernel/entry.S:78:need_resched	= 20
+x	./arch/i386/kernel/entry.S:208:	cmpl $0,need_resched(%ebx)
+x	./arch/i386/kernel/process.c:109:	oldval = xchg(&current->need_resched, -1);
+x	./arch/i386/kernel/process.c:122:				: :"m" (current->need_resched));
+x	./include/linux/sched.h:356:	volatile long need_resched;
+x	./include/linux/sched.h:1067:static inline void set_need_resched(void)
+x	./include/linux/sched.h:1069:	current->need_resched = 1;
+x	./include/linux/sched.h:1072:static inline void clear_need_resched(void)
+x	./include/linux/sched.h:1074:	current->need_resched = 0;
+x	./include/linux/sched.h:1077:static inline void set_tsk_need_resched(struct task_struct *tsk)
+x	./include/linux/sched.h:1079:	tsk->need_resched = 1;
+x	./include/linux/sched.h:1082:static inline void clear_tsk_need_resched(struct task_struct *tsk)
+x	./include/linux/sched.h:1084:	tsk->need_resched = 0;
+x	./include/linux/sched.h:1087:static inline int need_resched(void)
+x	./kernel/fork.c:793:		current->need_resched = 1;
+x	./kernel/sched.c:384:	need_resched = p->need_resched;
+x	./kernel/sched.c:386:	set_tsk_need_resched(p);
+x	./kernel/sched.c:390:	set_tsk_need_resched(p);
+x	./kernel/sched.c:762:		set_need_resched();
+x	./kernel/sched.c:836:		set_tsk_need_resched(p);
+x	./kernel/sched.c:848:			set_tsk_need_resched(p);
+x	./kernel/sched.c:868:		set_tsk_need_resched(p);
+x	./kernel/sched.c:904:need_resched:
+x	./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
+x	./kernel/sched.c:1030:	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
+x	./kernel/sched.c:1031:		goto need_resched;
+x	./kernel/sched.c:1808:	set_tsk_need_resched(idle);
 
 
 
-./Documentation/sched-coding.txt:114:void set_tsk_need_resched(struct task_struct *tsk)
-./Documentation/sched-coding.txt:116:void clear_tsk_need_resched(struct task_struct *tsk)
-./Documentation/sched-coding.txt:118:void set_need_resched()
-./Documentation/sched-coding.txt:120:void clear_need_resched()
-./include/linux/sched.h:1067:static inline void set_need_resched(void)
-./include/linux/sched.h:1072:static inline void clear_need_resched(void)
-./include/linux/sched.h:1077:static inline void set_tsk_need_resched(struct task_struct *tsk)
-./include/linux/sched.h:1082:static inline void clear_tsk_need_resched(struct task_struct *tsk)
-./kernel/sched.c:386:	set_tsk_need_resched(p);
-./kernel/sched.c:390:	set_tsk_need_resched(p);
-./kernel/sched.c:762:		set_need_resched();
-./kernel/sched.c:836:		set_tsk_need_resched(p);
-./kernel/sched.c:848:			set_tsk_need_resched(p);
-./kernel/sched.c:868:		set_tsk_need_resched(p);
-./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
-./kernel/sched.c:1808:	set_tsk_need_resched(idle);
+x	./Documentation/sched-coding.txt:114:void set_tsk_need_resched(struct task_struct *tsk)
+x	./Documentation/sched-coding.txt:116:void clear_tsk_need_resched(struct task_struct *tsk)
+x	./Documentation/sched-coding.txt:118:void set_need_resched()
+x	./Documentation/sched-coding.txt:120:void clear_need_resched()
+x	./include/linux/sched.h:1067:static inline void set_need_resched(void)
+x	./include/linux/sched.h:1072:static inline void clear_need_resched(void)
+x	./include/linux/sched.h:1077:static inline void set_tsk_need_resched(struct task_struct *tsk)
+x	./include/linux/sched.h:1082:static inline void clear_tsk_need_resched(struct task_struct *tsk)
+x	./kernel/sched.c:386:	set_tsk_need_resched(p);
+x	./kernel/sched.c:390:	set_tsk_need_resched(p);
+x	./kernel/sched.c:762:		set_need_resched();
+x	./kernel/sched.c:836:		set_tsk_need_resched(p);
+x	./kernel/sched.c:848:			set_tsk_need_resched(p);
+x	./kernel/sched.c:868:		set_tsk_need_resched(p);
+x	./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
+x	./kernel/sched.c:1808:	set_tsk_need_resched(idle);
