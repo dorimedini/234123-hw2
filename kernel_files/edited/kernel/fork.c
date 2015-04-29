@@ -741,10 +741,19 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	 * This should also correctly handle the parent
 	 * becoming overdue, because scheduler_tick knows
 	 * what to do.
+	 *
+	 * We need to add code to update the remaining_trials,
+	 * though, and change the child's num_trials value
+	 * to be equal to it's new remaining_trials (so we can
+	 * calculate n - which trial the child is working on)
 	 */
 	p->time_slice = (current->time_slice + 1) >> 1;
 	p->first_time_slice = 1;
 	current->time_slice >>= 1;
+	/** START HW2 */
+	p->remaining_trials = p->trial_num = (current->remaining_trials + 1) >> 1;
+	current->remaining_trials >> 1;
+	/** END HW2 */
 	p->sleep_timestamp = jiffies;
 	if (!current->time_slice) {
 		/*
