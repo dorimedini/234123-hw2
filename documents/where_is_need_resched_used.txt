@@ -1,148 +1,27 @@
-./Documentation/DocBook/kernel-hacking.tmpl:if (current-&gt;need_resched)
-./Documentation/sched-coding.txt:void set_tsk_need_resched(struct task_struct *tsk)
-./Documentation/sched-coding.txt:	Sets need_resched in the given task.
-./Documentation/sched-coding.txt:void clear_tsk_need_resched(struct task_struct *tsk)
-./Documentation/sched-coding.txt:	Clears need_resched in the given task.
-./Documentation/sched-coding.txt:void set_need_resched()
-./Documentation/sched-coding.txt:	Sets need_resched in the current task.
-./Documentation/sched-coding.txt:void clear_need_resched()
-./Documentation/sched-coding.txt:	Clears need_resched in the current task.
-./Documentation/sched-coding.txt:int need_resched()
-./Documentation/sched-coding.txt:	Returns true if need_resched is set in the current task, false
-./arch/i386/kernel/apm.c:	while (!current->need_resched) {
-./arch/i386/kernel/entry.S:need_resched	= 20
-./arch/i386/kernel/entry.S:	cli				# need_resched and signals atomic test
-./arch/i386/kernel/entry.S:	cmpl $0,need_resched(%ebx)
-./arch/i386/kernel/process.c:		if (!current->need_resched)
-./arch/i386/kernel/process.c: * to poll the ->need_resched flag instead of waiting for the
-./arch/i386/kernel/process.c:	oldval = xchg(&current->need_resched, -1);
-./arch/i386/kernel/process.c:				: :"m" (current->need_resched));
-./arch/i386/kernel/process.c:		if (!current->need_resched)
-Binary file ./arch/i386/kernel/entry.o matches
-Binary file ./arch/i386/kernel/kernel.o matches
-./arch/i386/math-emu/fpu_entry.c:  if (FPU_lookahead && !current->need_resched)
-./crypto/ciphers/gen-cbc.h:		if (!atomic && current->need_resched)
-./crypto/ciphers/gen-cbc.h:		if (!atomic && current->need_resched)
-./crypto/ciphers/gen-cfb.h:		if (!atomic && current->need_resched)
-./crypto/ciphers/gen-cfb.h:		if (!atomic && current->need_resched)
-./crypto/ciphers/gen-ctr.h:		if (!atomic && current->need_resched)
-./crypto/ciphers/gen-ctr.h:		if (!atomic && current->need_resched)
-./crypto/ciphers/gen-ecb.h:		if (!atomic && current->need_resched) {
-./crypto/ciphers/gen-ecb.h:		if (!atomic && current->need_resched) {
-./crypto/ciphers/gen-rtc.h:		if (!atomic && current->need_resched)
-./crypto/ciphers/gen-rtc.h:		if (!atomic && current->need_resched)
-Binary file ./drivers/atm/eni.o matches
-Binary file ./drivers/atm/suni.o matches
-Binary file ./drivers/atm/zatm.o matches
-Binary file ./drivers/atm/uPD98402.o matches
-Binary file ./drivers/atm/nicstar.o matches
-Binary file ./drivers/atm/idt77252.o matches
-Binary file ./drivers/atm/idt77105.o matches
-Binary file ./drivers/atm/horizon.o matches
-Binary file ./drivers/atm/ambassador.o matches
-Binary file ./drivers/atm/atmtcp.o matches
-Binary file ./drivers/atm/iphase.o matches
-Binary file ./drivers/atm/firestream.o matches
-Binary file ./drivers/atm/lanai.o matches
-Binary file ./drivers/atm/fore200e.o matches
-Binary file ./drivers/atm/fore_200e.o matches
-./drivers/char/amd768_rng.c:		if(current->need_resched)
-./drivers/char/lp.c:		} else if (current->need_resched)
-./drivers/char/lp.c:		if (current->need_resched)
-./drivers/char/mem.c:		if (current->need_resched)
-./drivers/char/mwave/3780i.c:	if(current->need_resched)
-./drivers/char/mwave/3780i.c:	if(current->need_resched)
-./drivers/char/ppdev.c:		if (current->need_resched)
-./drivers/char/ppdev.c:		if (current->need_resched) {
-./drivers/char/random.c:		if ((flags & EXTRACT_ENTROPY_USER) && current->need_resched) {
-./drivers/char/tty_io.c:			if (current->need_resched)
-./drivers/i2c/i2c-algo-bit.c:                        if (need_resched) schedule();
-./drivers/i2c/i2c-algo-bit.c:		if (current->need_resched)
-./drivers/i2c/i2c-algo-ite.c:                        if (need_resched) schedule();
-./drivers/md/md.c:		if (md_need_resched(current))
-./drivers/media/radio/radio-sf16fmi.c:		if(current->need_resched)
-./drivers/media/radio/radio-sf16fmi.c:		if(current->need_resched)
-./drivers/media/video/c-qcam.c:		if (current->need_resched)
-./drivers/media/video/c-qcam.c:			if (current->need_resched)
-./drivers/media/video/c-qcam.c:			if (current->need_resched)
-./drivers/media/video/cpia.c:				if (current->need_resched)
-./drivers/media/video/cpia.c:		if (current->need_resched)
-./drivers/media/video/cpia.c:		if (current->need_resched)
-./drivers/media/video/saa5249.c:          if (current->need_resched) \
-./drivers/mtd/chips/amd_flash.c:		if (current->need_resched) {
-./drivers/mtd/chips/amd_flash.c:		if (current->need_resched)
-./drivers/mtd/devices/doc2000.c:		if (current->need_resched) {
-./drivers/parport/ieee1284.c:		if (current->need_resched)
-./drivers/parport/ieee1284_ops.c:			    && current->need_resched)
-./drivers/parport/parport_pc.c:		if (current->need_resched && time_before (jiffies, expire))
-./drivers/parport/parport_pc.c:				if (current->need_resched &&
-./drivers/parport/parport_pc.c:			if (current->need_resched)
-./drivers/parport/parport_pc.c:		if (current->need_resched)
-./drivers/parport/parport_pc.c:		if (current->need_resched && time_before (jiffies, expire))
-./drivers/parport/parport_pc.c:				if (current->need_resched &&
-./drivers/sound/via82cxxx_audio.c:	if (current->need_resched) {
-./drivers/sound/via82cxxx_audio.c:	if (current->need_resched) {
-./fs/jbd/commit.c:	if (bufs || current->need_resched) {
-./fs/jbd/commit.c:		if (current->need_resched)
-./fs/jbd/commit.c:			if (current->need_resched)
-./fs/jffs2/background.c:		if (current->need_resched)
-./fs/jffs2/erase.c:		if (current->need_resched)
-./fs/jffs2/nodemgmt.c:			if (current->need_resched)
-./fs/jfs/jfs_txnmgr.c:			if (current->need_resched)
-./fs/jfs/jfs_txnmgr.c:				if (current->need_resched)
-./fs/namei.c:	if (current->need_resched) {
-./fs/reiserfs/inode.c:	if (current->need_resched)
-./include/linux/low-latency.h:#define conditional_schedule_needed() ((enable_lowlatency == 2) || (enable_lowlatency && current->need_resched))
-./include/linux/low-latency.h:#define conditional_schedule_needed() (enable_lowlatency && current->need_resched)
-./include/linux/low-latency.h:#define conditional_schedule_needed() (current->need_resched)
-./include/linux/mtd/cfi.h:	if (current->need_resched) {
-./include/linux/raid/md_compatible.h:#define md_need_resched(tsk) ((tsk)->need_resched)
-./include/linux/sched.h:	volatile long need_resched;
-./include/linux/sched.h:static inline void set_need_resched(void)
-./include/linux/sched.h:	current->need_resched = 1;
-./include/linux/sched.h:static inline void clear_need_resched(void)
-./include/linux/sched.h:	current->need_resched = 0;
-./include/linux/sched.h:static inline void set_tsk_need_resched(struct task_struct *tsk)
-./include/linux/sched.h:	tsk->need_resched = 1;
-./include/linux/sched.h:static inline void clear_tsk_need_resched(struct task_struct *tsk)
-./include/linux/sched.h:	tsk->need_resched = 0;
-./include/linux/sched.h:static inline int need_resched(void)
-./include/linux/sched.h:	return unlikely(current->need_resched);
-./kernel/fork.c:		current->need_resched = 1;
-./kernel/printk.c:	if (console_may_schedule && current->need_resched) {
-./kernel/sched.c:	int need_resched;
-./kernel/sched.c:	need_resched = p->need_resched;
-./kernel/sched.c:	set_tsk_need_resched(p);
-./kernel/sched.c:	if (!need_resched && (p->cpu != smp_processor_id()))
-./kernel/sched.c:	set_tsk_need_resched(p);
-./kernel/sched.c:		set_need_resched();
-./kernel/sched.c:		set_tsk_need_resched(p);
-./kernel/sched.c:			set_tsk_need_resched(p);
-./kernel/sched.c:		set_tsk_need_resched(p);
-./kernel/sched.c:need_resched:
-./kernel/sched.c:	clear_tsk_need_resched(prev);
-./kernel/sched.c:	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
-./kernel/sched.c:		goto need_resched;
-./kernel/sched.c:	set_tsk_need_resched(idle);
-./kernel/signal.c: * No need to set need_resched since signal event passing
-./kernel/softirq.c:			if (current->need_resched)
-./mm/filemap.c:		if (current->need_resched) {
-./mm/swapfile.c:		if (current->need_resched)
-./mm/vmscan.c:		if (current->need_resched) {
-./mm/vmscan.c:		if (current->need_resched) {
-./net/core/pktgen.c:		if (netif_queue_stopped(odev) || current->need_resched) {
-./net/core/pktgen.c:				if (current->need_resched)
-./net/sunrpc/sched.c:		if (++count >= 200 || current->need_resched) {
-./net/tux/accept.c:		if (current->need_resched)
-./net/tux/main.c:	if (unlikely(current->need_resched)) {
-./net/tux/main.c:	while (current->need_resched) {
-./net/tux/main.c:	while (current->need_resched) {
-./tags:clear_need_resched	include/linux/sched.h	/^static inline void clear_need_resched(void)$/;"	f	file:
-./tags:clear_tsk_need_resched	include/linux/sched.h	/^static inline void clear_tsk_need_resched(struct task_struct *tsk)$/;"	f	file:
-./tags:md_need_resched	include/linux/raid/md_compatible.h	136;"	d	file:
-./tags:need_resched	arch/i386/kernel/entry.S	/^need_resched	= 20$/;"	d
-./tags:need_resched	include/linux/sched.h	/^	volatile long need_resched;$/;"	m	struct:task_struct	file:
-./tags:need_resched	include/linux/sched.h	/^static inline int need_resched(void)$/;"	f	file:
-./tags:set_need_resched	include/linux/sched.h	/^static inline void set_need_resched(void)$/;"	f	file:
-./tags:set_tsk_need_resched	include/linux/sched.h	/^static inline void set_tsk_need_resched(struct task_struct *tsk)$/;"	f	file:
-Binary file ./vmlinux matches
+./arch/i386/kernel/entry.S:78:need_resched	= 20
+./arch/i386/kernel/entry.S:208:	cmpl $0,need_resched(%ebx)
+./arch/i386/kernel/process.c:109:	oldval = xchg(&current->need_resched, -1);
+./arch/i386/kernel/process.c:122:				: :"m" (current->need_resched));
+./include/linux/sched.h:356:	volatile long need_resched;
+./include/linux/sched.h:1067:static inline void set_need_resched(void)
+./include/linux/sched.h:1069:	current->need_resched = 1;
+./include/linux/sched.h:1072:static inline void clear_need_resched(void)
+./include/linux/sched.h:1074:	current->need_resched = 0;
+./include/linux/sched.h:1077:static inline void set_tsk_need_resched(struct task_struct *tsk)
+./include/linux/sched.h:1079:	tsk->need_resched = 1;
+./include/linux/sched.h:1082:static inline void clear_tsk_need_resched(struct task_struct *tsk)
+./include/linux/sched.h:1084:	tsk->need_resched = 0;
+./include/linux/sched.h:1087:static inline int need_resched(void)
+./kernel/fork.c:793:		current->need_resched = 1;
+./kernel/sched.c:384:	need_resched = p->need_resched;
+./kernel/sched.c:386:	set_tsk_need_resched(p);
+./kernel/sched.c:390:	set_tsk_need_resched(p);
+./kernel/sched.c:762:		set_need_resched();
+./kernel/sched.c:836:		set_tsk_need_resched(p);
+./kernel/sched.c:848:			set_tsk_need_resched(p);
+./kernel/sched.c:868:		set_tsk_need_resched(p);
+./kernel/sched.c:904:need_resched:
+./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
+./kernel/sched.c:1030:	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
+./kernel/sched.c:1031:		goto need_resched;
+./kernel/sched.c:1808:	set_tsk_need_resched(idle);
