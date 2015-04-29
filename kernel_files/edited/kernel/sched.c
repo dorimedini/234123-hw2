@@ -57,6 +57,10 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 	info[index].time = jiffies;
 	info[index].reason = prev->switch_reason;
 	
+	// Reset the switch reason so we don't log
+	// the same reason twice by accident...
+	prev->switch_reason = SWITCH_UNKNOWN;
+	
 	// Update outer fields:
 	logger->next_index++;
 	logger->next_index %= 150;
