@@ -490,12 +490,22 @@ struct task_struct {
 	int remaining_trials;
 	
 	/**
-	 * HW2
+	 * HW2:
 	 *
 	 * Save the requested time
 	 */
 	int requested_time;
-
+	
+	/**
+	 * HW2:
+	 *
+	 * To log context switch reasons, we need to store
+	 * the reason in the task itself because the context
+	 * switching functions have no way to know why the
+	 * need_resched bit was turned on...
+	 */
+	int switch_reason;
+	
 };
 
 
@@ -646,8 +656,9 @@ extern struct exec_domain	default_exec_domain;
     blocked:		{{0}},						\
     alloc_lock:		SPIN_LOCK_UNLOCKED,				\
     journal_info:	NULL,						\
+	switch_reason:	0,							\
 }
-
+/** HW2: the switch_reason above needs to be initialized to 0 */
 
 #ifndef INIT_TASK_SIZE
 # define INIT_TASK_SIZE	2048*sizeof(long)
