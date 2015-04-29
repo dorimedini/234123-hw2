@@ -232,8 +232,12 @@ struct runqueue {
 	 * curr_overdue_SHORT:
 	 * A pointer to the last overdue-SHORT process in overdue_SHORT[]
 	 * (which is in fact the next overdue-SHORT process to run)
+	 *
+	 * After reading a bit about the linux list_t, and realising that
+	 * the last element can be reached in O(1) because it's a circular
+	 * list, I think we don't need this field at all...
 	 */
-	list_t curr_overdue_SHORT;
+	//list_t curr_overdue_SHORT;
 	
 } ____cacheline_aligned;
 
@@ -1049,8 +1053,12 @@ pick_next_task:
 	// (because rq->nr_running != 0)
 	else if (!hw2_debug && idx == MAX_PRIO) {
 		
-		// Let's assume the pointer curr_overdue_SHORT is valid.
-		next = list_entry(&rq->curr_overdue_SHORT, task_t, run_list);
+		// Let's assume the overdue_SHORT list isn't empty.
+		// This can be easily tested by calling
+		// list_empty(&rq->overdue_SHORT), if we want.
+		// As the list_t is circular, to get the last element
+		// just do .prev
+		next = list_entry(rq->overdue_SHORT.prev, task_t, run_list);
 		
 	}
 	// If we should be running an OTHER task:
@@ -1060,7 +1068,6 @@ pick_next_task:
 	}
 	
 	/* queue = array->queue + idx; */
-	/* next = list_entry(curr_overdue_SHORT, task_t, run_list); */
 	/** END HW2 */
 	
 	
@@ -1913,7 +1920,6 @@ void __init sched_init(void)
 		rq->active_SHORT = rq->arrays + 2;
 		rq->expired_SHORT = rq->arrays + 3;
 		INIT_LIST_HEAD(&rq->overdue_SHORT);
-		INIT_LIST_HEAD(&rq->curr_overdue_SHORT);
 		/** END HW2 */
 		spin_lock_init(&rq->lock);
 		INIT_LIST_HEAD(&rq->migration_queue);
