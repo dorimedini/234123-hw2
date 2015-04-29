@@ -322,7 +322,19 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 static inline int effective_prio(task_t *p)
 {
 	int bonus, prio;
-
+	
+	/**
+	 * HW2:
+	 *
+	 * If the process is SHORT, just return the static_prio.
+	 * The process's nice is already calculated in the
+	 * static_prio, and we don't want any bonuses of any kind!
+	 */
+	/** START HW2 */
+	if (p->policy == SCHED_SHORT)
+		return p->static_prio;
+	/** END HW2 */
+	
 	/*
 	 * Here we scale the actual sleep average [0 .... MAX_SLEEP_AVG]
 	 * into the -5 ... 0 ... +5 bonus/penalty range.
