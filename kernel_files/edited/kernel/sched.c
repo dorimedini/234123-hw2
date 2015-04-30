@@ -95,6 +95,21 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
  * If it's an OTHER process, just enqueue it in rq->active.
  * If it's a non-overdue SHORT, enqueue in rq->active_SHORT
  * If it's overdue, add to the head of the overdue_SHORT list
+ *
+ * When dequeueing a non-overdue process, perform similar
+ * actions as in hw2_enqueue. If we're dequeueing an overdue
+ * SHORT task we need to take care of the list structure.
+ *
+ * enqueue_task also does p->array->nr_running++,
+ * but an overdue task doesn't have a counter.
+ * It doesn't matter - the runqueue's counter isn't
+ * touched by enqueue_task, so it's value should be
+ * valid here.
+ * For example, we can see in the code things like:
+ * - enqueue_task(p,rq->active);
+ * - rq->nr_running++;
+ * meaning enqueue_task isn't responsible for counting
+ * the number of tasks in the runqueue.
  */
 void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
 	if (p->policy != SCHED_SHORT) {	// Regular process
@@ -104,21 +119,23 @@ void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
 		enqueue_task(p, make_active ? rq->active_SHORT : rq->expired_SHORT);
 	}
 	else {							// Overdue SHORT. make_active is irrelevant
+		// Add the overdue task to it's FIFO list
 		list_add(&p->run_list, &rq->overdue_SHORT);
-		
-		// Add stuff enqueue_task usually does.
+		// enqueue_task is responsible for this pointer,
+		// so we should nullify it here
 		p->array = NULL;
-		
-		// enqueue_task also does p->array->nr_running++,
-		// but an overdue task doesn't have a counter.
-		// It doesn't matter - the runqueue's counter isn't
-		// touched by enqueue_task, so it's value should be
-		// valid here.
-		// For example, we can see in the code things like:
-		// - enqueue_task(p,rq->active);
-		// - rq->nr_running++;
-		// meaning enqueue_task isn't responsible for counting
-		// the number of tasks in the runqueue.
+	}
+}
+void hw2_dequeue(task_t* p, prio_array_t* array) {
+
+	// If this isn't an overdue process, dequeue_task
+	// doesn't need to know if this is a SHORT or not.
+	if (p->policy != SCHED_SHORT || p->remaining_trials) {
+		dequeue_task(p, array);
+	}
+	else {		// Overdue SHORT
+		// Remove the task from the list
+		list_del(&p->run_list);
 	}
 }
 
@@ -444,7 +461,10 @@ static inline void deactivate_task(struct task_struct *p, runqueue_t *rq)
 	rq->nr_running--;
 	if (p->state == TASK_UNINTERRUPTIBLE)
 		rq->nr_uninterruptible++;
-	dequeue_task(p, p->array);
+	/** START HW2 */
+	// dequeue_task(p, p->array); Original code
+	hw2_dequeue(p, p->array);
+	/** END HW2 */
 	p->array = NULL;
 }
 
@@ -751,6 +771,14 @@ static void load_balance(runqueue_t *this_rq, int idle)
 		}
 	}
 
+	/**
+	 * HW2:
+	 *
+	 * As we're assuming there's only one CPU, this function
+	 * will always return here. The only way busiest!=NULL
+	 * is if rq_src!=this_rq sometime in the code above - as
+	 * there is only one runqueue, this won't happen.
+	 */
 	if (likely(!busiest))
 		return;
 
@@ -825,6 +853,7 @@ skip_queue:
 	 * take the task out of the other runqueue and
 	 * put it into this one:
 	 */
+	// HW2: No need to change this (see above comment)
 	dequeue_task(next, array);
 	busiest->nr_running--;
 	next->cpu = this_cpu;
@@ -939,6 +968,8 @@ void scheduler_tick(int user_tick, int system)
 			set_tsk_need_resched(p);
 
 			/* put it at the end of the queue: */
+			// HW2: No need to change this because
+			// p isn't a SHORT process
 			dequeue_task(p, rq->active);
 			enqueue_task(p, rq->active);
 		}
@@ -962,6 +993,8 @@ void scheduler_tick(int user_tick, int system)
 	 * from SCHED_SHORT , so continue with the regular check.  
 	 */		
 		if (p->policy != SCHED_SHORT) {
+			// HW2: No need to change this because
+			// p isn't a SHORT process
 			dequeue_task(p, rq->active);
 			set_tsk_need_resched(p);
 
@@ -980,7 +1013,8 @@ void scheduler_tick(int user_tick, int system)
 	 * Dealing with SCHED_SHORT policy.  
 	 */
 		} else if (p->remaining_trials) {
-			dequeue_task(p, rq->active_SHORT);    			// Get the proc out from our active array
+			
+			hw2_dequeue(p, p->array/*==rq->active_SHORT*/);	// Get the proc out from our active array
 			set_tsk_need_resched(p);
 
 			p->first_time_slice = 0; 
@@ -1354,7 +1388,7 @@ void set_user_nice(task_t *p, long nice)
 	}
 	array = p->array;
 	if (array)
-		dequeue_task(p, array);	/** HW2: This is OK for shorts as well */
+		hw2_dequeue(p, array);	/** HW2: This is OK for shorts as well */
 	p->static_prio = NICE_TO_PRIO(nice);
 	p->prio = NICE_TO_PRIO(nice);
 	if (array) {
