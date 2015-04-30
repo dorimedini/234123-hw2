@@ -29,8 +29,8 @@ v	./kernel/sched.c:868:		set_tsk_need_resched(p);
 v	./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
 v	./kernel/sched.c:1808:	set_tsk_need_resched(idle);
 
-x	./kernel/sched.c:379:static inline void resched_task(task_t *p)
+v	./kernel/sched.c:379:static inline void resched_task(task_t *p)
 x	./kernel/sched.c:431:		resched_task(p);
-x	./kernel/sched.c:470:		 * If sync is set, a resched_task() is a NOOP
+v	./kernel/sched.c:470:		 * If sync is set, a resched_task() is a NOOP
 x	./kernel/sched.c:473:			resched_task(rq->curr);
-x	./kernel/sched.c:1215:			resched_task(rq->curr);
+v	./kernel/sched.c:1215:			resched_task(rq->curr);

@@ -635,7 +635,7 @@ repeat:
 void kick_if_running(task_t * p)
 {
 	if (p == task_rq(p)->curr)
-		resched_task(p);
+		resched_task(p);	// This is only called from kernel/signal.c, I don't think we need to log something here
 }
 #endif
 
@@ -1198,6 +1198,9 @@ need_resched:
 		}
 	default:
 		deactivate_task(prev, rq);					// If we're uninterruptible, deactivate the task
+		/** START HW2 */
+		UPDATE_REASON(current, SWITCH_PREV_WAIT);
+		/** END HW2 */
 	case TASK_RUNNING:								// Otherwise no one cares so shut up
 		;
 	}
@@ -1304,6 +1307,10 @@ switch_tasks:
 	} else
 		spin_unlock_irq(&rq->lock);
 	finish_arch_schedule(prev);
+	
+	reacquire_kernel_lock(current);
+	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
+		goto need_resched;
 
 	/**
 	 * HW2:
@@ -1315,10 +1322,6 @@ switch_tasks:
 	UPDATE_REASON(prev,SWITCH_UNKNOWN);
 	/** END HW2 */
 
-	
-	reacquire_kernel_lock(current);
-	if (need_resched())								// Why would we need this...? Interrupt for some hardware signal?
-		goto need_resched;
 }
 
 /*
@@ -1515,8 +1518,12 @@ void set_user_nice(task_t *p, long nice)
 		 * If the task is running and lowered its priority,
 		 * or increased its priority then reschedule its CPU:
 		 */
-		if ((NICE_TO_PRIO(nice) < p->static_prio) || (p == rq->curr))
+		if ((NICE_TO_PRIO(nice) < p->static_prio) || (p == rq->curr)) {
 			resched_task(rq->curr);
+			/** START HW2 */
+			UPDATE_REASON(current, SWITCH_PRIO);
+			/** END HW2 */
+		}
 	}
 out_unlock:
 	task_rq_unlock(rq, &flags);

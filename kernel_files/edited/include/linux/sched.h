@@ -353,7 +353,7 @@ enum SWITCH_REASONS {
 	SWITCH_ENDED,		// 2: A task ended
 	SWITCH_YIELD,		// 3: A task gave up the CPU
 	SWITCH_OVERDUE,		// 4: A SHORT task became overdue
-	SWITCH_PREV_WAIT,	// 5: The task switched from has yielded the CPU because it started waiting
+	SWITCH_PREV_WAIT,	// 5: The task switched from the CPU because it started waiting
 	SWITCH_PRIO,		// 6: A task with a higher priority returned from waiting
 	SWITCH_SLICE		// 7: The previous task ran out of time
 };
