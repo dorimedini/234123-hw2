@@ -937,11 +937,11 @@ void scheduler_tick(int user_tick, int system)
 	/** 
 	 * HW2: 
 	 * If the current proc's policy is different
-	 * from SCHED_SHORT , so continue with the regular check.  
+	 * from SCHED_SHORT, so continue with the regular check.  
 	 */
 	if (p->policy != SCHED_SHORT) {
 		if (p->array != rq->active) {																								// array but still running.
-			set_tsk_need_resched(p);								 
+			set_tsk_need_resched(p);
 			return;
 		}
 	/** 
@@ -966,6 +966,9 @@ void scheduler_tick(int user_tick, int system)
 			p->time_slice = TASK_TIMESLICE(p);
 			p->first_time_slice = 0;
 			set_tsk_need_resched(p);
+			/** START HW2 */
+			UPDATE_REASON(p, SWITCH_SLICE);
+			/** END HW2 */
 
 			/* put it at the end of the queue: */
 			// HW2: No need to change this because
@@ -997,6 +1000,9 @@ void scheduler_tick(int user_tick, int system)
 			// p isn't a SHORT process
 			dequeue_task(p, rq->active);
 			set_tsk_need_resched(p);
+			/** START HW2 */
+			UPDATE_REASON(p, SWITCH_SLICE);
+			/** END HW2 */
 
 			p->prio = effective_prio(p);
 			p->first_time_slice = 0;
@@ -1016,11 +1022,13 @@ void scheduler_tick(int user_tick, int system)
 			
 			hw2_dequeue(p, p->array/*==rq->active_SHORT*/);	// Get the proc out from our active array
 			set_tsk_need_resched(p);
+			UPDATE_REASON(p, SWITCH_SLICE);
 
 			p->first_time_slice = 0; 
 			if (!--p->remaining_trials) {					// If it became overdue
 				p->time_slice = 1;
 				hw2_enqueue(p,rq,1);
+				UPDATE_REASON(p, SWITCH_OVERDUE);
 			} else {
 				p->time_slice = (p->requested_time) / ((p->trial_num - p->remaining_trials) + 1);
 				hw2_enqueue(p,rq,0);
@@ -1667,6 +1675,10 @@ asmlinkage long sys_sched_getparam(pid_t pid, struct sched_param *param)
 	if (!p)
 		goto out_unlock;
 	lp.sched_priority = p->rt_priority;
+	/** START HW2 */
+	lp.trial_num = p->remaining_trials;
+	lp.requested_time = p->requested_time;
+	/** END HW2 */
 	read_unlock(&tasklist_lock);
 
 	/*
@@ -1828,6 +1840,9 @@ asmlinkage long sys_sched_get_priority_max(int policy)
 		ret = MAX_USER_RT_PRIO-1;
 		break;
 	case SCHED_OTHER:
+	/** START HW2 */
+	case SCHED_SHORT:
+	/** END HW2 */
 		ret = 0;
 		break;
 	}
@@ -1844,6 +1859,9 @@ asmlinkage long sys_sched_get_priority_min(int policy)
 		ret = 1;
 		break;
 	case SCHED_OTHER:
+	/** START HW2 */
+	case SCHED_SHORT:
+	/** END HW2 */
 		ret = 0;
 	}
 	return ret;
