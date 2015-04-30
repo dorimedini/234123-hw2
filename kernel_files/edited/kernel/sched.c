@@ -250,7 +250,7 @@ struct runqueue {
 	unsigned long nr_running, nr_switches, expired_timestamp;
 	signed long nr_uninterruptible;
 	task_t *curr, *idle;
-	prio_array_t *active, *expired, arrays[/*2*/4];	// We need two extra prio_arrays
+	prio_array_t *active, *expired, arrays[/*2*/4 /* expired_SHORT for the grep */];	// We need two extra prio_arrays
 	int prev_nr_running[NR_CPUS];
 	task_t *migration_thread;
 	list_t migration_queue;
