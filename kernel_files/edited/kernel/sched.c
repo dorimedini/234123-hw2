@@ -2110,7 +2110,7 @@ void __init sched_init(void)
 		spin_lock_init(&rq->lock);
 		INIT_LIST_HEAD(&rq->migration_queue);
 
-		for (j = 0; j < /*2*/4; j++) {	/** HW2: from 0 to 4, not 2 */
+		for (j = 0; j < /*2*/3; j++) {	/** HW2: from 0 to 3, not 2 */
 			array = rq->arrays + j;
 			for (k = 0; k < MAX_PRIO; k++) {
 				INIT_LIST_HEAD(array->queue + k);
