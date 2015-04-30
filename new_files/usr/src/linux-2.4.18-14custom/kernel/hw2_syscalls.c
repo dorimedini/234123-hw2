@@ -49,7 +49,7 @@ int sys_remaining_time(int pid) {
 	// Return the data
 	// NOTE: This depends on the fact that overdue processes
 	// have a time-slice of zero!
-	return (task->time_slice * 1000) / HZ;
+	return hw2_ticks_to_ms(task->time_slice);
 	
 }
 

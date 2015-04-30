@@ -81,6 +81,14 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 		logger->remaining_switches--;
 }
 
+/**
+ * HW2:
+ *
+ * Convert milliseconds to ticks, or vice versa
+ */
+#define hw2_ms_to_ticks(val) (HZ * (val) / 1000)
+#define hw2_ticks_to_ms(val) (1000 * (val) / HZ)
+
 
 /**
  * HW2:
@@ -1030,7 +1038,7 @@ void scheduler_tick(int user_tick, int system)
 				hw2_enqueue(p,rq,1);
 				UPDATE_REASON(p, SWITCH_OVERDUE);
 			} else {
-				p->time_slice = (HZ * p->requested_time / 1000) / ((p->trial_num - p->remaining_trials) + 1);
+				p->time_slice = (hw2_ms_to_ticks(p->requested_time)) / ((p->trial_num - p->remaining_trials) + 1);
 				hw2_enqueue(p,rq,0);
 			}
 		}
@@ -1601,7 +1609,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		p->trial_num = p->remaining_trials = lp.trial_num;
 
 		// Requested time is also the first time slice
-		p->time_slice = lp.requested_time;
+		p->time_slice = hw2_ms_to_ticks(lp.requested_time);
 		
 	}
 	/** END HW2 */

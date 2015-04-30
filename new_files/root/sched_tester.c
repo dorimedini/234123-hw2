@@ -75,10 +75,10 @@ int main(int argc, char** argv) {
 	}
 	
 	// Get the statistics
-	int switches = get_scheduling_statistic(info);
+	int num_switches = get_scheduling_statistic(info);
 	
 	// Print them
-	print_info(info, switches);
+	print_info(info, num_switches);
 	
 	return 0;
 }
