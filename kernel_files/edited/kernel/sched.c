@@ -155,6 +155,24 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
 	}
 }
 
+
+/**
+ * HW2:
+ *
+ * Calculate whether or not the old task is more important
+ * than the new, regarding the value of prio.
+ *
+ * Doesn't calculated dynamic priority.
+ */
+int should_switch(task_t* oldt, task_t* newt) {
+
+	// Overdue process never switches any other process
+	if (is_overdue(newt))
+		return 0;
+	
+	
+}
+
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
  * to static priority [ MAX_RT_PRIO..MAX_PRIO-1 ],
@@ -587,37 +605,7 @@ repeat_lock_task:
 		 */
 		// If the priority value is smaller:
 		if (p->prio < rq->curr->prio) {
-			// If the new process is an OTHER and the current is either OTHER or overdue
-			if (p->policy == SCHED_OTHER && (rq->curr->policy != SHORT || is_overdue(rq->curr))) {
-				UPDATE_REASON(rq->curr, SWITCH_PRIO);
-				resched_task(rq->curr);	// Old code, still needed
-			}
-			// If the new process is a SHORT, it isn't a RT
-			// because it's prio is smaller
-			else if (p->policy == SCHED_SHORT && !is_overdue(p)) {
-				UPDATE_REASON(rq->curr, SWITCH_PRIO);
-				resched_task(rq->curr);	// Old code, still needed
-			}
-			// If it's a RT process
-			else if (p->policy != SCHED_OTHER) {
-				UPDATE_REASON(rq->curr, SWITCH_PRIO);
-				resched_task(rq->curr);	// Old code, still needed
-			}			
-		}
-		// The new priority is lower (larger number) but we still
-		// may need to switch, for example if the currently running
-		// task is overdue with a higher prio value or the new task
-		// is a SHORT
-		else {
-			// If the new process is a non-overdue SHORT:
-			if (p->policy == SCHED_SHORT && !is_overdue(p)) {
-				// If the other (old) task is overdue or an OTHER (note
-				// that if we're here, the other process may be RT):
-				if (rq->curr->policy == SCHED_OTHER || is_overdue(rq->curr)) {
-					UPDATE_REASON(rq->curr, SWITCH_PRIO);
-					resched_task(rq->curr);	// Old code, still needed
-				}
-			}
+			resched_task(rq->curr);	// Old code, still needed
 		}
 		success = 1;
 	}
