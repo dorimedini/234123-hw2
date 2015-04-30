@@ -110,6 +110,33 @@ int is_overdue(task_t* p) {
 /**
  * HW2:
  *
+ * Returns 1 if this is an real time process
+ */
+int is_rt(task_t* p) {
+	return (p->policy == SCHED_RR || p->policy == SCHED_FIFO ) ? 1 : 0;
+} 
+
+/**
+ * HW2:
+ *
+ * Returns 1 if this is an SHORT process
+ */
+int is_short(task_t* p) {
+	return (p->policy == SCHED_SHORT) ? 1 : 0;
+} 
+
+/**
+ * HW2:
+ *
+ * Returns 1 if this is an OTHER process
+ */
+int is_other(task_t* p) { 
+	return (p->policy == SCHED_OTHER) ? 1 : 0;
+} 
+
+/**
+ * HW2:
+ *
  * Before calls to enqueue or dequeue, we need
  * to decide which prio_array or list_t to add
  * the process to.
@@ -169,7 +196,7 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
 
 
 /**
- * HW2:
+ * HW2:  IMPORTENT NEED TO TEST THIS !
  *
  * Calculate whether or not the old task is more important
  * than the new, regarding the value of prio.
@@ -179,9 +206,47 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
 int should_switch(task_t* oldt, task_t* newt) {
 
 	// Overdue process never switches any other process
-	if (is_overdue(newt))
+	if (is_overdue(newt)) {
 		return 0;
-	
+	}
+	// New process is rt 
+	if (rt_task(newt)) {
+		return (!rt_task(oldt) || oldt->prio > newt->prio);
+	}
+
+	// In this case the new process isn't overdue or rt.
+	// So lets see some cases which the new process is short.
+	if (is_short(newt) ) {
+		if (is_short(oldt)) {
+			// is_short func check for short or overdue so in those both cases return 1.
+			if (is_overdue(oldt)) {
+				// The old process is overdue and a little cute short (not overdue process) wants to run.
+				return 1;
+			} else {
+				// Both processes are shorts (not overdues) let's compare their dick's lenght.
+				return (oldt->prio > newt->prio);
+			}
+		// The old process is not short 
+		} else {
+			return (!rt_task(oldt);
+		}
+	} else {
+		if (is_short(oldt)) {
+			return 0;
+		} else {
+			// That means the new is other.
+			if (is_short(oldt)) {
+				return is_overdue(oldt);
+			} else {
+				if (rt_task(oldt)) {
+					return 0;
+				} else {
+					return newt->prio < old->prio;
+				}
+			}
+		}
+
+	}
 	
 }
 
