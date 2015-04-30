@@ -37,6 +37,15 @@ extern hw2_switch_log hw2_logger;
 /**
  * HW2:
  *
+ * Set this debug flag to 1 if you want OTHER
+ * processes to run before SHORT (hoping this works)
+ */
+int hw2_debug = 0;
+
+
+/**
+ * HW2:
+ *
  * Update the switch reason of a task.
  * Only if the new reason is of lower numerical value
  * should we switch
@@ -132,7 +141,10 @@ void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
 		enqueue_task(p, make_active ? rq->active : rq->expired);
 	}
 	else if (p->remaining_trials) {	// Non-overdue SHORT
-		enqueue_task(p, make_active ? rq->active_SHORT : rq->expired_SHORT);
+		// Note that with this form of round-robin,
+		// we want to enqueue "expired" tasks to the
+		// end of the priority list.
+		enqueue_task(p, rq->active_SHORT);
 	}
 	else {							// Overdue SHORT. make_active is irrelevant
 		// Add the overdue task to it's FIFO list
@@ -284,7 +296,7 @@ struct runqueue {
 	unsigned long nr_running, nr_switches, expired_timestamp;
 	signed long nr_uninterruptible;
 	task_t *curr, *idle;
-	prio_array_t *active, *expired, arrays[/*2*/4 /* expired_SHORT for the grep */];	// We need two extra prio_arrays
+	prio_array_t *active, *expired, arrays[/*2*/3];	// We need an extra prio_array
 	int prev_nr_running[NR_CPUS];
 	task_t *migration_thread;
 	list_t migration_queue;
@@ -317,8 +329,10 @@ struct runqueue {
 	 *         corresponding pointer in active_SHORT. Then, choose
 	 *         a process to run from the Q group in the new active_SHORT
 	 *         queue.
+	 *
+	 * UPDATE: WE DON'T NEED THIS!
 	 */
-	prio_array_t *expired_SHORT;
+	//prio_array_t *expired_SHORT;
 	
 	/**
 	 * HW2:
@@ -1164,32 +1178,18 @@ pick_next_task:
 	 * To do this:
 	 * 1. Check if there's a RT process by checking if idx<=MAX_RT_PRIO.
 	 * 2. Check if there's a SHORT task to run by checking if there's any
-	 *    process in active_SHORT or expired_SHORT
+	 *    process in active_SHORT
 	 */
 	/** START HW2 */
-	int hw2_debug = 0;
-	int highest_prio_active_short = sched_find_first_bit(rq->active_SHORT->bitmap);
-	int highest_prio_expired_short = sched_find_first_bit(rq->expired_SHORT->bitmap);
+	int highest_prio_short = sched_find_first_bit(rq->active_SHORT->bitmap);
 	// Are there SHORTS we should run?
-	if (!hw2_debug && (idx > MAX_RT_PRIO-1 && (highest_prio_expired_short != MAX_PRIO || highest_prio_active_short != MAX_PRIO))) {
+	// Check if idx isn't a RT priority and that there is some SHORT to run
+	if (!hw2_debug && (idx > MAX_RT_PRIO-1 && highest_prio_short != MAX_PRIO)) {
 		
 		// YES!!
 		
-		// Define this int for debug purposes
-		
-		// Check if we need to switch an expired list to active mode.
-		// If a high priority queue has expired and it's priority is
-		// higher than any priority in the active queue, we still need to
-		// run the expired high-priority SHORTs.
-		if (highest_prio_expired_short < highest_prio_active_short) {
-			list_t tmp = *(rq->active_SHORT->queue + highest_prio_expired_short);
-			*(rq->active_SHORT->queue + highest_prio_expired_short) = *(rq->expired_SHORT->queue + highest_prio_expired_short);
-			*(rq->expired_SHORT->queue + highest_prio_expired_short) = tmp;
-			highest_prio_active_short = highest_prio_expired_short;
-		}
-		
 		// Set the next task
-		queue = rq->active_SHORT->queue + highest_prio_active_short;
+		queue = rq->active_SHORT->queue + highest_prio_short;
 		next = list_entry(queue->next, task_t, run_list);
 		
 	}
@@ -2101,11 +2101,10 @@ void __init sched_init(void)
 		/**
 		 * HW2:
 		 *
-		 * Initialize the new arrays
+		 * Initialize the new array & list
 		 */
 		/** START HW2 */
 		rq->active_SHORT = rq->arrays + 2;
-		rq->expired_SHORT = rq->arrays + 3;
 		INIT_LIST_HEAD(&rq->overdue_SHORT);
 		/** END HW2 */
 		spin_lock_init(&rq->lock);
