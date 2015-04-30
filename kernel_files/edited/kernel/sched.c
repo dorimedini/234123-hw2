@@ -89,7 +89,15 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 #define hw2_ms_to_ticks(val) (HZ * (val) / 1000)
 #define hw2_ticks_to_ms(val) (1000 * (val) / HZ)
 
-
+/**
+ * HW2:
+ *
+ * Returns 1 if this is an overdue SHORT process
+ */
+int is_overdue(task_t* p) {
+	return (p->policy == SCHED_SHORT && !p->remaining_trials) ? 1 : 0;
+}
+ 
 /**
  * HW2:
  *
@@ -569,8 +577,48 @@ repeat_lock_task:
 		/*
 		 * If sync is set, a resched_task() is a NOOP
 		 */
-		if (p->prio < rq->curr->prio)
-			resched_task(rq->curr);
+		/**
+		 * HW2:
+		 *
+		 * We need to do some more tests to see if the woken-up task
+		 * needs to be scheduled instead of the current one.
+		 *
+		 * 
+		 */
+		// If the priority value is smaller:
+		if (p->prio < rq->curr->prio) {
+			// If the new process is an OTHER and the current is either OTHER or overdue
+			if (p->policy == SCHED_OTHER && (rq->curr->policy != SHORT || is_overdue(rq->curr))) {
+				UPDATE_REASON(rq->curr, SWITCH_PRIO);
+				resched_task(rq->curr);	// Old code, still needed
+			}
+			// If the new process is a SHORT, it isn't a RT
+			// because it's prio is smaller
+			else if (p->policy == SCHED_SHORT && !is_overdue(p)) {
+				UPDATE_REASON(rq->curr, SWITCH_PRIO);
+				resched_task(rq->curr);	// Old code, still needed
+			}
+			// If it's a RT process
+			else if (p->policy != SCHED_OTHER) {
+				UPDATE_REASON(rq->curr, SWITCH_PRIO);
+				resched_task(rq->curr);	// Old code, still needed
+			}			
+		}
+		// The new priority is lower (larger number) but we still
+		// may need to switch, for example if the currently running
+		// task is overdue with a higher prio value or the new task
+		// is a SHORT
+		else {
+			// If the new process is a non-overdue SHORT:
+			if (p->policy == SCHED_SHORT && !is_overdue(p)) {
+				// If the other (old) task is overdue or an OTHER (note
+				// that if we're here, the other process may be RT):
+				if (rq->curr->policy == SCHED_OTHER || is_overdue(rq->curr)) {
+					UPDATE_REASON(rq->curr, SWITCH_PRIO);
+					resched_task(rq->curr);	// Old code, still needed
+				}
+			}
+		}
 		success = 1;
 	}
 	p->state = TASK_RUNNING;
