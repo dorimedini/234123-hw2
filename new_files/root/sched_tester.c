@@ -70,9 +70,7 @@ int main(int argc, char** argv) {
 	}
 	
 	// Wait for them
-	for (i=0; i<total; i++) {
-		waitpid(pids[i]);
-	}
+	while (wait(NULL) != -1);
 	
 	// Get the statistics
 	int num_switches = get_scheduling_statistic(info);
