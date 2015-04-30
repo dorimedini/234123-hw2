@@ -1030,7 +1030,7 @@ void scheduler_tick(int user_tick, int system)
 				hw2_enqueue(p,rq,1);
 				UPDATE_REASON(p, SWITCH_OVERDUE);
 			} else {
-				p->time_slice = (p->requested_time) / ((p->trial_num - p->remaining_trials) + 1);
+				p->time_slice = (HZ * p->requested_time / 1000) / ((p->trial_num - p->remaining_trials) + 1);
 				hw2_enqueue(p,rq,0);
 			}
 		}
