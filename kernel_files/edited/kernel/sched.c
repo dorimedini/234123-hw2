@@ -684,9 +684,12 @@ repeat_lock_task:
 		 *
 		 * 
 		 */
-		// If the priority value is smaller:
-		if (p->prio < rq->curr->prio) {
-			resched_task(rq->curr);	// Old code, still needed
+		/* Old code
+		if (p->prio < rq->curr->prio)
+			resched_task(rq->curr);	*/
+		if (should_switch(rq->curr, p)) {
+			resched_task(rq->curr);
+			UPDATE_REASON(rq->curr, SWITCH_PRIO);
 		}
 		success = 1;
 	}
@@ -1521,7 +1524,7 @@ void set_user_nice(task_t *p, long nice)
 		if ((NICE_TO_PRIO(nice) < p->static_prio) || (p == rq->curr)) {
 			resched_task(rq->curr);
 			/** START HW2 */
-			UPDATE_REASON(current, SWITCH_PRIO);
+			UPDATE_REASON(rq->curr, SWITCH_PRIO);
 			/** END HW2 */
 		}
 	}
