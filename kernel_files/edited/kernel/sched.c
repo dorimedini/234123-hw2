@@ -467,7 +467,9 @@ static inline void activate_task(task_t *p, runqueue_t *rq)
 			p->sleep_avg = MAX_SLEEP_AVG;
 		p->prio = effective_prio(p);
 	}
-	
+	/** START HW2 */
+	// enqueue_task(p, array); //Original code
+	/** END HW2 */
 	hw2_enqueue(p, rq, 1);
 	rq->nr_running++;
 }
