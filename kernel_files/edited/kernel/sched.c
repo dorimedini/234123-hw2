@@ -105,6 +105,20 @@ void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
 	}
 	else {							// Overdue SHORT. make_active is irrelevant
 		list_add(&p->run_list, &rq->overdue_SHORT);
+		
+		// Add stuff enqueue_task usually does.
+		p->array = NULL;
+		
+		// enqueue_task also does p->array->nr_running++,
+		// but an overdue task doesn't have a counter.
+		// It doesn't matter - the runqueue's counter isn't
+		// touched by enqueue_task, so it's value should be
+		// valid here.
+		// For example, we can see in the code things like:
+		// - enqueue_task(p,rq->active);
+		// - rq->nr_running++;
+		// meaning enqueue_task isn't responsible for counting
+		// the number of tasks in the runqueue.
 	}
 }
 
