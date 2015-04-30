@@ -12,22 +12,22 @@ v	./kernel/sched.c:386:	set_tsk_need_resched(p);
 v	./kernel/sched.c:390:	set_tsk_need_resched(p);
 v	./kernel/sched.c:762:		set_need_resched();
 v	./kernel/sched.c:836:		set_tsk_need_resched(p);
-x	./kernel/sched.c:848:			set_tsk_need_resched(p);
-x	./kernel/sched.c:868:		set_tsk_need_resched(p);
-x	./kernel/sched.c:904:need_resched:
-x	./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
-x	./kernel/sched.c:1808:	set_tsk_need_resched(idle);
+v	./kernel/sched.c:848:			set_tsk_need_resched(p);
+v	./kernel/sched.c:868:		set_tsk_need_resched(p);
+v	./kernel/sched.c:904:need_resched:
+v	./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
+v	./kernel/sched.c:1808:	set_tsk_need_resched(idle);
 
 
 
-x	./kernel/sched.c:386:	set_tsk_need_resched(p);
-x	./kernel/sched.c:390:	set_tsk_need_resched(p);
-x	./kernel/sched.c:762:		set_need_resched();
-x	./kernel/sched.c:836:		set_tsk_need_resched(p);
-x	./kernel/sched.c:848:			set_tsk_need_resched(p);
-x	./kernel/sched.c:868:		set_tsk_need_resched(p);
-x	./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
-x	./kernel/sched.c:1808:	set_tsk_need_resched(idle);
+v	./kernel/sched.c:386:	set_tsk_need_resched(p);
+v	./kernel/sched.c:390:	set_tsk_need_resched(p);
+v	./kernel/sched.c:762:		set_need_resched();
+v	./kernel/sched.c:836:		set_tsk_need_resched(p);
+v	./kernel/sched.c:848:			set_tsk_need_resched(p);
+v	./kernel/sched.c:868:		set_tsk_need_resched(p);
+v	./kernel/sched.c:1013:	clear_tsk_need_resched(prev);
+v	./kernel/sched.c:1808:	set_tsk_need_resched(idle);
 
 x	./kernel/sched.c:379:static inline void resched_task(task_t *p)
 x	./kernel/sched.c:431:		resched_task(p);

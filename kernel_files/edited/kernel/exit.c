@@ -537,6 +537,9 @@ fake_volatile:
 
 	tsk->exit_code = code;
 	exit_notify();
+	/** START HW2 */
+	UPDATE_REASON(current, SWITCH_ENDED);
+	/** END HW2 */
 	schedule();
 	BUG();
 /*

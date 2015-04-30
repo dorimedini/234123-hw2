@@ -920,7 +920,7 @@ skip_queue:
 	this_rq->nr_running++;
 	enqueue_task(next, this_rq->active);
 	if (next->prio < current->prio)
-		set_need_resched();
+		set_need_resched();	// HW2: No need to log this, we're assuming one CPU
 	if (!idle && --imbalance) {
 		if (curr != head)
 			goto skip_queue;
@@ -997,25 +997,22 @@ void scheduler_tick(int user_tick, int system)
 	/** 
 	 * HW2: 
 	 * If the current proc's policy is different
-	 * from SCHED_SHORT, so continue with the regular check.  
+	 * from SCHED_SHORT, so continue with the regular check.
+	 *
+	 * Note that we don't need to do the same for SHORTs
+	 * because
+	 * 1. Overdue SHORTs don't have time slices and they don't expire
+	 * 2. Regular SHORTs don't expire anyway
 	 */
+	/** START HW2 */
 	if (p->policy != SCHED_SHORT) {
 		if (p->array != rq->active) {																								// array but still running.
 			set_tsk_need_resched(p);
 			return;
 		}
-	/** 
-	 * HW2: 
-	 * The current proc's policy is SCHED_SHORT so we need to deal with it. 
-	 */
-	} else {
-		// Like in SCHED_OTHER if a proc is in the expired array but still running 
-		// it needed to be resched.
-		if (p->array != rq->active_SHORT && p->remaining_trials) {																								// array but still running.
-			set_tsk_need_resched(p);								 
-			return;
-		}
 	}
+	/** END HW2 */
+	
 	spin_lock(&rq->lock);
 	if (unlikely(rt_task(p))) {
 		/*
@@ -1217,6 +1214,8 @@ pick_next_task:
 	
 switch_tasks:
 	prefetch(next);
+	// DO NOT clear the reason yet, we still need to log it!
+	// We'll call UPDATE_REASON(prev,SWITCH_UNKNOWN) in a moment
 	clear_tsk_need_resched(prev);
 
 	if (likely(prev != next)) {						// If we've switched the task: do this.
@@ -1872,7 +1871,10 @@ asmlinkage long sys_sched_yield(void)
 
 out_unlock:
 	spin_unlock(&rq->lock);
-
+	
+	/** START HW2 */
+	UPDATE_REASON(current, SWITCH_YIELD);
+	/** END HW2 */
 	schedule();
 
 	return 0;
@@ -2081,6 +2083,8 @@ void __init init_idle(task_t *idle, int cpu)
 	idle->state = TASK_RUNNING;
 	idle->cpu = cpu;
 	double_rq_unlock(idle_rq, rq);
+	// HW2: Don't need to log this, no way a process
+	// was forked / exited before this...
 	set_tsk_need_resched(idle);
 	__restore_flags(flags);
 }
