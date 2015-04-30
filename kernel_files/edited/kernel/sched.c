@@ -196,7 +196,8 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
 
 
 /**
- * HW2:  IMPORTENT NEED TO TEST THIS !
+ * HW2:  TESTED AND PASSED !
+ * NEED TO CHANGE TO DEBUG SHIT cannot recall what dori told me. So need to handle it.
  *
  * Calculate whether or not the old task is more important
  * than the new, regarding the value of prio.
@@ -209,7 +210,7 @@ int should_switch(task_t* oldt, task_t* newt) {
 	if (is_overdue(newt)) {
 		return 0;
 	}
-	// New process is rt 
+	// New process is rt
 	if (rt_task(newt)) {
 		return (!rt_task(oldt) || oldt->prio > newt->prio);
 	}
@@ -223,12 +224,12 @@ int should_switch(task_t* oldt, task_t* newt) {
 				// The old process is overdue and a little cute short (not overdue process) wants to run.
 				return 1;
 			} else {
-				// Both processes are shorts (not overdues) let's compare their dick's lenght.
+				// Both processes are shorts (not overdues) let's compare their dick's length.
 				return (oldt->prio > newt->prio);
 			}
-		// The old process is not short 
+		// The old process is not short
 		} else {
-			return (!rt_task(oldt);
+			return (!rt_task(oldt));
 		}
 	} else {
 		if (is_short(oldt)) {
@@ -241,13 +242,12 @@ int should_switch(task_t* oldt, task_t* newt) {
 				if (rt_task(oldt)) {
 					return 0;
 				} else {
-					return newt->prio < old->prio;
+					return newt->prio < oldt->prio;
 				}
 			}
 		}
 
 	}
-	
 }
 
 /*
