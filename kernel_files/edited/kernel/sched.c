@@ -1081,8 +1081,12 @@ void scheduler_tick(int user_tick, int system)
 	 */
 	/** START HW2 */
 	if (p->policy != SCHED_SHORT) {
-		if (p->array != rq->active) {																								// array but still running.
+		if (p->array != rq->active) {				// The process is in the expired prio_array, but is still running...
 			set_tsk_need_resched(p);
+			/** START HW2 */
+			// TA said to write this up as an end-of-timeslice context switch
+			UPDATE_REASON(p, SWITCH_SLICE);
+			/** END HW2 */
 			return;
 		}
 	}
