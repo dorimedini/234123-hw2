@@ -205,7 +205,14 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
  * Doesn't calculated dynamic priority.
  */
 int should_switch(task_t* oldt, task_t* newt) {
-
+	
+	// FOR DEBUGGING PURPOSES:
+	// Don't run SHORTs before OTHERs, in case
+	// this breaks the system.
+	if (hw2_debug && !is_short(oldt) && is_short(newt)) {
+		return 0;
+	}
+	
 	// Overdue process never switches any other process
 	if (is_overdue(newt)) {
 		return 0;
