@@ -1161,12 +1161,21 @@ void scheduler_tick(int user_tick, int system)
 			UPDATE_REASON(p, SWITCH_SLICE);
 
 			p->first_time_slice = 0; 
-			if (!--p->remaining_trials) {					// If it became overdue
+			
+			// First, check if the next timeslice is zero.
+			// If it is, the process should become overdue
+			// regardless of the number of remaining trials.
+			// Note that the process may NOT already be overdue,
+			// because to get in here we checked the value
+			// of p->remaining_trials
+			--p->remaining_trials;
+			p->time_slice = (hw2_ms_to_ticks(p->requested_time)) / (p->trial_num - p->remaining_trials + 1);
+			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
 				p->time_slice = 1;
+				p->remaining_trials = 0;
 				hw2_enqueue(p,rq,1);
 				UPDATE_REASON(p, SWITCH_OVERDUE);
 			} else {
-				p->time_slice = (hw2_ms_to_ticks(p->requested_time)) / ((p->trial_num - p->remaining_trials) + 1);
 				hw2_enqueue(p,rq,0);
 			}
 		}
