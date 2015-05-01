@@ -127,6 +127,27 @@ extern unsigned long nr_uninterruptible(void);
  */
 #define SCHED_SHORT		4
 
+/**
+ * HW2:
+ *
+ * Update the switch reason of a task.
+ * Only if the new reason is of lower numerical value
+ * should we switch
+ */
+#define UPDATE_REASON(tsk,res) \
+	if ((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason > (res)) \
+		(tsk)->switch_reason = (res);
+
+		
+/**
+ * HW2:
+ *
+ * Convert milliseconds to ticks, or vice versa
+ */
+#define hw2_ms_to_ticks(val) (HZ * (val) / 1000)
+#define hw2_ticks_to_ms(val) (1000 * (val) / HZ)
+
+
 struct sched_param {
 	int sched_priority;
 

@@ -46,17 +46,6 @@ int hw2_debug = 0;
 /**
  * HW2:
  *
- * Update the switch reason of a task.
- * Only if the new reason is of lower numerical value
- * should we switch
- */
-#define UPDATE_REASON(tsk,res) \
-	if ((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason > (res)) \
-		(tsk)->switch_reason = (res);
-
-/**
- * HW2:
- *
  * Implementation of the switch logger functions (declared in sched.h).
  */
 void hw2_start_logging(hw2_switch_log* logger) {
@@ -89,14 +78,6 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 	if (logger->remaining_switches > 0)
 		logger->remaining_switches--;
 }
-
-/**
- * HW2:
- *
- * Convert milliseconds to ticks, or vice versa
- */
-#define hw2_ms_to_ticks(val) (HZ * (val) / 1000)
-#define hw2_ticks_to_ms(val) (1000 * (val) / HZ)
 
 /**
  * HW2:
@@ -134,66 +115,6 @@ int is_other(task_t* p) {
 	return (p->policy == SCHED_OTHER) ? 1 : 0;
 } 
 
-/**
- * HW2:
- *
- * Before calls to enqueue or dequeue, we need
- * to decide which prio_array or list_t to add
- * the process to.
- * Call this instead of enqueue() for enqueueing
- *
- * Before enqueueing the task we need to check where
- * to enqueue it.
- * If it's an OTHER process, just enqueue it in rq->active.
- * If it's a non-overdue SHORT, enqueue in rq->active_SHORT
- * If it's overdue, add to the head of the overdue_SHORT list
- *
- * When dequeueing a non-overdue process, perform similar
- * actions as in hw2_enqueue. If we're dequeueing an overdue
- * SHORT task we need to take care of the list structure.
- *
- * enqueue_task also does p->array->nr_running++,
- * but an overdue task doesn't have a counter.
- * It doesn't matter - the runqueue's counter isn't
- * touched by enqueue_task, so it's value should be
- * valid here.
- * For example, we can see in the code things like:
- * - enqueue_task(p,rq->active);
- * - rq->nr_running++;
- * meaning enqueue_task isn't responsible for counting
- * the number of tasks in the runqueue.
- */
-void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
-	if (p->policy != SCHED_SHORT) {	// Regular process
-		enqueue_task(p, make_active ? rq->active : rq->expired);
-	}
-	else if (p->remaining_trials) {	// Non-overdue SHORT
-		// Note that with this form of round-robin,
-		// we want to enqueue "expired" tasks to the
-		// end of the priority list.
-		enqueue_task(p, rq->active_SHORT);
-	}
-	else {							// Overdue SHORT. make_active is irrelevant
-		// Add the overdue task to it's FIFO list
-		list_add(&p->run_list, &rq->overdue_SHORT);
-		// enqueue_task is responsible for this pointer,
-		// so we should nullify it here
-		p->array = NULL;
-	}
-}
-void hw2_dequeue(task_t* p, prio_array_t* array) {
-
-	// If this isn't an overdue process, dequeue_task
-	// doesn't need to know if this is a SHORT or not.
-	if (p->policy != SCHED_SHORT || p->remaining_trials) {
-		dequeue_task(p, array);
-	}
-	else {		// Overdue SHORT
-		// Remove the task from the list
-		list_del(&p->run_list);
-	}
-}
-
 
 /**
  * HW2:  TESTED AND PASSED !
@@ -203,59 +124,10 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
  * than the new, regarding the value of prio.
  *
  * Doesn't calculated dynamic priority.
+ *
+ * Implementation bellow.
  */
-int should_switch(task_t* oldt, task_t* newt) {
-	
-	// FOR DEBUGGING PURPOSES:
-	// Don't run SHORTs before OTHERs, in case
-	// this breaks the system.
-	if (hw2_debug && !is_short(oldt) && is_short(newt)) {
-		return 0;
-	}
-	
-	// Overdue process never switches any other process
-	if (is_overdue(newt)) {
-		return 0;
-	}
-	// New process is rt
-	if (rt_task(newt)) {
-		return (!rt_task(oldt) || oldt->prio > newt->prio);
-	}
-
-	// In this case the new process isn't overdue or rt.
-	// So lets see some cases which the new process is short.
-	if (is_short(newt) ) {
-		if (is_short(oldt)) {
-			// is_short func check for short or overdue so in those both cases return 1.
-			if (is_overdue(oldt)) {
-				// The old process is overdue and a little cute short (not overdue process) wants to run.
-				return 1;
-			} else {
-				// Both processes are shorts (not overdues) let's compare their dick's length.
-				return (oldt->prio > newt->prio);
-			}
-		// The old process is not short
-		} else {
-			return (!rt_task(oldt));
-		}
-	} else {
-		if (is_short(oldt)) {
-			return 0;
-		} else {
-			// That means the new is other.
-			if (is_short(oldt)) {
-				return is_overdue(oldt);
-			} else {
-				if (rt_task(oldt)) {
-					return 0;
-				} else {
-					return newt->prio < oldt->prio;
-				}
-			}
-		}
-
-	}
-}
+int should_switch(task_t*, task_t*);
 
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
@@ -451,6 +323,67 @@ static struct runqueue runqueues[NR_CPUS] __cacheline_aligned;
 # define finish_arch_switch(rq)		spin_unlock_irq(&(rq)->lock)
 #endif
 
+/**
+ * HW2:
+ *
+ * Defined above. See definition for documentation.
+ */
+int should_switch(task_t* oldt, task_t* newt) {
+	
+	// FOR DEBUGGING PURPOSES:
+	// Don't run SHORTs before OTHERs, in case
+	// this breaks the system.
+	if (hw2_debug && !is_short(oldt) && is_short(newt)) {
+		return 0;
+	}
+	
+	// Overdue process never switches any other process
+	if (is_overdue(newt)) {
+		return 0;
+	}
+	// New process is rt
+	if (rt_task(newt)) {
+		return (!rt_task(oldt) || oldt->prio > newt->prio);
+	}
+
+	// In this case the new process isn't overdue or rt.
+	// So lets see some cases which the new process is short.
+	if (is_short(newt) ) {
+		if (is_short(oldt)) {
+			// is_short func check for short or overdue so in those both cases return 1.
+			if (is_overdue(oldt)) {
+				// The old process is overdue and a little cute short (not overdue process) wants to run.
+				return 1;
+			} else {
+				// Both processes are shorts (not overdues) let's compare their dick's length.
+				return (oldt->prio > newt->prio);
+			}
+		// The old process is not short
+		} else {
+			return (!rt_task(oldt));
+		}
+	} else {
+		if (is_short(oldt)) {
+			return 0;
+		} else {
+			// That means the new is other.
+			if (is_short(oldt)) {
+				return is_overdue(oldt);
+			} else {
+				if (rt_task(oldt)) {
+					return 0;
+				} else {
+					return newt->prio < oldt->prio;
+				}
+			}
+		}
+
+	}
+}
+
+
+
+
 /*
  * task_rq_lock - lock the runqueue a given task resides on and disable
  * interrupts.  Note the ordering: we can safely lookup the task_rq without
@@ -514,6 +447,70 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 	array->nr_active++;
 	p->array = array;
 }
+
+
+/**
+ * HW2:
+ *
+ * Before calls to enqueue or dequeue, we need
+ * to decide which prio_array or list_t to add
+ * the process to.
+ * Call this instead of enqueue() for enqueueing
+ *
+ * Before enqueueing the task we need to check where
+ * to enqueue it.
+ * If it's an OTHER process, just enqueue it in rq->active.
+ * If it's a non-overdue SHORT, enqueue in rq->active_SHORT
+ * If it's overdue, add to the head of the overdue_SHORT list
+ *
+ * When dequeueing a non-overdue process, perform similar
+ * actions as in hw2_enqueue. If we're dequeueing an overdue
+ * SHORT task we need to take care of the list structure.
+ *
+ * enqueue_task also does p->array->nr_running++,
+ * but an overdue task doesn't have a counter.
+ * It doesn't matter - the runqueue's counter isn't
+ * touched by enqueue_task, so it's value should be
+ * valid here.
+ * For example, we can see in the code things like:
+ * - enqueue_task(p,rq->active);
+ * - rq->nr_running++;
+ * meaning enqueue_task isn't responsible for counting
+ * the number of tasks in the runqueue.
+ */
+void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
+	if (p->policy != SCHED_SHORT) {	// Regular process
+		enqueue_task(p, make_active ? rq->active : rq->expired);
+	}
+	else if (p->remaining_trials) {	// Non-overdue SHORT
+		// Note that with this form of round-robin,
+		// we want to enqueue "expired" tasks to the
+		// end of the priority list.
+		enqueue_task(p, rq->active_SHORT);
+	}
+	else {							// Overdue SHORT. make_active is irrelevant
+		// Add the overdue task to it's FIFO list
+		list_add(&p->run_list, &rq->overdue_SHORT);
+		// enqueue_task is responsible for this pointer,
+		// so we should nullify it here
+		p->array = NULL;
+	}
+}
+void hw2_dequeue(task_t* p, prio_array_t* array) {
+
+	// If this isn't an overdue process, dequeue_task
+	// doesn't need to know if this is a SHORT or not.
+	if (p->policy != SCHED_SHORT || p->remaining_trials) {
+		dequeue_task(p, array);
+	}
+	else {		// Overdue SHORT
+		// Remove the task from the list
+		list_del(&p->run_list);
+	}
+}
+
+
+
 
 static inline int effective_prio(task_t *p)
 {
