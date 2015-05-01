@@ -752,7 +752,21 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	current->time_slice >>= 1;
 	/** START HW2 */
 	p->remaining_trials = p->trial_num = (current->remaining_trials + 1) >> 1;
-	current->remaining_trials >> 1;
+	// This may be zero! We need to make it overdue if it is
+	if (current->remaining_trials) {
+		current->remaining_trials >> 1;
+		// If the parent has just become overdue...
+		if (!current->remaining_trials) {
+			// ... let the tick handler take care of it.
+			// Leaving the code like this will cause it
+			// to call scheduler_tick(0,0) in a few lines,
+			// and with time_slice=1 and remaining_trials=1
+			// so the tick handler will move it to the
+			// overdue queue
+			current->remaining_trials = 1;
+			current->time_slice = 0;
+		}
+	}
 	/** END HW2 */
 	p->sleep_timestamp = jiffies;
 	if (!current->time_slice) {
