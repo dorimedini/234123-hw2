@@ -132,10 +132,12 @@ extern unsigned long nr_uninterruptible(void);
  *
  * Update the switch reason of a task.
  * Only if the new reason is of lower numerical value
- * should we switch
+ * should we switch, but if the reason is currently
+ * unknown we must switch (even though the numerical
+ * value of REASON_UNKNOWN is 0, the lowest)
  */
 #define UPDATE_REASON(tsk,res) \
-	if ((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason > (res)) \
+	if (((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason > (res)) || (tsk)->switch_reason == SWITCH_UNKNOWN) \
 		(tsk)->switch_reason = (res);
 
 		

@@ -2,9 +2,29 @@
 #define _HW2_SYSCALLS_H
 
 #include <errno.h>
-#include <linux/sched.h>	// Need this for definition of hw2_switch_info
 extern int errno;
 
+/**
+ * We're not allowed to include sched.h from the kernel space,
+ * so some things need to be redefined...
+ */
+#define SCHED_SHORT		4
+struct hw2_switch_info_struct {
+	int previous_pid;
+	int next_pid;
+	int previous_policy;
+	int next_policy;
+	unsigned long time;	// The value of jiffies at moment of switch
+	int reason;
+};
+typedef struct hw2_switch_info_struct hw2_switch_info;
+struct sched_param {
+	int sched_priority;
+	int requested_time;
+	int trial_num;
+};
+
+ 
 /**
  * Returns 1 if the input PID is a SHORT-process,
  * 0 if it's overdue.
