@@ -3,6 +3,52 @@
 
 #define REQUESTED 100
 
+
+/**
+ * Stringify the reason number
+ */
+char* reason2str(int res) {
+	switch(res) {
+		case 0:
+			return "UNKNOWN";
+		case 1:
+			return "CREATED";
+		case 2:
+			return "ENDED";
+		case 3:
+			return "YIELD";
+		case 4:
+			return "OVERDUE";
+		case 5:
+			return "WAITING";
+		case 6:
+			return "BACK FROM WAIT";
+		case 7:
+			return "OUT OF TIME";
+		default:
+			return "ILLEGAL REASON VALUE";
+	}
+}
+
+/**
+ * Stringify the policy.
+ * For printing reasons, must be no more than 8 characters
+ */
+char* policy2str(int pol) {
+	switch(pol) {
+		case 0:
+			return "OTHER";
+		case 1:
+		case 2:
+			return "RT";
+		case 4:
+			return "SHORT";
+		default:
+			return "ILLEGAL";
+	}
+}
+
+ 
 /**
  * Sets the calling process to SHORT with the
  * designated number of trials
@@ -27,8 +73,8 @@ void print_info(hw2_switch_info* info, int total) {
 	printf("START PRINTING %d SWITCHES:\n", total);
 	printf("     PREV-PID - NEXT-PID - PREV-POL - NEXT-POL -   TIME   -  REASON\n");
 	for (i=0; i<total; ++i) {
-		printf("%3d: %7d  | %7d  | %7d  | %7d  | %7d  | %7d\n",
-				i, info[i].previous_pid, info[i].next_pid, info[i].previous_policy, info[i].next_policy, info[i].time, info[i].reason);
+		printf("%3d: %7d  | %7d  | %8s | %8s | %7d  | %s\n",
+				i, info[i].previous_pid, info[i].next_pid, policy2str(info[i].previous_policy), policy2str(info[i].next_policy), info[i].time, reason2str(info[i].reason));
 	}
 	printf("END PRINT\n");
 }
