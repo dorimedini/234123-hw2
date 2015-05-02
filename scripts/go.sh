@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Update all files
+cd /mnt/hgfs/HW/234123-hw2/scripts/
 ./update_files.sh
 
 # Now, build the kernel
