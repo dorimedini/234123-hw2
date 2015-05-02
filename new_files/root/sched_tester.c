@@ -1,6 +1,5 @@
 
-#include <linux/sched.h>	// Need this for definition of hw2_switch_info and SCHED_SHORT and such
-#include <hw2_syscalls.h>	// For get_scheduling_statistic
+#include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
 
 #define REQUESTED 100
 
@@ -26,9 +25,10 @@ int calculate_fibo(int num) {
 void print_info(hw2_switch_info* info, int total) {
 	int i;
 	printf("START PRINTING %d SWITCHES:\n", total);
+	printf("     PREV-PID - NEXT-PID - PREV-POL - NEXT-POL -   TIME   -  REASON\n");
 	for (i=0; i<total; ++i) {
-		printf("  PREV-PID: %d\n  NEXT-PID: %d\n  PREV-POL: %d\n  NEXT-POL: %d\n      TIME: %lu\n    REASON: %d\n",
-				info[i].previous_pid, info[i].next_pid, info[i].previous_policy, info[i].next_policy, info[i].time, info[i].reason);
+		printf("%3d: %7d  | %7d  | %7d  | %7d  | %7d  | %7d\n",
+				i, info[i].previous_pid, info[i].next_pid, info[i].previous_policy, info[i].next_policy, info[i].time, info[i].reason);
 	}
 	printf("END PRINT\n");
 }
@@ -45,14 +45,20 @@ int main(int argc, char** argv) {
 	hw2_switch_info info[150];
 	
 	// Parse the input
-	if (!(argc%2)) return 1;	// Even number of arguments? Illegal!
+	if (!(argc%2)) {
+		printf("Odd number of input arguments...\n");
+		return 1;	// Even number of arguments? Illegal!
+	}
 	int total = (argc-1)/2;
 	int trials[total], numbers[total];
 	int i;
 	for (i=0; i<total; ++i) {
-		trials[i] = atoi(argv[2*i+1]);
-		numbers[i] = atoi(argv[2*i+2]);
-		if (trials[i] < 1 || numbers[i] < 0) return 2;	// Bad input
+		numbers[i] = atoi(argv[2*i+1]);
+		trials[i] = atoi(argv[2*i+2]);
+		if (trials[i] < 1 || trials[i] > 50 || numbers[i] < 0) {
+			printf("trials[%d]==%d or numbers[%d]==%d are illegl values\n", i, trials[i], i, numbers[i]);
+			return 2;	// Bad input
+		}
 	}
 	
 	// Create processes
@@ -70,7 +76,7 @@ int main(int argc, char** argv) {
 	}
 	
 	// Wait for them
-	while (wait(NULL) != -1);
+	while (wait() != -1);
 	
 	// Get the statistics
 	int num_switches = get_scheduling_statistic(info);

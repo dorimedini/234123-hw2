@@ -71,12 +71,11 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 	UPDATE_REASON(prev,SWITCH_UNKNOWN);
 	
 	// Update outer fields:
+	logger->remaining_switches--;
 	logger->next_index++;
 	logger->next_index %= 150;
 	if (logger->logged < 150)
 		logger->logged++;
-	if (logger->remaining_switches > 0)
-		logger->remaining_switches--;
 }
 
 /**
