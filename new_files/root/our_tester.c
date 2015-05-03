@@ -38,14 +38,14 @@
  * - int pid;
  * - CREATE_PROCS(pid,10,SCHED_SHORT,4000,5);
  * - ... more code, 11 processes executing it...
- * - if (!pid) CREATE_PROCS(pid,5,SCHED_OTHER, 0,0);
+ * - if (pid) CREATE_PROCS(pid,5,SCHED_OTHER, 0,0);
  * - ... more code, 16 processes executing it...
  * - EXIT_PROCS(pid);
  * - ... more code, only one process (the original process) executing it...
  *
 */
 #define EXIT_PROCS(pid) do { \
-		if (pid) exit(0); \
+		if (!pid) exit(0); \
 		else while(wait() != -1); \
 	} while(0)
 
