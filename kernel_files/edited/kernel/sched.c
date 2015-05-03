@@ -1742,6 +1742,12 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 			p->time_slice = hw2_ms_to_ticks(lp.requested_time);
 		}
 		
+		// Assaf said that we should resched the process
+		// after becoming SHORT, that it should happen in
+		// this function but doesn't (it does in later
+		// versions of the kernel). Question 146 in Piazza
+		current->need_resched = 1;
+		
 	}
 	/** END HW2 */
 	
