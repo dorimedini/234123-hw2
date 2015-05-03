@@ -57,7 +57,7 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 	if (!logger->remaining_switches) return;
 	
 	// Update switch fields:
-	hw2_switch_info* info = logger->arr;
+	struct switch_info* info = logger->arr;
 	int index = logger->next_index;
 	info[index].previous_pid = prev->pid;
 	info[index].next_pid = next->pid;
@@ -127,6 +127,9 @@ int is_other(task_t* p) {
  * Implementation bellow.
  */
 int should_switch(task_t*, task_t*);
+
+
+
 
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
@@ -509,6 +512,31 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
 }
 
 
+/**
+ * HW2:
+ *
+ * WARNING: ONLY CALL THIS FUNCTION IF CALLING
+ * ENQUEUE AND DEQUEUE IS SAFE!
+ *
+ * Helper function to put a SHORT process back
+ * at the end of the line, be it overdue or not.
+ *
+ * This is useful because the original scheduler
+ * never had to do shit like this...
+ */
+void hw2_back_of_the_queue(task_t* p, runqueue_t* rq) {
+	if (!is_short(p)) {
+		return;
+	}
+	hw2_dequeue(p, p->array);
+	hw2_enqueue(p, rq, 0);
+}
+ 
+#define OVERDUE_PUSH_BACK(p,rq) do { \
+		if (is_overdue(p)) hw2_back_of_the_queue(p, rq); \
+	} while(0)
+
+
 
 
 static inline int effective_prio(task_t *p)
@@ -684,8 +712,6 @@ repeat_lock_task:
 		 *
 		 * We need to do some more tests to see if the woken-up task
 		 * needs to be scheduled instead of the current one.
-		 *
-		 * 
 		 */
 		/* Old code
 		if (p->prio < rq->curr->prio)
@@ -693,6 +719,14 @@ repeat_lock_task:
 		if (should_switch(rq->curr, p)) {
 			resched_task(rq->curr);
 			UPDATE_REASON(rq->curr, SWITCH_PRIO);
+			/**
+			 * HW2:
+			 *
+			 * If the currently running process is overdue,
+			 * it needs to go back to the back of the line
+			 * after switching...
+			 */
+			OVERDUE_PUSH_BACK(rq->curr, rq);
 		}
 		success = 1;
 	}
@@ -1547,10 +1581,15 @@ void set_user_nice(task_t *p, long nice)
 		 * If the task is running and lowered its priority,
 		 * or increased its priority then reschedule its CPU:
 		 */
-		if ((NICE_TO_PRIO(nice) < p->static_prio) || (p == rq->curr)) {
+		if ((NICE_TO_PRIO(nice) < p->static_prio) || (p == rq->curr)/** START HW2 */ || should_switch(rq->curr, p)/** END HW2 */) {
 			resched_task(rq->curr);
+			/**
+			 * If the current process is overdue we need to
+			 * push it to the back...
+			 */
 			/** START HW2 */
 			UPDATE_REASON(rq->curr, SWITCH_PRIO);
+			OVERDUE_PUSH_BACK(rq->curr, rq);
 			/** END HW2 */
 		}
 	}
