@@ -18,7 +18,7 @@
 		int i; \
 		for (i=0; i<num; ++i) { \
 			pid = fork(); \
-			if (pid) { \
+			if (!pid) { \
 				struct sched_param param = { .sched_priority = 0, .requested_time = req, .trial_num = trials}; \
 				sched_setscheduler(pid, policy, &param); \
 				break; \
