@@ -1286,7 +1286,17 @@ pick_next_task:
 		// list_empty(&rq->overdue_SHORT), if we want.
 		// As the list_t is circular, to get the last element
 		// just do .prev
+		// Also note that if we came here via an overdue
+		// process (current is an overdue process) we should
+		// still run the next one (forking an overdue process
+		// should cause it to switch - see Piazza)
 		next = list_entry(rq->overdue_SHORT.prev, task_t, run_list);
+		
+		// Also, it may be a good idea to push the overdue
+		// task into the queue again, so it isn't run again
+		// if it waits...
+		hw2_dequeue(next, NULL);
+		hw2_enqueue(next, rq, 0);
 		
 	}
 	// If we should be running an OTHER task:
