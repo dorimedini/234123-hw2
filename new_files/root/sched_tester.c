@@ -66,9 +66,9 @@ int calculate_fibo(int num) {
 
 
 /**
- * Prints the info in the hw2_switch_info array
+ * Prints the info in the switch_info array
  */
-void print_info(hw2_switch_info* info, int total) {
+void print_info(struct switch_info* info, int total) {
 	int i;
 	printf("START PRINTING %d SWITCHES:\n", total);
 	printf("     PREV-PID - NEXT-PID - PREV-POL - NEXT-POL -   TIME   -  REASON\n");
@@ -88,7 +88,7 @@ void print_info(hw2_switch_info* info, int total) {
 int main(int argc, char** argv) {
 
 	// Declare the logger!
-	hw2_switch_info info[150];
+	struct switch_info info[150];
 	
 	// Parse the input
 	if (!(argc%2)) {

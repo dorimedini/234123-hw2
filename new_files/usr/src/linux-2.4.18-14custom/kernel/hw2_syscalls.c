@@ -1,6 +1,6 @@
 
 #include <asm/uaccess.h>	// Need this for copy_to_user()
-#include <linux/sched.h>	// Need this for definition of hw2_switch_info
+#include <linux/sched.h>	// Need this for definition of switch_info
 #include <linux/errno.h>	// Need this for the definition of EINVAL etc.
 #define NO_SUCH_PROC -EINVAL// At the time I didn't know the required error if no such process exists
 
@@ -22,7 +22,7 @@ hw2_switch_log hw2_logger = { .next_index = 0, .logged = 0, .remaining_switches 
 int sys_is_SHORT(int);
 int sys_remaining_time(int);
 int sys_remaining_trials(int);
-int sys_get_scheduling_statistic(hw2_switch_info*);
+int sys_get_scheduling_statistic(struct switch_info*);
 
 /**
  * Implementation:
@@ -71,7 +71,7 @@ int sys_remaining_trials(int pid) {
 
 
 
-int sys_get_scheduling_statistic(hw2_switch_info* info) {
+int sys_get_scheduling_statistic(struct switch_info* info) {
 	
 	int i, counter;
 

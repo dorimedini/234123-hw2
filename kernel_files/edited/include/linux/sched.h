@@ -556,7 +556,7 @@ struct task_struct {
  * This struct represents a logged task as a result of switching.
  * It's used by the switch logger for this assignment.
  */
-struct hw2_switch_info_struct {
+struct switch_info {
 	int previous_pid;
 	int next_pid;
 	int previous_policy;
@@ -564,7 +564,6 @@ struct hw2_switch_info_struct {
 	unsigned long time;	// The value of jiffies at moment of switch
 	int reason;
 };
-typedef struct hw2_switch_info_struct hw2_switch_info;
 
 /**
  * HW2:
@@ -572,7 +571,7 @@ typedef struct hw2_switch_info_struct hw2_switch_info;
  * This stores 150 switch logs
  */
 struct hw2_switch_log_struct {
-	hw2_switch_info arr[150];
+	struct switch_info arr[150];
 	int next_index;			// Where should we log the next switch
 	int logged;				// How many processes were logged (caps at 150)
 	int remaining_switches;	// How many more switches should this logger log? Max 30

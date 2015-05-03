@@ -4,26 +4,6 @@
 #include <errno.h>
 extern int errno;
 
-/**
- * We're not allowed to include sched.h from the kernel space,
- * so some things need to be redefined...
- */
-#define SCHED_SHORT		4
-struct hw2_switch_info_struct {
-	int previous_pid;
-	int next_pid;
-	int previous_policy;
-	int next_policy;
-	unsigned long time;	// The value of jiffies at moment of switch
-	int reason;
-};
-typedef struct hw2_switch_info_struct hw2_switch_info;
-struct sched_param {
-	int sched_priority;
-	int requested_time;
-	int trial_num;
-};
-
  
 /**
  * Returns 1 if the input PID is a SHORT-process,
@@ -57,7 +37,7 @@ int remaining_trials(int);
  * Call this function to get the switch logging info from
  * the kernel.
  */
-int get_scheduling_statistic(hw2_switch_info*);
+int get_scheduling_statistic(struct switch_info*);
 
 
 // Use this to get the correct return value from a system call.
@@ -77,7 +57,7 @@ long convert_to_errno(long res) {
 int is_SHORT_wrapper(int);
 int remaining_time_wrapper(int);
 int remaining_trials_wrapper(int);
-int get_scheduling_statistic_wrapper(hw2_switch_info*);
+int get_scheduling_statistic_wrapper(struct switch_info*);
 
 
 /**
@@ -92,7 +72,7 @@ int remaining_time(int pid) {
 int remaining_trials(int pid) {
 	return remaining_trials_wrapper(pid);
 }
-int get_scheduling_statistic(hw2_switch_info* info) {
+int get_scheduling_statistic(struct switch_info* info) {
 	return get_scheduling_statistic_wrapper(info);
 }
 
@@ -140,7 +120,7 @@ int remaining_trials_wrapper(int pid) {
 	);
 	return (int)convert_to_errno(__res);
 }
-int get_scheduling_statistic_wrapper(hw2_switch_info* info) {
+int get_scheduling_statistic_wrapper(struct switch_info* info) {
 	long __res;
 	__asm__ volatile (
 		"movl $246, %%eax;"				// System call number
