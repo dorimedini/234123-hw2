@@ -99,8 +99,8 @@ int main(int argc, char** argv) {
 	int trials[total], numbers[total];
 	int i;
 	for (i=0; i<total; ++i) {
-		numbers[i] = atoi(argv[2*i+1]);
-		trials[i] = atoi(argv[2*i+2]);
+		trials[i] = atoi(argv[2*i+1]);
+		numbers[i] = atoi(argv[2*i+2]);
 		if (trials[i] < 1 || trials[i] > 50 || numbers[i] < 0) {
 			printf("trials[%d]==%d or numbers[%d]==%d are illegl values\n", i, trials[i], i, numbers[i]);
 			return 2;	// Bad input
