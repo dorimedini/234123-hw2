@@ -53,8 +53,8 @@ char* policy2str(int pol) {
  * Sets the calling process to SHORT with the
  * designated number of trials
  */
-void set_to_SHORT(int pid, int trials) {
-	struct sched_param param = { .sched_priority = 0, .requested_time = REQUESTED, .trial_num = trials};
+void set_to_SHORT(int pid, int requested, int trials) {
+	struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
 	sched_setscheduler(pid, SCHED_SHORT, &param);
 }
 
