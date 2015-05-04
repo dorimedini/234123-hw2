@@ -29,10 +29,9 @@ int sys_get_scheduling_statistic(struct switch_info*);
  */
 int sys_is_SHORT(int pid) {
 
-	// Use existing logic. If pid is not SHORT,
-	// x will be set to -EINVAL anyway.
-	int x = sys_remaining_trials(pid);
-	return x > 0? 1 : x;
+	// Get the task and return the policy
+	task_t* task = find_task_by_pid(pid);
+	return (task->policy == SCHED_SHORT) ? 1 : 0;
 	
 }
 
