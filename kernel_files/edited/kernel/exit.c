@@ -497,7 +497,9 @@ NORET_TYPE void do_exit(long code)
 	/** END HW2 */
 	
 	struct task_struct *tsk = current;
-
+	
+	if (tsk->policy == SCHED_SHORT && !tsk->remaining_trials) PRINT("IN EXIT WITH OVERDUE PROCESS %d\n",tsk->pid);
+	
 	if (in_interrupt())
 		panic("Aiee, killing interrupt handler!");
 	if (!tsk->pid)
@@ -540,6 +542,7 @@ fake_volatile:
 	/** START HW2 */
 	UPDATE_REASON(current, SWITCH_ENDED);
 	/** END HW2 */
+	if (tsk->policy == SCHED_SHORT && !tsk->remaining_trials) PRINT("ENTERING SCHEDULE() WITH EXITING OVERDUE PROCESS %d\n",tsk->pid);
 	schedule();
 	BUG();
 /*
@@ -576,6 +579,7 @@ asmlinkage long sys_wait4(pid_t pid,unsigned int * stat_addr, int options, struc
 	int flag, retval;
 	DECLARE_WAITQUEUE(wait, current);
 	struct task_struct *tsk;
+	PRINT("CALLED WAIT: PID=%d, POLICY=%d\n",current->pid,current->policy);
 
 	if (options & ~(WNOHANG|WUNTRACED|__WNOTHREAD|__WCLONE|__WALL))
 		return -EINVAL;
@@ -659,6 +663,7 @@ repeat:
 		retval = -ERESTARTSYS;
 		if (signal_pending(current))
 			goto end_wait4;
+		PRINT("ENTERING SCHEDULE VIA WAIT, PID=%d, POLICY=%d\n",current->pid,current->policy);
 		schedule();
 		goto repeat;
 	}
