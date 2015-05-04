@@ -2,6 +2,7 @@
 #define _HW2_SYSCALLS_H
 
 #include <errno.h>
+#include <sched.h>
 extern int errno;
 
  
