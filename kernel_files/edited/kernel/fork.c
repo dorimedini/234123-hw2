@@ -594,6 +594,8 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	    struct pt_regs *regs, unsigned long stack_size)
 {
 	
+	PRINT("IN DO_FORK, PARENT PID=%d", current->pid);
+	
 	int retval;
 	unsigned long flags;
 	struct task_struct *p;
@@ -834,7 +836,18 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		UPDATE_REASON(current, SWITCH_CREATED);
 		/** END HW2 */	
 	}
-
+	
+	/**
+	 * HW2:
+	 *
+	 * If this isn't an overdue SHORT but it is
+	 * a SHORT, we need to resched
+	 */
+	if (current->policy == SCHED_SHORT && current->remaining_trials) {
+		current->need_resched = 1;
+		UPDATE_REASON(current, SWITCH_CREATED);
+	}
+	
 	/**
 	 * HW2:
 	 *
@@ -843,8 +856,10 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	/** START HW2 */
 	hw2_start_logging(&hw2_logger);
 	/** END HW2 */	
-		
+	PRINT(" CHILD PID=%d",p->pid);
+	
 fork_out:
+	PRINT("\n");
 	return retval;
 
 bad_fork_cleanup_namespace:
