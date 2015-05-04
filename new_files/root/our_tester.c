@@ -2,6 +2,17 @@
  #include "test_utils.h"
  #include <stdio.h>
 
+enum SWITCH_REASONS {
+	SWITCH_UNKNOWN = 0,	// 0: Reason unknown - should cause error
+	SWITCH_CREATED,		// 1: Switched due to creation of another task
+	SWITCH_ENDED,		// 2: A task ended
+	SWITCH_YIELD,		// 3: A task gave up the CPU
+	SWITCH_OVERDUE,		// 4: A SHORT task became overdue
+	SWITCH_PREV_WAIT,	// 5: The task switched from the CPU because it started waiting
+	SWITCH_PRIO,		// 6: A task with a higher priority returned from waiting
+	SWITCH_SLICE		// 7: The previous task ran out of time
+};
+
 /**
  * Call this to create multiple processes with the
  * same policy, storing the PID of the process in pid.
@@ -56,6 +67,12 @@
 		else while(wait() != -1); \
 	} while(0)
 
+#define CREATE_SHORT(pid)
+do { \
+		struct sched_param param = { .sched_priority = 0, .requested_time = 2000, .trial_num = 20}; \
+		sched_setscheduler(pid, is_SHORT(pid) ? -1 : SCHED_SHORT, &param); \
+	} while(0)
+
 #define BEST_SHORT(pid) do { \
 		struct sched_param param = { .sched_priority = 0, .requested_time = 5000, .trial_num = 50}; \
 		sched_setscheduler(pid, is_SHORT(pid) ? -1 : SCHED_SHORT, &param); \
@@ -69,7 +86,7 @@ int calculate_fibo(int num) {
 }
 
 int getRelevantLogger(int* relevantPids, int n ,
-						struct switch_info* relevantLogger) {
+						struct switch_info* relevantLogger, bool print) {
 	int index = 0;
 	struct switch_info info[150];
 	// Get the statistics
@@ -79,6 +96,11 @@ int getRelevantLogger(int* relevantPids, int n ,
 			relevantLogger[index] = info[i];
 			++index;
 		}
+	}
+	if (print) {
+		print_info(info, num_switches);
+		printf ("\n\n The Relevant Logger:\n");
+		print_info(relevantLogger, index);
 	}
 	return index;
 }
@@ -92,34 +114,76 @@ int findTheRelevant(int* relevantPids, int n,int thePidToFind) {
 	return 0;
 }
 
-/* An OTHER Proc created a new proc which became short. The new proc should run and then
- *	the old proc
+/*
+ * TEST: An OTHER Proc created a new proc which became short.  The proiority of the new proc (The short one)
+ * is higher than the old one (the OTHER) .
+ *
+ * RESULT: The new proc should run and after it finish the old proc
+ * should run
 */
-bool other_to_short() {
+bool other_to_short_with_high_prio() {
 	int relevantPids[2];
-	relevantPids[0] = getpid();
+	int dad_pid = getpid();
+	int son_pid;
+	relevantPids[0] = dad_pid;
 	int pid = fork(); // The major dad.
 	if (!pid) {
-		relevantPids[1] = getpid();
+		son_pid = getpid();
+		relevantPids[1] = son_pid;
 		BEST_SHORT(pid); // make the son short
 		calculate_fibo(15);
 	} else {
 		calculate_fibo(30);
 	}
 	struct switch_info info[150];
-	int size =  getRelevantLogger(relevantPids,2,info);
+	int size =  getRelevantLogger(relevantPids,2,info, 0);
 
-return true
+	TEST_EQUALS(size, 3);
+	TEST_EQUALS(info[0].previous_pid, dad_pid);
+	TEST_EQUALS(info[1].previous_pid, son_pid);
+	TEST_EQUALS(info[1].reason, SWITCH_ENDED);
+	TEST_EQUALS(info[2].previous_pid, dad_pid);
+
+return true;
+}
+
+/*
+ * TEST: An OTHER Proc created a new proc which became short.  The proiority of the new proc (The short one)
+ * is lower than the old one (the OTHER) .
+ *
+ * RESULT: The new proc should run and after it finish the old proc
+ * should run
+*/
+bool other_to_short_with_low_prio() {
+	int relevantPids[2];
+	int dad_pid = getpid();
+	int son_pid;
+	relevantPids[0] = dad_pid;
+	int pid = fork(); // The major dad.
+	if (!pid) {
+		son_pid = getpid();
+		relevantPids[1] = son_pid;
+		CREATE_SHORT(pid) // make the son short
+		nice(5);
+		calculate_fibo(15);
+	} else {
+		calculate_fibo(30);
+	}
+	struct switch_info info[150];
+	int size =  getRelevantLogger(relevantPids,2,info, 0);
+
+	TEST_EQUALS(size, 3);
+	TEST_EQUALS(info[0].previous_pid, dad_pid);
+	TEST_EQUALS(info[1].previous_pid, son_pid);
+	TEST_EQUALS(info[1].reason, SWITCH_ENDED);
+	TEST_EQUALS(info[2].previous_pid, dad_pid);
+
+return true;
 }
 
 
 int main() {
-	int pid = fork();
-	if (pid) {
-		printf("Dad pid is %d\n", pid);
-	} else {
-		printf("Son pid is %d\n", pid);
-	}
-
+	other_to_short_with_high_prio();
+	other_to_short_with_low_prio();
 	return 0;
 }
