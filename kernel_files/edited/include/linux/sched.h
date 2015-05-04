@@ -123,6 +123,20 @@ extern unsigned long nr_uninterruptible(void);
 /**
  * HW2:
  *
+ * Set this to 1 to enable debugging printk
+ */
+#define HWPRINT 1
+
+/**
+ * HW2:
+ *
+ * Use this to print debug info
+ */
+#define PRINT if(HWPRINT) printk
+
+/**
+ * HW2:
+ *
  * Define new scheduling policy SCHED_SHORT
  */
 #define SCHED_SHORT		4
@@ -140,7 +154,6 @@ extern unsigned long nr_uninterruptible(void);
 	if (((tsk)->switch_reason != SWITCH_UNKNOWN && (tsk)->switch_reason > (res)) || (tsk)->switch_reason == SWITCH_UNKNOWN) \
 		(tsk)->switch_reason = (res);
 
-		
 /**
  * HW2:
  *
