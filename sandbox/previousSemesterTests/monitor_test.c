@@ -58,11 +58,11 @@ void inializeArray()
 	int i=0;
 	for(i=0;i<150;i++){
 		info[i].time=0; 
-				info[i].previous_pid=0; 
-				info[i].previous_policy=0; 
-				info[i].next_pid=0; 
-				info[i].next_policy=0; 
-				info[i].reason=TASK_OTHER;
+		info[i].previous_pid=0; 
+		info[i].previous_policy=0; 
+		info[i].next_pid=0; 
+		info[i].next_policy=0; 
+		info[i].reason=TASK_OTHER;
 	}
 }
 

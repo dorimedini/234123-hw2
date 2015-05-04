@@ -149,6 +149,15 @@ int calculate_fibo(int num) {
 	return calculate_fibo(num-1)+calculate_fibo(num-2);
 }
 
+int findTheRelevant(int* relevantPids, int n,int thePidToFind) {
+	for (int i = 0 ; i < n ; ++i) {
+		if (relevantPids[i] == thePidToFind) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 int getRelevantLogger(int* relevantPids, int n ,
 						struct switch_info* relevantLogger, bool print) {
 	int index = 0;
@@ -169,14 +178,7 @@ int getRelevantLogger(int* relevantPids, int n ,
 	return index;
 }
 
-int findTheRelevant(int* relevantPids, int n,int thePidToFind) {
-	for (int i = 0 ; i < n ; ++i) {
-		if (relevantPids[i] == thePidToFind) {
-			return 1;
-		}
-	}
-	return 0;
-}
+
 
 
 #endif /* TEST_UTILS_H_ */
