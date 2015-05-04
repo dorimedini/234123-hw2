@@ -53,7 +53,7 @@ char* policy2str(int pol) {
  * Sets the calling process to SHORT with the
  * designated number of trials
  */
-void set_to_SHORT(int pid, int trials) {
+void set_to_SHORT(int pid, int requested, int trials) {
 	struct sched_param param = { .sched_priority = 0, .requested_time = REQUESTED, .trial_num = trials};
 	if (is_SHORT(pid)) {
 		sched_setparam(pid, &param);
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 	pid = fork();
 	if (!pid) {
 		int short_pid = getpid();
-		set_to_SHORT(short_pid, 5);				// Turn into a SHORT process (may need to turn into an OTHER first)
+		set_to_SHORT(short_pid, REQUESTED, 5);				// Turn into a SHORT process (may need to turn into an OTHER first)
 		// Run until we have one trial left and 5 timeslice
 		while(remaining_trials(short_pid)>1);
 		while(remaining_time(short_pid)>5);
@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
 /*	for (i=0; i<total; ++i) {
 		pid = fork();
 		if (!pid) {	// Let each child:
-			set_to_SHORT(getpid(), trials[i]);				// Turn into a SHORT process (may need to turn into an OTHER first)
+			set_to_SHORT(getpid(), REQUESTED, trials[i]);				// Turn into a SHORT process (may need to turn into an OTHER first)
 			calculate_fibo(numbers[i]);			// And then calculate a Fibonacci number
 			exit(0);
 		}
