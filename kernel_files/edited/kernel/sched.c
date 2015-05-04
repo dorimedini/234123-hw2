@@ -66,6 +66,9 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 	info[index].time = jiffies;
 	info[index].reason = prev->switch_reason;
 	
+	// DEBUG:
+	PRINT("LOGGING SWITCH: PID=%d, POLICY=%d, REASON=%d\n", prev->pid, prev->policy, prev->switch_reason);
+	
 	// Reset the switch reason so we don't log
 	// the same reason twice by accident...
 	UPDATE_REASON(prev,SWITCH_UNKNOWN);
@@ -117,10 +120,12 @@ int is_other(task_t* p) {
 
 /**
  * HW2:  TESTED AND PASSED !
- * NEED TO CHANGE TO DEBUG SHIT cannot recall what dori told me. So need to handle it.
  *
  * Calculate whether or not the old task is more important
  * than the new, regarding the value of prio.
+ *
+ * Note that we should only use this function if
+ * hw2_debug is OFF (=0)
  *
  * Doesn't calculated dynamic priority.
  *
@@ -283,7 +288,7 @@ struct runqueue {
 	/**
 	 * HW2:
 	 *
-	 * overdue_SHORT[]:
+	 * overdue_SHORT:
 	 * As the overdue processes only need to run
 	 * FIFO-style, all we need is a regular queue. Insert newly
 	 * overdue SHORT processes at the start of the list, and when
@@ -335,9 +340,6 @@ int should_switch(task_t* oldt, task_t* newt) {
 	// FOR DEBUGGING PURPOSES:
 	// Don't run SHORTs before OTHERs, in case
 	// this breaks the system.
-	if (hw2_debug && !is_short(oldt) && is_short(newt)) {
-		return 0;
-	}
 	
 	// Overdue process never switches any other process
 	if (is_overdue(newt)) {
@@ -450,6 +452,16 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 	p->array = array;
 }
 
+/**
+ * HW2:
+ *
+ * Test if a process is in a run queue already.
+ * This should be useful so we don't accidentally
+ * enqueue/dequeue a process twice.
+ */
+//int is_queued(task_t* p) {
+//	return !list_empty(&p->run_list);
+//}
 
 /**
  * HW2:
@@ -481,16 +493,21 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
  * the number of tasks in the runqueue.
  */
 void hw2_enqueue(task_t* p, runqueue_t* rq, int make_active) {
-	if (p->policy != SCHED_SHORT) {	// Regular process
+	
+	// Regular process (or debug mode)
+	if (hw2_debug || !is_short(p)) {
 		enqueue_task(p, make_active ? rq->active : rq->expired);
 	}
-	else if (p->remaining_trials) {	// Non-overdue SHORT
+	// Non-overdue SHORT (no expired array)
+	else if (!is_overdue(p)) {
 		// Note that with this form of round-robin,
 		// we want to enqueue "expired" tasks to the
 		// end of the priority list.
 		enqueue_task(p, rq->active_SHORT);
 	}
-	else {							// Overdue SHORT. make_active is irrelevant
+	// Overdue SHORT. make_active is irrelevant,
+	// but make sure p isn't already in the queue
+	else /*if (!is_queued(p)) */{
 		// Add the overdue task to it's FIFO list
 		list_add(&p->run_list, &rq->overdue_SHORT);
 		// enqueue_task is responsible for this pointer,
@@ -502,12 +519,18 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
 
 	// If this isn't an overdue process, dequeue_task
 	// doesn't need to know if this is a SHORT or not.
-	if (p->policy != SCHED_SHORT || p->remaining_trials) {
-		dequeue_task(p, array);
+	// However, if it's overdue, make sure we're not
+	// dequeueing again
+	if (!hw2_debug && is_overdue(p)/* && is_queued(p)*/) {
+		// Remove the task from the list.
+		// Use list_del_init instead of list_del
+		// so we can test the pointers and test - 
+		// using only p - if p is in a list or
+		// not (see is_queued)
+		list_del/*_init*/(&p->run_list);
 	}
-	else {		// Overdue SHORT
-		// Remove the task from the list
-		list_del(&p->run_list);
+	else {
+		dequeue_task(p, array);
 	}
 }
 
@@ -529,7 +552,7 @@ void hw2_back_of_the_queue(task_t* p, runqueue_t* rq) {
 		return;
 	}
 	hw2_dequeue(p, p->array);
-	hw2_enqueue(p, rq, 0);
+	hw2_enqueue(p, rq, 1);
 }
  
 #define OVERDUE_PUSH_BACK(p,rq) do { \
@@ -713,10 +736,11 @@ repeat_lock_task:
 		 * We need to do some more tests to see if the woken-up task
 		 * needs to be scheduled instead of the current one.
 		 */
-		/* Old code
-		if (p->prio < rq->curr->prio)
-			resched_task(rq->curr);	*/
-		if (should_switch(rq->curr, p)) {
+		// Old code:
+		if (hw2_debug && p->prio < rq->curr->prio)
+			resched_task(rq->curr);
+		// New code:
+		else if (!hw2_debug && should_switch(rq->curr, p)) {
 			resched_task(rq->curr);
 			UPDATE_REASON(rq->curr, SWITCH_PRIO);
 			/**
@@ -1078,11 +1102,12 @@ static inline void idle_tick(void)
  * We call it with interrupts disabled.
  */
 void scheduler_tick(int user_tick, int system)
-{
+{	
+	
 	int cpu = smp_processor_id();
 	runqueue_t *rq = this_rq();									// The current run queue
 	task_t *p = current;
-
+	if (is_overdue(p)) PRINT("IN TICK WITH OVERDUE PROC %d\n", p->pid);
 	if (p == rq->idle) {
 		if (local_bh_count(cpu) || local_irq_count(cpu) > 1)
 			kstat.per_cpu_system[cpu] += system;
@@ -1123,7 +1148,13 @@ void scheduler_tick(int user_tick, int system)
 	/** END HW2 */
 	
 	spin_lock(&rq->lock);
-	if (unlikely(rt_task(p))) {
+	/**
+	 * HW2:
+	 *
+	 * If we're overdue, it's like a SCHED_FIFO task as far as
+	 * scheduler_tick() is concerned: add it to the if() statement
+	 */
+	if (unlikely(rt_task(p))/** START HW2 */ || is_overdue(p)/** END HW2 */) {
 		/*
 		 * RR tasks need a special form of timeslice management.
 		 * FIFO tasks have no timeslices.
@@ -1155,13 +1186,14 @@ void scheduler_tick(int user_tick, int system)
 	if (p->sleep_avg)									
 		p->sleep_avg--;								// The procces isn't sleeping so decrease its sleep avg
 	if (!--p->time_slice) {
-		
-	/** 
-	 * HW2: 
-	 * If the current proc's policy is different
-	 * from SCHED_SHORT , so continue with the regular check.  
-	 */		
+		PRINT("IN TICK: pid=%d, NOT RT, ZERO TIME LEFT, ",current->pid);
+		/** 
+		 * HW2: 
+		 * If the current proc's policy is different
+		 * from SCHED_SHORT, so continue with the regular check.  
+		 */		
 		if (p->policy != SCHED_SHORT) {
+			PRINT("NOT SHORT\n");
 			// HW2: No need to change this because
 			// p isn't a SHORT process
 			dequeue_task(p, rq->active);
@@ -1180,12 +1212,19 @@ void scheduler_tick(int user_tick, int system)
 				enqueue_task(p, rq->expired);
 			} else
 				enqueue_task(p, rq->active);
-	/** 
-	 * HW2: 
-	 * Dealing with SCHED_SHORT policy.  
-	 */
-		} else if (p->remaining_trials) {
-			
+		/** 
+		 * HW2: 
+		 *
+		 * Dealing with SCHED_SHORT policy.
+		 * We SHOULD NOT get here with an overdue process!
+		 * Overdue handling is done above, with RT handling
+		 */
+		}
+		else if (is_overdue(p)) {
+			PRINT("ERROR: In scheduler_tick(), line %d, with an overdue process...\n",__LINE__);
+		}
+		else {
+			PRINT("SHORT\n");
 			hw2_dequeue(p, p->array/*==rq->active_SHORT*/);	// Get the proc out from our active array
 			set_tsk_need_resched(p);
 			UPDATE_REASON(p, SWITCH_SLICE);
@@ -1201,16 +1240,31 @@ void scheduler_tick(int user_tick, int system)
 			--p->remaining_trials;
 			p->time_slice = (hw2_ms_to_ticks(p->requested_time)) / (p->trial_num - p->remaining_trials + 1);
 			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
-				p->time_slice = 1;
-				p->remaining_trials = 0;
-				hw2_enqueue(p,rq,1);
+				// CODE THAT SHOULD WORK:
+			//	INIT_LIST_HEAD(&p->run_list);	// If we don't do this, hw2_enqueue will think it's enqueued already
+			//	UPDATE_REASON(p, SWITCH_OVERDUE);
+			//	list_add(&p->run_list,&rq->overdue_SHORT);
+				
+				
+				// START DEBUG
+			//	p->remaining_trials=1;
+			//	p->time_slice=100;
+				PRINT("BECAME OVERDUE: pid=%d. &runlist=%p, runlist.next=%p, runlist.prev=%p. The answer to is_queued is %s\n", p->pid, &p->run_list, p->run_list.next, p->run_list.prev, /*is_queued(p)? "YES" : "NO"*/"IRRELEVANT");
 				UPDATE_REASON(p, SWITCH_OVERDUE);
-			} else {
-				hw2_enqueue(p,rq,0);
+				list_add(&p->run_list,&rq->overdue_SHORT);
+				PRINT("OVERDUE LIST: HEAD=%p, NEXT=%p, NEXT->NEXT=%p\n",
+							&rq->overdue_SHORT,
+							rq->overdue_SHORT.next ? rq->overdue_SHORT.next : 0,
+							rq->overdue_SHORT.next ? rq->overdue_SHORT.next->next : 0);
+				// END DEBUG
+			}
+			else {
+				hw2_enqueue(p,rq,1);
 			}
 		}
 	}
 out:
+	if (is_overdue(p)) PRINT("LEAVING TICK WITH OVERDUE %d\n",p->pid);
 #if CONFIG_SMP
 	if (!(jiffies % BUSY_REBALANCE_TICK))
 		load_balance(rq, 0);
@@ -1230,13 +1284,16 @@ asmlinkage void schedule(void)
 	prio_array_t *array;
 	list_t *queue;
 	int idx;
-
+	
+	
 	if (unlikely(in_interrupt()))
 		BUG();
 
 need_resched:
 	prev = current;									// Assume we're going to switch the current process to something else
 	rq = this_rq();									// Get a pointer to the runqueue
+
+	if (is_overdue(prev)) PRINT("IN SCHEDULE: CURRENT=%d, POLICY=%d, REASON=%d\n", prev->pid, prev->policy, prev->switch_reason);
 
 	release_kernel_lock(prev, smp_processor_id());	// Lock something
 	prepare_arch_schedule(prev);					// Just architecture things
@@ -1270,7 +1327,9 @@ pick_next_task:
 		rq->expired_timestamp = 0;
 		goto switch_tasks;
 	}
-
+	
+	if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d\n",__LINE__);
+	
 	array = rq->active;								// Get a pointer to the active array.
 													// We may need to change thins because there are other runnable tasks
 													// not in rq->active
@@ -1285,6 +1344,7 @@ pick_next_task:
 	}
 
 	idx = sched_find_first_bit(array->bitmap);
+	if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d\n",__LINE__);
 	
 	/**
 	 * HW2:
@@ -1299,53 +1359,96 @@ pick_next_task:
 	 *    process in active_SHORT
 	 */
 	/** START HW2 */
-	int highest_prio_short = sched_find_first_bit(rq->active_SHORT->bitmap);
-	// Are there SHORTS we should run?
-	// Check if idx isn't a RT priority and that there is some SHORT to run
-	if (!hw2_debug && (idx > MAX_RT_PRIO-1 && highest_prio_short != MAX_PRIO)) {
-		
-		// YES!!
-		
-		// Set the next task
-		queue = rq->active_SHORT->queue + highest_prio_short;
-		next = list_entry(queue->next, task_t, run_list);
-		
+	if (!hw2_debug) {
+		if (is_short(prev)) PRINT("NON-DEBUG MODE: idx=%d, ",idx);
+		int highest_prio_short = sched_find_first_bit(rq->active_SHORT->bitmap);
+		if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d\n",__LINE__);
+		if (is_short(prev)) PRINT("highestshort=%d, ", highest_prio_short);
+		// Are there SHORTS we should run?
+		// Check if idx isn't a RT priority and that there is some SHORT to run
+		if (idx > MAX_RT_PRIO-1 && highest_prio_short != MAX_PRIO) {
+			PRINT("running a SHORT process: ");
+			// YES!!
+			
+			// Set the next task
+			queue = rq->active_SHORT->queue + highest_prio_short;
+			next = list_entry(queue->next, task_t, run_list);
+			PRINT("pid=%d, policy=%d\n", next->pid,next->policy);
+			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, THINKS WE'RE SHORT!\n",__LINE__);
+			
+		}
+		// Otherwise, are there any RT or OTHER tasks to run?
+		// If idx==MAX_PRIO then rq->active is empty, so there
+		// must be only overdues to run...
+		else if (idx != MAX_PRIO) {
+			
+			// In this case, do the default (original) scheduling choice
+			queue = array->queue + idx;
+			next = list_entry(queue->next, task_t, run_list);
+			if (is_short(prev)) PRINT("running a RT/OTHER process: pid=%d, policy=%d\n",next->pid,next->policy);
+			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, THINKS WE'RE OTHER OR RT!\n",__LINE__);
+		}
+		// If there are no SHORT, OTHER or RT tasks then there MUST be an Overdue task
+		// (because rq->nr_running != 0)
+		else {
+			
+			// Let's assume the overdue_SHORT list isn't empty.
+			// This can be easily tested by calling
+			// list_empty(&rq->overdue_SHORT), if we want.
+			// As the list_t is circular, to get the last element
+			// just do .prev
+			// Also note that if we came here via an overdue
+			// process (current is an overdue process) we should
+			// still run the next one (forking an overdue process
+			// should cause it to switch - see Piazza)
+			next = list_entry(rq->overdue_SHORT.prev, task_t, run_list);
+			if (is_short(prev)) PRINT("running an overdue process: pid=%d, policy=%d\n",next->pid,next->policy);
+			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d. NEXT OVERDUE: %p, CURRENT OVERDUE: %p. POINTERS: next=%p AND prev=%p\n",__LINE__, &next->run_list, &prev->run_list, next, prev);
+			
+		}
 	}
-	// If there are no SHORT, OTHER or RT tasks then there MUST be an Overdue task
-	// (because rq->nr_running != 0)
-	else if (!hw2_debug && idx == MAX_PRIO) {
-		
-		// Let's assume the overdue_SHORT list isn't empty.
-		// This can be easily tested by calling
-		// list_empty(&rq->overdue_SHORT), if we want.
-		// As the list_t is circular, to get the last element
-		// just do .prev
-		// Also note that if we came here via an overdue
-		// process (current is an overdue process) we should
-		// still run the next one (forking an overdue process
-		// should cause it to switch - see Piazza)
-		next = list_entry(rq->overdue_SHORT.prev, task_t, run_list);
-		
-		// Also, it may be a good idea to push the overdue
-		// task into the queue again, so it isn't run again
-		// if it waits...
-		hw2_dequeue(next, NULL);
-		hw2_enqueue(next, rq, 0);
-		
-	}
-	// If we should be running an OTHER task:
+	// If hw2_debug is ON, execute the original code:
 	else {
 		queue = array->queue + idx;
 		next = list_entry(queue->next, task_t, run_list);
+		if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, ORIGINAL CODE!\n",__LINE__);
 	}
 	
-	/* queue = array->queue + idx; */
+	/**
+	 * If a SHORT task was forked, the parent must
+	 * go to the end of the queue (weird, but true...)
+	 *
+	 * This is also true for overdue SHORTs as well,
+	 * in any case (if an overdue process is swapped
+	 * for a different one it needs to go to the back
+	 * of the queue). However, if an overdue process
+	 * got here via waiting OR exiting, it has already
+	 * been kicked from the queue so no need to do
+	 * anything.
+	 *
+	 * We need to make sure the task is in RUNNING state
+	 * before we do this, otherwise we may push a dead
+	 * process back to the queue...
+	 *
+	 * NOTE: This function call does hw2_dequeue() and
+	 * hw2_enqueue()
+	 */
+	if (!hw2_debug && next != prev && prev->state == TASK_RUNNING) {
+		if (is_overdue(prev)) {
+			PRINT("PUSHING OVERDUE BACK\n");
+			hw2_back_of_the_queue(prev, rq);
+			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, PUSHING BACK\n",__LINE__);
+		}
+		else if (is_short(prev) && prev->switch_reason == SWITCH_CREATED) {
+			hw2_back_of_the_queue(prev, rq);
+		}
+	}
 	/** END HW2 */
 	
 	
 switch_tasks:
 	prefetch(next);
-	// DO NOT clear the reason yet, we still need to log it!
+	// HW2: DO NOT clear the reason yet, we still need to log it!
 	// We'll call UPDATE_REASON(prev,SWITCH_UNKNOWN) in a moment
 	clear_tsk_need_resched(prev);
 
@@ -1354,6 +1457,8 @@ switch_tasks:
 		rq->nr_switches++;
 		rq->curr = next;
 	
+		if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, SWITCHING!\n",__LINE__);
+		
 		prepare_arch_switch(rq);					// Architecture shit
 		/**
 		 * HW2:
@@ -1557,7 +1662,7 @@ void set_user_nice(task_t *p, long nice)
 	 * value.
 	 */
 	/** START HW2 */
-	if (p->policy == SCHED_SHORT && !p->remaining_trials)
+	if (is_overdue(p))
 		return;
 	/** END HW2 */
 	
@@ -1581,7 +1686,7 @@ void set_user_nice(task_t *p, long nice)
 		 * If the task is running and lowered its priority,
 		 * or increased its priority then reschedule its CPU:
 		 */
-		if ((NICE_TO_PRIO(nice) < p->static_prio) || (p == rq->curr)/** START HW2 */ || should_switch(rq->curr, p)/** END HW2 */) {
+		if ((NICE_TO_PRIO(nice) < p->static_prio) || (p == rq->curr)/** START HW2 */ || (!hw2_debug && should_switch(rq->curr, p))/** END HW2 */) {
 			resched_task(rq->curr);
 			/**
 			 * If the current process is overdue we need to
@@ -1668,7 +1773,10 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	unsigned long flags;
 	runqueue_t *rq;
 	task_t *p;
-
+	
+	PRINT("IN SETSCHEDULER WITH POLICY == %d FOR PID=%d: ",policy,pid);
+	if (!param) PRINT("NULL PARAM STRUCT!\n");
+	
 	if (!param || pid < 0)
 		goto out_nounlock;
 
@@ -1676,6 +1784,8 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	if (copy_from_user(&lp, param, sizeof(struct sched_param)))
 		goto out_nounlock;
 
+	PRINT("REQ=%d, TRIALS=%d, PRIO=%d, ", lp.requested_time, lp.trial_num, lp.sched_priority);
+	
 	/*
 	 * We play safe to avoid deadlocks.
 	 */
@@ -1687,6 +1797,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	if (!p)
 		goto out_unlock_tasklist;
 
+	
 	/*
 	 * To be able to change p->policy safely, the apropriate
 	 * runqueue lock must be held.
@@ -1731,7 +1842,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	retval = -EINVAL;
 	if (lp.sched_priority < 0 || lp.sched_priority > MAX_USER_RT_PRIO-1)
 		goto out_unlock;
-	if ((policy == SCHED_OTHER) != (lp.sched_priority == 0))
+	if ((policy == SCHED_OTHER/** START HW2 */ || policy == SCHED_SHORT/** END HW2 */) != (lp.sched_priority == 0))
 		goto out_unlock;
 	/**
 	 * HW2:
@@ -1740,8 +1851,10 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 * are legal
 	 */
 	/** START HW2 */
-	if (policy == SCHED_SHORT && (lp.requested_time > 5000 || lp.requested_time < 1 || lp.trial_num > 50 || lp.trial_num < 1))
+	if (policy == SCHED_SHORT && (lp.requested_time > 5000 || lp.requested_time < 1 || lp.trial_num > 50 || lp.trial_num < 1)) {
+		PRINT("TRIED TO CREATE SHORT AND FAILED: REQTIME=%d, TRIALS=%d",lp.requested_time,lp.trial_num);
 		goto out_unlock;
+	}
 	/** END HW2 */
 
 	retval = -EPERM;
@@ -1755,8 +1868,10 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 * HW2:
 	 *
 	 * Some new things we have to test for and maybe return EPERM
-	 * (operation not permitted): If the old policy is SCHED_SHORT,
-	 * this is an illegal call
+	 * (operation not permitted): 
+	 * - If the old policy is SCHED_SHORT, this is an illegal call
+	 * - If the old policy isn't OTHER but the new policy is SHORT,
+	 *   then this is an illegal call
 	 *
 	 * Note that if the caller promises not to change policies,
 	 * this should be a legal call! This is because setscheduler()
@@ -1765,8 +1880,14 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	 * not to change policies
 	 */
 	/** START HW2 */
-	if (p->policy == SCHED_SHORT && !no_change)
+	if (p->policy == SCHED_SHORT && !no_change) {
+		PRINT("TRIED TO CHANGE SHORT SHORT TO SHORT: PID=%d",p->pid);
 		goto out_unlock;
+	}
+	if (p->policy != SCHED_OTHER && policy == SCHED_SHORT) {
+		PRINT("TRIED TO CHANGE NON-OTHER TO SHORT: PID=%d",p->pid);
+		goto out_unlock;
+	}
 	/** END HW2 */
 
 	array = p->array;
@@ -1796,11 +1917,14 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		// this function but doesn't (it does in later
 		// versions of the kernel). Question 146 in Piazza
 		current->need_resched = 1;
+		UPDATE_REASON(current, SWITCH_PRIO);
 		
 	}
 	/** END HW2 */
 	
 	p->policy = policy;
+	if (policy == SCHED_SHORT)
+		PRINT("POLICY CHANGED TO SHORT FOR PID=%d", p->pid);
 	p->rt_priority = lp.sched_priority;
 	/** 
 	 * HW2:
@@ -1814,6 +1938,8 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		p->prio = p->static_prio;
 	if (array)
 		activate_task(p, task_rq(p));
+	
+	PRINT("\n");
 	
 out_unlock:
 	task_rq_unlock(rq, &flags);
@@ -1988,6 +2114,17 @@ out_unlock:
 
 asmlinkage long sys_sched_yield(void)
 {
+	
+	/**
+	 * HW2:
+	 *
+	 * No need to do anything here: we can assume
+	 * a SHORT process never yields (even an overdue
+	 * SHORT process).
+	 *
+	 * However, we do need to log the switch reason
+	 */
+	
 	runqueue_t *rq = this_rq_lock();
 	prio_array_t *array = current->array;
 	int i;
@@ -1997,7 +2134,7 @@ asmlinkage long sys_sched_yield(void)
 		list_add_tail(&current->run_list, array->queue + current->prio);
 		goto out_unlock;
 	}
-
+	
 	list_del(&current->run_list);
 	if (!list_empty(array->queue + current->prio)) {
 		list_add(&current->run_list, array->queue[current->prio].next);
@@ -2014,7 +2151,7 @@ asmlinkage long sys_sched_yield(void)
 
 	list_add(&current->run_list, array->queue[i].next);
 	__set_bit(i, array->bitmap);
-
+	
 out_unlock:
 	spin_unlock(&rq->lock);
 	
