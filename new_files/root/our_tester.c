@@ -26,8 +26,6 @@ bool other_to_short_with_high_prio() {
 	int relevantPids[2];
 	int otherPid = getpid();
 	int shortPid;
-	//Give the process we want to test long job
-	calculate_fibo(30);
 
 	// Rememeber the other pid
 	relevantPids[0] = otherPid
@@ -41,8 +39,10 @@ bool other_to_short_with_high_prio() {
 		exit(0);
 	} else { // Inside the dad
 		relevantPids[1] = shortPid;		
-		// switch info array for our relevent switches
 		EXIT_PROCS(1);
+		//Give the process we want to test long job
+		calculate_fibo(30);
+		// switch info array for our relevent switches
 		struct switch_info info[150];
 		int size =  getRelevantLogger(relevantPids,2,info, 0);
 		// Check the switches
@@ -59,8 +59,7 @@ bool other_to_short_with_low_prio() {
 	int relevantPids[2];
 	int otherPid = getpid();
 	int shortPid;
-	//Give the process we want to test long job
-	calculate_fibo(30);
+
 
 	// Rememeber the other pid
 	relevantPids[0] = otherPid
@@ -73,6 +72,8 @@ bool other_to_short_with_low_prio() {
 		// Kill this short
 		exit(0);
 	} else { // Inside the dad
+		//Give the process we want to test long job
+		calculate_fibo(30);
 		relevantPids[1] = shortPid;		
 		// switch info array for our relevent switches
 		EXIT_PROCS(1);
