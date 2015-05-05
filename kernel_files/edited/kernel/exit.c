@@ -579,7 +579,6 @@ asmlinkage long sys_wait4(pid_t pid,unsigned int * stat_addr, int options, struc
 	int flag, retval;
 	DECLARE_WAITQUEUE(wait, current);
 	struct task_struct *tsk;
-	PRINT("CALLED WAIT: PID=%d, POLICY=%d\n",current->pid,current->policy);
 
 	if (options & ~(WNOHANG|WUNTRACED|__WNOTHREAD|__WCLONE|__WALL))
 		return -EINVAL;
@@ -635,7 +634,7 @@ repeat:
 				if (!retval && stat_addr)
 					retval = put_user(p->exit_code, stat_addr);
 				if (retval)
-					goto end_wait4; 
+					goto end_wait4;
 				retval = p->pid;
 				if (p->p_opptr != p->p_pptr) {
 					write_lock_irq(&tasklist_lock);
@@ -663,7 +662,6 @@ repeat:
 		retval = -ERESTARTSYS;
 		if (signal_pending(current))
 			goto end_wait4;
-		PRINT("ENTERING SCHEDULE VIA WAIT, PID=%d, POLICY=%d\n",current->pid,current->policy);
 		schedule();
 		goto repeat;
 	}
