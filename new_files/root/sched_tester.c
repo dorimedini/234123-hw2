@@ -130,30 +130,16 @@ int main(int argc, char** argv) {
 	// Create processes
 	int pid;
 	
-	// Try to make something overdue...
-	pid = fork();
-	if (!pid) {
-		int short_pid = getpid();
-		set_to_SHORT(short_pid, REQUESTED, 5);				// Turn into a SHORT process (may need to turn into an OTHER first)
-		// Run until we have one trial left and 5 timeslice
-		while(remaining_trials(short_pid)>1);
-		while(remaining_time(short_pid)>5);
-	//	exit(0);	// For debug purposes
-		calculate_fibo(35);	// Should take more than 5 ticks
-		exit(0);
-	}
-	
-	
-/*	for (i=0; i<total; ++i) {
+	for (i=0; i<total; ++i) {
 		pid = fork();
 		if (!pid) {	// Let each child:
-			set_to_SHORT(getpid(), REQUESTED, trials[i]);				// Turn into a SHORT process (may need to turn into an OTHER first)
-			calculate_fibo(numbers[i]);			// And then calculate a Fibonacci number
+			set_to_SHORT(getpid(), REQUESTED, trials[i]);	// Turn into a SHORT process (may need to turn into an OTHER first)
+			calculate_fibo(numbers[i]);						// And then calculate a Fibonacci number
 			exit(0);
 		}
 	}
 	
-*/	// Wait for them
+	// Wait for them
 	while (wait() != -1);
 	
 	// Get the statistics
