@@ -133,7 +133,7 @@ extern unsigned long nr_uninterruptible(void);
  * Set this to 1 to enable debugging prints.
  * See the macro PRINT to see this in action
  */
-#define HWPRINT 1
+#define HWPRINT 0
 
 /**
  * HW2:
