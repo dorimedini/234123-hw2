@@ -459,9 +459,9 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
  * This should be useful so we don't accidentally
  * enqueue/dequeue a process twice.
  */
-//int is_queued(task_t* p) {
-//	return !list_empty(&p->run_list);
-//}
+int is_queued(task_t* p) {
+	return !list_empty(&p->run_list);
+}
 
 /**
  * HW2:
@@ -527,7 +527,7 @@ void hw2_dequeue(task_t* p, prio_array_t* array) {
 		// so we can test the pointers and test - 
 		// using only p - if p is in a list or
 		// not (see is_queued)
-		list_del/*_init*/(&p->run_list);
+		list_del_init(&p->run_list);
 	}
 	else {
 		dequeue_task(p, array);
@@ -711,7 +711,21 @@ static int try_to_wake_up(task_t * p, int sync)
 repeat_lock_task:
 	rq = task_rq_lock(p, &flags);
 	old_state = p->state;
-	if (!p->array) {
+	/**
+	 * HW2:
+	 *
+	 * The !p->array test isn't good for overdue
+	 * tasks... they may be enqueued in the queue
+	 * but their array field may be NULL.
+	 *
+	 * For non-overdues, the test is sufficient - 
+	 * but for overdue processes we need to test
+	 * if they're enqueued
+	 */
+	/** START HW2 */
+//	if (!p->array) {	OLD IF STATEMENT
+	if ((!p->array && !is_overdue(p)) || (is_overdue(p) && !is_queued(p))) {
+	/** END HW2 */
 		/*
 		 * Fast-migrate the task if it's not running or runnable
 		 * currently. Do not violate hard affinity.
@@ -1247,7 +1261,7 @@ void scheduler_tick(int user_tick, int system)
 			 */
 			// START DEBUG CODE:
 			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
-			//	INIT_LIST_HEAD(&p->run_list);	// If we don't do this, hw2_enqueue will think it's enqueued already
+				INIT_LIST_HEAD(&p->run_list);	// If we don't do this, hw2_enqueue will think it's enqueued already
 			//	p->remaining_trials=1;
 			//	p->time_slice=100;
 				PRINT_NO_TICK("BECAME OVERDUE: pid=%d. &runlist=%p, runlist.next=%p, runlist.prev=%p. The answer to is_queued is %s\n", p->pid, &p->run_list, p->run_list.next, p->run_list.prev, is_queued(p)? "YES" : "NO");
@@ -2136,6 +2150,10 @@ asmlinkage long sys_sched_yield(void)
 	 * However, we do need to log the switch reason
 	 * (this happens bellow)
 	 */
+	if (is_short(current)) {
+		PRINT("BUG: SHORT PROCESS YIELDING! SCHED.C, LINE %d\n",__LINE__);
+		while(1);
+	}
 	
 	runqueue_t *rq = this_rq_lock();
 	prio_array_t *array = current->array;
