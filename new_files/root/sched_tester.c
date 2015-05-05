@@ -152,9 +152,6 @@ int main(int argc, char** argv) {
 	for (i=0; i<total; ++i) printf("%d ",pids[i]);
 	printf("\n");
 	print_info(info, num_switches);
-
 	
-	
-		
 	return 0;
 }
