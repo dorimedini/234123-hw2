@@ -1,7 +1,7 @@
 
 #include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
 
-#define REQUESTED 1000
+#define REQUESTED 50
 
 
 /**
@@ -54,7 +54,7 @@ char* policy2str(int pol) {
  * designated number of trials
  */
 void set_to_SHORT(int pid, int requested, int trials) {
-	struct sched_param param = { .sched_priority = 0, .requested_time = REQUESTED, .trial_num = trials};
+	struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
 	if (is_SHORT(pid)) {
 		sched_setparam(pid, &param);
 		printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
@@ -128,25 +128,33 @@ int main(int argc, char** argv) {
 	
 	
 	// Create processes
-	int pid;
-	
+	int pids[total];
 	for (i=0; i<total; ++i) {
-		pid = fork();
-		if (!pid) {	// Let each child:
-			set_to_SHORT(getpid(), REQUESTED, trials[i]);	// Turn into a SHORT process (may need to turn into an OTHER first)
+		pids[i] = fork();
+		if (!pids[i]) {	// Let each child:
 			calculate_fibo(numbers[i]);						// And then calculate a Fibonacci number
 			exit(0);
+		}
+		else {			// Make the RT father:
+			set_to_SHORT(pids[i], REQUESTED, trials[i]);	// Turn the child into a SHORT process (may need to turn into an OTHER first)
 		}
 	}
 	
 	// Wait for them
-	while (wait() != -1);
+	int status;
+	while (wait(&status) != -1);
 	
 	// Get the statistics
 	int num_switches = get_scheduling_statistic(info);
 	
 	// Print them
+	printf("PIDs participating (children): ");
+	for (i=0; i<total; ++i) printf("%d ",pids[i]);
+	printf("\n");
 	print_info(info, num_switches);
+
 	
+	
+		
 	return 0;
 }
