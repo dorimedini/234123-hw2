@@ -178,7 +178,52 @@ int getRelevantLogger(int* relevantPids, int n ,
 	return index;
 }
 
+void set_to_SHORT_with_prio(int pid, int requested, int trials, int setNice) {
+	struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
+	sched_setscheduler(pid, SCHED_SHORT, &param);
+	nice(setNice);
+}
 
-
+/* Here we check if the switches was (in this order)
+ * testProc
+ * testProc
+ * testProc
+ * ..
+ * ..
+ * someProc
+ * someProc
+ * ... 
+ * ...
+ * testProc
+ * testProc
+ * testProc
+ */
+bool checkTheReleventSwitches(int testProc, int someProc,struct switch_info* info, int size) {
+	int startSeenSon = 0;
+	int endSeenSon = 0;
+	// Now we have only the dad and son switches 
+	for (int i=0 ; i < size ; ++i) {
+		if (!startSeenSon) {
+			if (info[i].previous_pid == testProc) {
+				continue;
+			} else {
+				startSeenSon = 1;
+			}
+		} else if (!endSeenSon) {
+			if (info[i].previous_pid == someProc) {
+				continue;
+			} else {
+				endSeenSon = 1;
+			}
+		} else {
+			if (info[i].previous_pid == testProc) {
+		 		continue;
+		 	} else {
+		 		return false;			 	
+		 	}	
+		}
+	}
+	return true;
+}
 
 #endif /* TEST_UTILS_H_ */
