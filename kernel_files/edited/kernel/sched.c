@@ -67,7 +67,7 @@ void hw2_log_switch(hw2_switch_log* logger, task_t *prev, task_t *next) {
 	info[index].reason = prev->switch_reason;
 	
 	// DEBUG:
-	PRINT("LOGGING SWITCH: PID=%d, POLICY=%d, REASON=%d\n", prev->pid, prev->policy, prev->switch_reason);
+	PRINT("LOGGING SWITCH: PID=%d-->%d, POLICY=%d-->%d, REASON=%d\n", prev->pid, next->pid, prev->policy, next->policy, prev->switch_reason);
 	
 	// Reset the switch reason so we don't log
 	// the same reason twice by accident...
@@ -719,7 +719,7 @@ repeat_lock_task:
 		if (unlikely(sync && (rq->curr != p) &&
 			(p->cpu != smp_processor_id()) &&
 			(p->cpus_allowed & (1UL << smp_processor_id())))) {
-
+			
 			p->cpu = smp_processor_id();
 			task_rq_unlock(rq, &flags);
 			goto repeat_lock_task;
@@ -1107,7 +1107,7 @@ void scheduler_tick(int user_tick, int system)
 	int cpu = smp_processor_id();
 	runqueue_t *rq = this_rq();									// The current run queue
 	task_t *p = current;
-	if (is_overdue(p)) PRINT("IN TICK WITH OVERDUE PROC %d\n", p->pid);
+	PRINT_ONCE_IF(is_overdue(p),"IN TICK WITH OVERDUE PROC %d\n", p->pid);
 	if (p == rq->idle) {
 		if (local_bh_count(cpu) || local_irq_count(cpu) > 1)
 			kstat.per_cpu_system[cpu] += system;
@@ -1186,7 +1186,7 @@ void scheduler_tick(int user_tick, int system)
 	if (p->sleep_avg)									
 		p->sleep_avg--;								// The procces isn't sleeping so decrease its sleep avg
 	if (!--p->time_slice) {
-		PRINT("IN TICK: pid=%d, NOT RT, ZERO TIME LEFT, ",current->pid);
+		PRINT("IN TICK: pid=%d, NOT RT, ZERO TIME LEFT, ",p->pid);
 		/** 
 		 * HW2: 
 		 * If the current proc's policy is different
@@ -1239,32 +1239,42 @@ void scheduler_tick(int user_tick, int system)
 			// of p->remaining_trials
 			--p->remaining_trials;
 			p->time_slice = (hw2_ms_to_ticks(p->requested_time)) / (p->trial_num - p->remaining_trials + 1);
+			/**
+			 * HW2 DEBUGGING:
+			 *
+			 * Switch between the next two blocks of code if we
+			 * fix the bug
+			 */
+			// START DEBUG CODE:
 			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
-				// CODE THAT SHOULD WORK:
 			//	INIT_LIST_HEAD(&p->run_list);	// If we don't do this, hw2_enqueue will think it's enqueued already
-			//	UPDATE_REASON(p, SWITCH_OVERDUE);
-			//	list_add(&p->run_list,&rq->overdue_SHORT);
-				
-				
-				// START DEBUG
 			//	p->remaining_trials=1;
 			//	p->time_slice=100;
-				PRINT("BECAME OVERDUE: pid=%d. &runlist=%p, runlist.next=%p, runlist.prev=%p. The answer to is_queued is %s\n", p->pid, &p->run_list, p->run_list.next, p->run_list.prev, /*is_queued(p)? "YES" : "NO"*/"IRRELEVANT");
+				PRINT("BECAME OVERDUE: pid=%d. &runlist=%p, runlist.next=%p, runlist.prev=%p. The answer to is_queued is %s\n", p->pid, &p->run_list, p->run_list.next, p->run_list.prev, is_queued(p)? "YES" : "NO");
 				UPDATE_REASON(p, SWITCH_OVERDUE);
 				list_add(&p->run_list,&rq->overdue_SHORT);
 				PRINT("OVERDUE LIST: HEAD=%p, NEXT=%p, NEXT->NEXT=%p\n",
 							&rq->overdue_SHORT,
 							rq->overdue_SHORT.next ? rq->overdue_SHORT.next : 0,
 							rq->overdue_SHORT.next ? rq->overdue_SHORT.next->next : 0);
-				// END DEBUG
 			}
 			else {
 				hw2_enqueue(p,rq,1);
 			}
+			// END DEBUG CODE
+			// START "GOOD" CODE (OR NOT)
+			/*
+			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
+				INIT_LIST_HEAD(&p->run_list);				// If we don't do this, hw2_enqueue will think it's enqueued already
+				UPDATE_REASON(p, SWITCH_OVERDUE);
+			}
+			hw2_enqueue(p,rq,1);							// Re insert into the runqueue (works for new overdue as well)
+			*/
+			// END "GOOD" CODE 
 		}
 	}
 out:
-	if (is_overdue(p)) PRINT("LEAVING TICK WITH OVERDUE %d\n",p->pid);
+	PRINT_ONCE_IF(is_overdue(p),"LEAVING TICK WITH OVERDUE %d\n",p->pid);
 #if CONFIG_SMP
 	if (!(jiffies % BUSY_REBALANCE_TICK))
 		load_balance(rq, 0);
@@ -1293,7 +1303,7 @@ need_resched:
 	prev = current;									// Assume we're going to switch the current process to something else
 	rq = this_rq();									// Get a pointer to the runqueue
 
-	if (is_overdue(prev)) PRINT("IN SCHEDULE: CURRENT=%d, POLICY=%d, REASON=%d\n", prev->pid, prev->policy, prev->switch_reason);
+	PRINT_IF(is_overdue(prev),"IN SCHEDULE: CURRENT=%d, POLICY=%d, REASON=%d\n", prev->pid, prev->policy, prev->switch_reason);
 
 	release_kernel_lock(prev, smp_processor_id());	// Lock something
 	prepare_arch_schedule(prev);					// Just architecture things
@@ -1328,7 +1338,7 @@ pick_next_task:
 		goto switch_tasks;
 	}
 	
-	if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d\n",__LINE__);
+	PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d\n",__LINE__);
 	
 	array = rq->active;								// Get a pointer to the active array.
 													// We may need to change thins because there are other runnable tasks
@@ -1344,7 +1354,7 @@ pick_next_task:
 	}
 
 	idx = sched_find_first_bit(array->bitmap);
-	if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d\n",__LINE__);
+	PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d\n",__LINE__);
 	
 	/**
 	 * HW2:
@@ -1360,10 +1370,10 @@ pick_next_task:
 	 */
 	/** START HW2 */
 	if (!hw2_debug) {
-		if (is_short(prev)) PRINT("NON-DEBUG MODE: idx=%d, ",idx);
+		PRINT_IF(is_short(prev),"NON-DEBUG MODE: idx=%d, ",idx);
 		int highest_prio_short = sched_find_first_bit(rq->active_SHORT->bitmap);
-		if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d\n",__LINE__);
-		if (is_short(prev)) PRINT("highestshort=%d, ", highest_prio_short);
+		PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d\n",__LINE__);
+		PRINT_IF(is_short(prev),"highestshort=%d, ", highest_prio_short);
 		// Are there SHORTS we should run?
 		// Check if idx isn't a RT priority and that there is some SHORT to run
 		if (idx > MAX_RT_PRIO-1 && highest_prio_short != MAX_PRIO) {
@@ -1374,7 +1384,8 @@ pick_next_task:
 			queue = rq->active_SHORT->queue + highest_prio_short;
 			next = list_entry(queue->next, task_t, run_list);
 			PRINT("pid=%d, policy=%d\n", next->pid,next->policy);
-			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, THINKS WE'RE SHORT!\n",__LINE__);
+			PRINT_IF(is_short(prev) && is_short(next) && next != prev, "SWAPPING BETWEEN SHORTS: %p-->%p\n THE QUEUE: HEAD==%p-->%p-->%p\n",prev,next,queue,queue->next,queue->next->next);
+			PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, THINKS WE'RE SHORT!\n",__LINE__);
 			
 		}
 		// Otherwise, are there any RT or OTHER tasks to run?
@@ -1385,8 +1396,8 @@ pick_next_task:
 			// In this case, do the default (original) scheduling choice
 			queue = array->queue + idx;
 			next = list_entry(queue->next, task_t, run_list);
-			if (is_short(prev)) PRINT("running a RT/OTHER process: pid=%d, policy=%d\n",next->pid,next->policy);
-			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, THINKS WE'RE OTHER OR RT!\n",__LINE__);
+			PRINT_IF(is_short(prev),"running a RT/OTHER process: pid=%d, policy=%d\n",next->pid,next->policy);
+			PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, THINKS WE'RE OTHER OR RT!\n",__LINE__);
 		}
 		// If there are no SHORT, OTHER or RT tasks then there MUST be an Overdue task
 		// (because rq->nr_running != 0)
@@ -1402,8 +1413,8 @@ pick_next_task:
 			// still run the next one (forking an overdue process
 			// should cause it to switch - see Piazza)
 			next = list_entry(rq->overdue_SHORT.prev, task_t, run_list);
-			if (is_short(prev)) PRINT("running an overdue process: pid=%d, policy=%d\n",next->pid,next->policy);
-			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d. NEXT OVERDUE: %p, CURRENT OVERDUE: %p. POINTERS: next=%p AND prev=%p\n",__LINE__, &next->run_list, &prev->run_list, next, prev);
+			PRINT_IF(is_short(prev),"running an overdue process: pid=%d, policy=%d\n",next->pid,next->policy);
+			PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d. NEXT OVERDUE: %p, CURRENT OVERDUE: %p. POINTERS: next=%p AND prev=%p\n",__LINE__, &next->run_list, &prev->run_list, next, prev);
 			
 		}
 	}
@@ -1411,7 +1422,7 @@ pick_next_task:
 	else {
 		queue = array->queue + idx;
 		next = list_entry(queue->next, task_t, run_list);
-		if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, ORIGINAL CODE!\n",__LINE__);
+		PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, ORIGINAL CODE!\n",__LINE__);
 	}
 	
 	/**
@@ -1437,7 +1448,7 @@ pick_next_task:
 		if (is_overdue(prev)) {
 			PRINT("PUSHING OVERDUE BACK\n");
 			hw2_back_of_the_queue(prev, rq);
-			if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, PUSHING BACK\n",__LINE__);
+			PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, PUSHING BACK\n",__LINE__);
 		}
 		else if (is_short(prev) && prev->switch_reason == SWITCH_CREATED) {
 			hw2_back_of_the_queue(prev, rq);
@@ -1457,7 +1468,7 @@ switch_tasks:
 		rq->nr_switches++;
 		rq->curr = next;
 	
-		if (is_overdue(prev)) PRINT("OVERDUE SCHEDULE: LINE %d, SWITCHING!\n",__LINE__);
+		PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, SWITCHING!\n",__LINE__);
 		
 		prepare_arch_switch(rq);					// Architecture shit
 		/**
@@ -1775,7 +1786,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 	task_t *p;
 	
 	PRINT("IN SETSCHEDULER WITH POLICY == %d FOR PID=%d: ",policy,pid);
-	if (!param) PRINT("NULL PARAM STRUCT!\n");
+	PRINT_IF(!param,"NULL PARAM STRUCT!\n");
 	
 	if (!param || pid < 0)
 		goto out_nounlock;
@@ -2123,6 +2134,7 @@ asmlinkage long sys_sched_yield(void)
 	 * SHORT process).
 	 *
 	 * However, we do need to log the switch reason
+	 * (this happens bellow)
 	 */
 	
 	runqueue_t *rq = this_rq_lock();
@@ -2491,6 +2503,7 @@ void set_cpus_allowed(task_t *p, unsigned long new_mask)
 	if (!p->array && (p != rq->curr)) {
 		p->cpu = __ffs(p->cpus_allowed);
 		task_rq_unlock(rq, &flags);
+		PRINT_IF(is_overdue(p), "POTENTIAL BUG: WE SHOULDN'T BE HERE (SCHED.C, LINE %d) WITH AN OVERDUE PROCESS\n",__LINE__);
 		goto out;
 	}
 	init_MUTEX_LOCKED(&req.sem);

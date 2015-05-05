@@ -123,7 +123,15 @@ extern unsigned long nr_uninterruptible(void);
 /**
  * HW2:
  *
- * Set this to 1 to enable debugging printk
+ * Define new scheduling policy SCHED_SHORT
+ */
+#define SCHED_SHORT		4
+
+/**
+ * HW2:
+ *
+ * Set this to 1 to enable debugging prints.
+ * See the macro PRINT to see this in action
  */
 #define HWPRINT 1
 
@@ -132,15 +140,41 @@ extern unsigned long nr_uninterruptible(void);
  *
  * Use this to print debug info
  */
-#define PRINT if(HWPRINT) printk
+#define PRINT(printk_str,...) do { \
+		if(HWPRINT) \
+			printk("%d>>>" printk_str, jiffies, ##__VA_ARGS__); \
+	} while(0)
 
 /**
  * HW2:
  *
- * Define new scheduling policy SCHED_SHORT
+ * Use this macro to print something conditionally
  */
-#define SCHED_SHORT		4
+#define PRINT_IF(cond,printk_str,...) do { \
+		if (cond) PRINT(printk_str, ##__VA_ARGS__); \
+	} while(0)
 
+/**
+ * HW2:
+ *
+ * Use this macro to print something only once
+ */
+#define PRINT_ONCE(printk_str,...) do { \
+		static int once=1; \
+		if (once) PRINT(printk_str,##__VA_ARGS__); \
+		once=0; \
+	} while(0)
+	
+
+/**
+ * HW2:
+ *
+ * Use this macro to print something only once, conditionally
+ */
+#define PRINT_ONCE_IF(cond,printk_str,...) do { \
+		if (cond) PRINT_ONCE(printk_str,##__VA_ARGS__); \
+	} while(0)
+ 
 /**
  * HW2:
  *

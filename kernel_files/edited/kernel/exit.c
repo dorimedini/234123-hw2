@@ -498,7 +498,7 @@ NORET_TYPE void do_exit(long code)
 	
 	struct task_struct *tsk = current;
 	
-	if (tsk->policy == SCHED_SHORT && !tsk->remaining_trials) PRINT("IN EXIT WITH OVERDUE PROCESS %d\n",tsk->pid);
+	PRINT_IF(tsk->policy == SCHED_SHORT && !tsk->remaining_trials, "IN EXIT WITH OVERDUE PROCESS %d\n",tsk->pid);
 	
 	if (in_interrupt())
 		panic("Aiee, killing interrupt handler!");
@@ -542,7 +542,7 @@ fake_volatile:
 	/** START HW2 */
 	UPDATE_REASON(current, SWITCH_ENDED);
 	/** END HW2 */
-	if (tsk->policy == SCHED_SHORT && !tsk->remaining_trials) PRINT("ENTERING SCHEDULE() WITH EXITING OVERDUE PROCESS %d\n",tsk->pid);
+	PRINT_IF(tsk->policy == SCHED_SHORT && !tsk->remaining_trials,"ENTERING SCHEDULE() WITH EXITING OVERDUE PROCESS %d\n",tsk->pid);
 	schedule();
 	BUG();
 /*
