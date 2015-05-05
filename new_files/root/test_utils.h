@@ -8,23 +8,25 @@
 #ifndef TEST_UTILS_H_
 #define TEST_UTILS_H_
 
+#define HZ 100
 
 #include <stdio.h>
+#include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
 
 #define TEST_EQUALS(a, b) if (((a) != (b))) { \
 								return 0; \
 							}
 
-#define TEST_DIFFERENT(result, a, b) if ((result) && ((a) == (b))) { \
-								result = false; \
+#define TEST_DIFFERENT(a, b) if (((a) == (b))) { \
+								return 0; \
 							}
 
-#define TEST_TRUE(result, bool) if ((result) && !(bool)) { \
-								result = false; \
+#define TEST_TRUE(bool) if ((!(bool))) { \
+								return 0; \
 							}
 
-#define TEST_FALSE(result, bool) if ((result) && (bool)) { \
-								result = false; \
+#define TEST_FALSE(bool) if ((bool)) { \
+								return 0; \
 							}
 
 #define RUN_TEST(name)  printf("Running "); \
@@ -87,40 +89,7 @@ void doMediumTask()
 	}
 }
 
-void initializeArray()
-{
-	int i=0;
-	for(i=0;i<150;i++){ 
-		info[i].previous_pid=0;
-		info[i].next_pid=0;
-		info[i].previous_policy=0; 
-		info[i].next_policy=0;
-		info[i].time=0; 
-		info[i].reason=SWITCH_UNKNOWN;
-	}
-}
 
-int check_monitor(int pid, int reason, int size){
-	if(size == -1)
-		return 0;
-	int i=0;
-	for(i=0; i< size; i++){
-		if(info[i].reason == reason && info[i].previous_pid == pid)
-			return 1;
-	}
-	return 0;
-}
-
-int check_monitor2(int pid, int reason, int size){
-	if(size == -1)
-		return 0;
-	int i=0;
-	for(i=0; i< size; i++){
-		if(info[i].reason == reason && info[i].next_pid == pid)
-			return 1;
-	}
-	return 0;
-}
 
 
 /**
@@ -154,7 +123,7 @@ int check_monitor2(int pid, int reason, int size){
 		} \
 	} while(0)
 */
-
+/*
 #define CREATE_PROC(pid,policy,req,trials,nice,relevantPids,index) do { \
 		int i; \
 		pid = fork(); \
@@ -166,7 +135,7 @@ int check_monitor2(int pid, int reason, int size){
 		} \
 		relevantPids[index] = pid; \
 	} while(0)
-
+*/
 /**
  * To destroy all processes created via CREATE_PROCS,
  * call this with the pid variable sent to CREATE_PROCS.
@@ -190,14 +159,13 @@ int check_monitor2(int pid, int reason, int size){
 		else while(wait() != -1); \
 	} while(0)
 
-
+/*
 #define REMEMBER_RELEVANT(pid, relevantPids, index) do { \
-	relevantPids[index] = pid;
-}
+		relevantPids[index] = pid;
+	} while(0)
+*/
 
-
-#define CHANGE_TO_SHORT(pid,requested,trials)
-do { \
+#define CHANGE_TO_SHORT(pid,requested,trials) do { \
 		struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials}; \
 		sched_setscheduler(pid, is_SHORT(pid) ? -1 : SCHED_SHORT, &param); \
 	} while(0)
@@ -215,7 +183,8 @@ int calculate_fibo(int num) {
 }
 
 int findTheRelevant(int* relevantPids, int n,int thePidToFind) {
-	for (int i = 0 ; i < n ; ++i) {
+	int i;
+	for (i = 0 ; i < n ; ++i) {
 		if (relevantPids[i] == thePidToFind) {
 			return 1;
 		}
@@ -223,13 +192,15 @@ int findTheRelevant(int* relevantPids, int n,int thePidToFind) {
 	return 0;
 }
 
+/*
 int getRelevantLogger(int* relevantPids, int n ,
 						struct switch_info* relevantLogger, bool print) {
 	int index = 0;
 	struct switch_info info[150];
 	// Get the statistics
 	int num_switches = get_scheduling_statistic(info);
-	for (int i = 0 ; i < num_switches ; ++i) {
+	int i;
+	for (i = 0 ; i < num_switches ; ++i) {
 		if (findTheRelevant(relevantPids,n,info[i].previous_pid)) {
 			relevantLogger[index] = info[i];
 			++index;
@@ -242,13 +213,14 @@ int getRelevantLogger(int* relevantPids, int n ,
 	}
 	return index;
 }
-
+*/
+/*
 void set_to_SHORT_with_prio(int pid, int requested, int trials, int setNice) {
 	struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
 	sched_setscheduler(pid, SCHED_SHORT, &param);
 	nice(setNice);
 }
-
+*/
 /* Here we check if the switches was (in this order)
  * testProc
  * testProc
@@ -262,7 +234,7 @@ void set_to_SHORT_with_prio(int pid, int requested, int trials, int setNice) {
  * testProc
  * testProc
  * testProc
- */
+ *
 bool checkTheReleventSwitches(int testProc, int someProc,struct switch_info* info, int size) {
 	int startSeenSon = 0;
 	int endSeenSon = 0;
@@ -291,7 +263,7 @@ bool checkTheReleventSwitches(int testProc, int someProc,struct switch_info* inf
 	return true;
 }
 
-
+*/
 
 
 

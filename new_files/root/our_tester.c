@@ -2,29 +2,52 @@
  #include "test_utils.h"
  #include <stdio.h>
  #include <assert.h>
-
-
-/*
-struct switch_info {
-	int previous_pid;
-	int next_pid;
-	int previous_policy;
-	int next_policy;
-	unsigned long time;	// The value of jiffies at moment of switch
-	int reason;
-};
-
-*/
+ #include <stdbool.h>
 
 
 // A global log array. We use it in all the tests
 struct switch_info info[150];
 
 
+void initializeArray()
+{
+	int i=0;
+	for(i=0;i<150;i++){ 
+		info[i].previous_pid=0;
+		info[i].next_pid=0;
+		info[i].previous_policy=0; 
+		info[i].next_policy=0;
+		info[i].time=0; 
+		info[i].reason=SWITCH_UNKNOWN;
+	}
+}
+
+int check_monitor(int pid, int reason, int size){
+	if(size == -1)
+		return 0;
+	int i=0;
+	for(i=0; i< size; i++){
+		if(info[i].reason == reason && info[i].previous_pid == pid)
+			return 1;
+	}
+	return 0;
+}
+
+int check_monitor2(int pid, int reason, int size){
+	if(size == -1)
+		return 0;
+	int i=0;
+	for(i=0; i< size; i++){
+		if(info[i].reason == reason && info[i].next_pid == pid)
+			return 1;
+	}
+	return 0;
+}
+
 /*NEW TESTS */
 
 /* TEST: check if OTHER proc ended */
-bool testTaskEnded(){
+bool testTaskEnded() {
 	initializeArray();
 	int id = fork();
 	int result;
@@ -72,7 +95,7 @@ bool testTaskBecomeOverDue(){
 		EXIT_PROCS(getpid());
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
-		TEST_EQUALS(check_monitor(id, SWITCH_BECOME_OVERDUE, result),1);
+		TEST_EQUALS(check_monitor(id, SWITCH_OVERDUE, result),1);
 	} else {
 		int thisPid = getpid();
 		CHANGE_TO_SHORT(thisPid,2000,4);
@@ -95,7 +118,7 @@ bool testTaskPreviousWait(){
 	} else {
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
-		TEST_EQUALS(check_monitor(pid, TASK_PREVOIUS_WAIT, result),1);
+		TEST_EQUALS(check_monitor(pid, SWITCH_PREV_WAIT, result),1);
 		_exit(0);
 	}
 
@@ -119,8 +142,8 @@ bool testMakeSonShort()
 		CHANGE_TO_SHORT(id, expected_requested_time, expected_trials);
 		TEST_TRUE(is_short(id));
 		assert(sched_getparam(id, &param) == 0);
-		TEST_TRUE(param.requested_time, expected_requested_time * HZ / 1000);
-		assert(param.trials_num == expected_trials);
+		TEST_EQUALS(param.requested_time, expected_requested_time * HZ / 1000);
+		TEST_EQUALS(param.trial_num, expected_trials);
 		doShortTask();
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
@@ -147,28 +170,36 @@ bool testBadParams()
 		struct sched_param param;
 		int requested = 7;
 		int trials = 51;
-		param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
+		param.sched_priority = 0;
+		param.requested_time = requested;
+		param.trial_num = trials;
 		TEST_EQUALS(sched_setscheduler(id, SCHED_SHORT, &param), -1);
 		assert(errno = EINVAL);
 		TEST_FALSE(sched_getscheduler(id));
 
 		requested = 7;
 		trials = -1;
-		param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
+		param.sched_priority = 0;
+		param.requested_time = requested;
+		param.trial_num = trials;
 		TEST_EQUALS(sched_setscheduler(id, SCHED_SHORT, &param), -1);
 		assert(errno = EINVAL);
 		TEST_FALSE(sched_getscheduler(id));
 
 		requested = 5001;
 		trials = 10;
-		param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
+		param.sched_priority = 0;
+		param.requested_time = requested;
+		param.trial_num = trials;
 		TEST_EQUALS(sched_setscheduler(id, SCHED_SHORT, &param), -1);
 		assert(errno = EINVAL);
 		TEST_FALSE(sched_getscheduler(id));
 
 		requested = -1;
 		trials = 10;
-		param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
+		param.sched_priority = 0;
+		param.requested_time = requested;
+		param.trial_num = trials;
 		TEST_EQUALS(sched_setscheduler(id, SCHED_SHORT, &param), -1);
 		assert(errno = EINVAL);
 		TEST_FALSE(sched_getscheduler(id));
@@ -205,10 +236,8 @@ bool testSysCalls()
 		int expected_trials = 10;
 		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);
 		TEST_TRUE(is_short(getPid()));
-		int remaining_time = remaining_time(pid);
-		int remaining_trials = remaining_trials(pid);
-		TEST_TRUE(remaining_time <= expected_requested_time);
-		TEST_TRUE(remaining_trials <= expected_requested_trials);
+		TEST_TRUE(remaining_time(pid) <= expected_requested_time);
+		TEST_TRUE(remaining_trials(pid) <= expected_trials);
 		
 		_exit(0);
 	}
@@ -225,8 +254,8 @@ bool testShortFork()
 	int id = fork();
 	if (id > 0) {
 		struct sched_param param;
-		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials)
-		TEST_EQUALS(sched_getparam(id, &param), 0);
+		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);
+		assert(sched_getparam(id, &param) == 0);
 		TEST_EQUALS(param.requested_time, (expected_requested_time * HZ / 1000));
 		TEST_EQUALS(param.trial_num, expected_trials);
 		EXIT_PROCS(getPid());
@@ -810,6 +839,4 @@ bool short_who_finishes_his_trials() {
 	}
 return true;
 }
-
-
 */
