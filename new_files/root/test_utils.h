@@ -11,7 +11,7 @@
 #define HZ 100
 
 #include <stdio.h>
-#include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
+
 
 #define TEST_EQUALS(a, b) if (((a) != (b))) { \
 								return 0; \

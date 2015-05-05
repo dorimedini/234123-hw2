@@ -3,6 +3,7 @@
  #include <stdio.h>
  #include <assert.h>
  #include <stdbool.h>
+ #include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
 
 
 // A global log array. We use it in all the tests
@@ -70,10 +71,9 @@ bool testTaskYield(){
 	int pid=getpid();
 	int id = fork();
 	int result;
-	int status;
 	if(id > 0){
 		sched_yield();
-		wait(&status);
+		EXIT_PROCS(getpid());
 	} else {
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
@@ -132,7 +132,7 @@ bool testTaskPreviousWait(){
  */
 bool testMakeSonShort()
 {
-	inializeArray();
+	initializeArray();
 	int id = fork();
 	int result;
 	struct sched_param param;
@@ -140,14 +140,14 @@ bool testMakeSonShort()
 	int expected_trials = 30;
 	if (id > 0) {	
 		CHANGE_TO_SHORT(id, expected_requested_time, expected_trials);
-		TEST_TRUE(is_short(id));
+		TEST_TRUE(is_SHORT(id));
 		assert(sched_getparam(id, &param) == 0);
 		TEST_EQUALS(param.requested_time, expected_requested_time * HZ / 1000);
 		TEST_EQUALS(param.trial_num, expected_trials);
 		doShortTask();
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
-		TEST_TRUE(check_monitor(getPid(), SWITCH_PRIO, result));
+		TEST_TRUE(check_monitor(getpid(), SWITCH_PRIO, result));
 		EXIT_PROCS(getpid());
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
@@ -204,7 +204,7 @@ bool testBadParams()
 		assert(errno = EINVAL);
 		TEST_FALSE(sched_getscheduler(id));
 
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 	} else if (id == 0) {
 		doShortTask();
 		_exit(0);
@@ -225,17 +225,17 @@ bool testSysCalls()
 		TEST_EQUALS(errno,EINVAL);
 		TEST_EQUALS(remaining_trials(id),-1);
 		TEST_EQUALS(errno, EINVAL);
-		TEST_FALSE(is_short(id));
+		TEST_FALSE(is_SHORT(id));
 
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 
 	} else {
-		int pid = getPid();
+		int pid = getpid();
 		struct sched_param param;
 		int expected_requested_time = 3000;
 		int expected_trials = 10;
 		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);
-		TEST_TRUE(is_short(getPid()));
+		TEST_TRUE(is_SHORT(getpid()));
 		TEST_TRUE(remaining_time(pid) <= expected_requested_time);
 		TEST_TRUE(remaining_trials(pid) <= expected_trials);
 		
@@ -258,21 +258,21 @@ bool testShortFork()
 		assert(sched_getparam(id, &param) == 0);
 		TEST_EQUALS(param.requested_time, (expected_requested_time * HZ / 1000));
 		TEST_EQUALS(param.trial_num, expected_trials);
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 
 	} else {
-		while(!is_short(getPid())) {;}	// wait until your dad set you to SHORT
+		while(!is_SHORT(getpid())) {;}	// wait until your dad set you to SHORT
 
 		TEST_EQUALS(remaining_time(getpid()), expected_requested_time);
-		expected_trials = remaining_trials(getPid());
+		expected_trials = remaining_trials(getpid());
 		int son = fork();
 		if (son == 0)
 		{
 			int grandson_initial_time = remaining_time(getpid());
 			TEST_TRUE(grandson_initial_time <= expected_requested_time/2);
 			TEST_TRUE(grandson_initial_time > 0);
-			TEST_TRUE(is_short(getPid()));
-			TEST_EQUALS(remaining_trials(getPid()), expected_trials/2);
+			TEST_TRUE(is_SHORT(getpid()));
+			TEST_EQUALS(remaining_trials(getpid()), expected_trials/2);
 			doMediumTask();
 			TEST_TRUE(remaining_time(getpid()) < grandson_initial_time);
 			_exit(0);
@@ -280,8 +280,8 @@ bool testShortFork()
 		else
 		{
 			TEST_TRUE(remaining_time(getpid()) <= expected_requested_time/2);
-			TEST_EQUALS(remaining_trials(getPid()), expected_trials/2);
-			EXIT_PROCS(getPid());
+			TEST_EQUALS(remaining_trials(getpid()), expected_trials/2);
+			EXIT_PROCS(getpid());
 			_exit(0);
 		}
 	}
@@ -297,24 +297,24 @@ bool testOverdueFork()
 	int id = fork();
 	if (id > 0) {
 		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);		// become overdue here
-		TEST_FALSE(is_short(id));
+		TEST_FALSE(is_SHORT(id));
 		TEST_EQUALS(remaining_time, 0);
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 
 	} else {
 		doShortTask();
 		int son = fork();
 		if (son == 0)
 		{
-			TEST_FALSE(remaining_trials(getPid()));
+			TEST_FALSE(remaining_trials(getpid()));
 			doShortTask();
-			TEST_FALSE(remaining_time(getPid()));
-			TEST_FALSE(is_short(getPid()));
+			TEST_FALSE(remaining_time(getpid()));
+			TEST_FALSE(is_SHORT(getpid()));
 			_exit(0);
 		}
 		else
 		{
-			EXIT_PROCS(getPid());
+			EXIT_PROCS(getpid());
 			_exit(0);
 		}
 	}
@@ -335,7 +335,7 @@ void testScheduleRealTimeOverShort()
 		int id2 = fork();
 		if (id2 == 0)
 		{
-			doLongTest();
+			doLongTask();
 			printf("\tRT son finished\n");
 			_exit(0);
 		}
@@ -346,7 +346,7 @@ void testScheduleRealTimeOverShort()
 			CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);	// SHORT process
 			sched_setscheduler(id2, SCHED_FIFO, &param);				//FIFO RealTime process
 		}
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 		printf("OK\n");
 	} else if (id == 0) {
 		doMediumTask();
@@ -380,7 +380,7 @@ void testScheduleRealTimeOverShort2()
 			sched_setscheduler(id, 1, &param);			//FIFO RealTime process
 			CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);	// LSHORT process
 		}
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 		printf("OK\n");
 	} else if (id == 0) {
 		doMediumTask();
@@ -401,7 +401,7 @@ void testScheduleShortOverOther()
 		int id2 = fork();
 		if (id2 == 0)
 		{
-			while (!is_short(getPid())) {}
+			while (!is_SHORT(getpid())) {}
 			doMediumTask();
 			printf("\tSHORT son finished\n");
 			_exit(0);
@@ -410,7 +410,7 @@ void testScheduleShortOverOther()
 		{
 			CHANGE_TO_SHORT(id2,expected_requested_time,expected_trials);		// LSHORT process
 		}
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 		printf("OK\n");
 	} else if (id == 0) {
 		doMediumTask();
@@ -438,7 +438,7 @@ void testScheduleShortOverOther2()
 		{
 			CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);		// LSHORT process
 		}
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 		printf("OK\n");
 	} else if (id == 0) {
 		doMediumTask();
@@ -466,7 +466,7 @@ void testScheduleOtherOverOverdue()
 		{
 			CHANGE_TO_SHORT(id2,expected_requested_time,expected_trials);
 		}
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 		printf("OK\n");
 	} else if (id == 0) {
 		doMediumTask();
@@ -494,7 +494,7 @@ void testScheduleOtherOverOverdue2()
 		{
 			CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);
 		}
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 		printf("OK\n");
 	} else if (id == 0) {
 		doMediumTask();
@@ -515,10 +515,10 @@ bool testScheduleOtherShortWhoBecameOverdue()
 		int id2 = fork();
 		if (id2 == 0)
 		{
-			while (!is_short(getPid())) {}
+			while (!is_SHORT(getpid())) {}
 			printf("\tSHORT son started\n");
-			while (remaining_trials(getPid()) > 0) {
-				if (remaining_trials(getPid()) >1) {
+			while (remaining_trials(getpid()) > 0) {
+				if (remaining_trials(getpid()) >1) {
 					printf("\tSHORT son became Overdue\n");
 				}
 			}
@@ -530,7 +530,7 @@ bool testScheduleOtherShortWhoBecameOverdue()
 		{
 			CHANGE_TO_SHORT(id2,expected_requested_time,expected_trials);		// LSHORT process
 		}
-		EXIT_PROCS(getPid());
+		EXIT_PROCS(getpid());
 		printf("OK\n");
 	} else if (id == 0) {
 		doMediumTask();
@@ -564,7 +564,7 @@ int main() {
 	testScheduleShortOverOther();
 
 	printf("Testing race: SHORT vs. OTHER #2(SHORT is supposed to win)\n");
-	testScheduleLShortOverOther2();
+	testScheduleShortOverOther2();
 
 	printf("Testing race: OTHER vs. OVERDUE (OTHER is supposed to win)\n");
 	testScheduleOtherOverOverdue();
