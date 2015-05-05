@@ -92,8 +92,7 @@ bool other_to_short_with_low_prio() {
 // Section 1
 bool rt_is_sched() {
 	int relevantPids[2];
-	// Give this proc long job
-	calculate_fibo(30);
+
 
 	// Creating two sons
 	for (int i = 0 ; i < 2 ; ++i) {
