@@ -84,6 +84,8 @@ int sys_get_scheduling_statistic(struct switch_info* info) {
 		// The copy_to_user function returns the number of bytes NOT copied,
 		// so if this value isn't zero we must return an error
 		if (copy_to_user(info+counter, &(hw2_logger.arr[i]), sizeof(hw2_logger.arr[i]))) {
+//			PRINT("Couldn't copy to user!\ni=%d, counter=%d, hw2_logger.logged=%d, hw2_logger.arr[i].prev_pid=%d\n"
+//											i,    counter,    hw2_logger.logged,    hw2_logger.arr[i].previous_pid);
 			return -EFAULT;
 		}
 		i = (i+1)%150;
