@@ -856,10 +856,10 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	/** START HW2 */
 	hw2_start_logging(&hw2_logger);
 	/** END HW2 */	
-	PRINT(" CHILD PID=%d",p->pid);
+	PRINT_NO_TICK(" CHILD PID=%d",p->pid);
 	
 fork_out:
-	PRINT("\n");
+	PRINT_NO_TICK("\n");
 	return retval;
 
 bad_fork_cleanup_namespace:

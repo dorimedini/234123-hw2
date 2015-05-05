@@ -138,11 +138,20 @@ extern unsigned long nr_uninterruptible(void);
 /**
  * HW2:
  *
+ * Debug printer
+ */
+#define PRINT_NO_TICK(printk_str,...) do { \
+		if(HWPRINT) \
+			printk(printk_str, ##__VA_ARGS__); \
+	} while(0)
+
+/**
+ * HW2:
+ *
  * Use this to print debug info
  */
 #define PRINT(printk_str,...) do { \
-		if(HWPRINT) \
-			printk("%d>>>" printk_str, jiffies, ##__VA_ARGS__); \
+		PRINT_NO_TICK("%d>>>" printk_str, jiffies, ##__VA_ARGS__); \
 	} while(0)
 
 /**
@@ -152,6 +161,17 @@ extern unsigned long nr_uninterruptible(void);
  */
 #define PRINT_IF(cond,printk_str,...) do { \
 		if (cond) PRINT(printk_str, ##__VA_ARGS__); \
+	} while(0)
+
+
+/**
+ * HW2:
+ *
+ * Use this macro to print something conditionally,
+ * without printing the timestamp
+ */
+#define PRINT_IF_NO_TICK(cond,printk_str,...) do { \
+		if (cond) PRINT_NO_TICK(printk_str, ##__VA_ARGS__); \
 	} while(0)
 
 /**
