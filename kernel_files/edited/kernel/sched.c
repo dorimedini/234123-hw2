@@ -1317,7 +1317,7 @@ need_resched:
 	prev = current;									// Assume we're going to switch the current process to something else
 	rq = this_rq();									// Get a pointer to the runqueue
 
-	PRINT_IF(is_overdue(prev),"IN SCHEDULE: CURRENT=%d, POLICY=%d, REASON=%d\n", prev->pid, prev->policy, prev->switch_reason);
+	PRINT_IF(is_overdue(prev),"IN SCHEDULE WITH OVERDUE: CURRENT=%d, POLICY=%d, REASON=%d\n", prev->pid, prev->policy, prev->switch_reason);
 
 	release_kernel_lock(prev, smp_processor_id());	// Lock something
 	prepare_arch_schedule(prev);					// Just architecture things
@@ -1352,12 +1352,24 @@ pick_next_task:
 		goto switch_tasks;
 	}
 	
-	PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d\n",__LINE__);
 	
 	array = rq->active;								// Get a pointer to the active array.
 													// We may need to change thins because there are other runnable tasks
 													// not in rq->active
-	if (unlikely(!array->nr_active)) {
+	/**
+	 * HW2:
+	 *
+	 * We need to add another test here because the original
+	 * code assumes if rq->nr_running isn't 0 then there are
+	 * processes in rq->active or rq->expired.
+	 *
+	 * In our case, both of those queues may be empty if there
+	 * is an overdue process
+	 */
+	/** START HW2 */
+//	if (unlikely(!array->nr_active)) { OLD CODE
+	if (unlikely(!array->nr_active) && list_empty(&rq->overdue_SHORT)) {
+	/** END HW2 */
 		/*
 		 * Switch the active and expired arrays.
 		 */
@@ -1368,7 +1380,6 @@ pick_next_task:
 	}
 
 	idx = sched_find_first_bit(array->bitmap);
-	PRINT_IF(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d\n",__LINE__);
 	
 	/**
 	 * HW2:
@@ -1398,7 +1409,7 @@ pick_next_task:
 			queue = rq->active_SHORT->queue + highest_prio_short;
 			next = list_entry(queue->next, task_t, run_list);
 			PRINT_NO_TICK("pid=%d, policy=%d\n", next->pid,next->policy);
-			PRINT_IF_NO_TICK(is_short(prev) && is_short(next) && next != prev, "SWAPPING BETWEEN SHORTS: %p-->%p\n THE QUEUE: HEAD==%p-->%p-->%p\n",prev,next,queue,queue->next,queue->next->next);
+			PRINT_IF_NO_TICK(is_short(prev) && is_short(next) && next != prev, "SWAPPING BETWEEN SHORTS: %p-->%p\n THE QUEUE: HEAD==%p-->%p-->%p\n",&prev->run_list,&next->run_list,queue,queue->next,queue->next->next);
 			PRINT_IF_NO_TICK(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, THINKS WE'RE SHORT!\n",__LINE__);
 			
 		}
