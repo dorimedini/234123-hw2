@@ -575,7 +575,7 @@ int main() {
 
 
 
-
+/* Our OLD TESTS. MAYBE WE CAN USE THEM LATER ON
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -584,7 +584,12 @@ int main() {
 // WHEN OTHER IS RUNNING...
 
 
-// Other proc will create a son process that will become short process 
+// Other proc will create a son process that will become short process
+
+
+
+
+
 bool other_to_short_with_high_prio() {
 	int relevantPids[2];
 	int otherPid = getpid();
@@ -718,7 +723,7 @@ bool other_shorts_in_the_same_prio() {
 
 
 
-
+*/
 
 /*
  * TEST: We use a SHORT proc with very high prio as a master proc. It create a first SHORT proc with
@@ -726,7 +731,7 @@ bool other_shorts_in_the_same_prio() {
  * 1 trial left.
  *
  * RESULT: It should look like that: dad->son1->son2->son1->son2->dad
-*/
+*
 bool two_shorts_different_prio() {
 	int pid1;
 	CREATE_PROC(pid, SCHED_SHORT, 5000, 50, -19);	//create a master proc to control the test
@@ -779,7 +784,7 @@ bool two_shorts_different_prio() {
  *
  * RESULT: The new proc should run but after a while it should become overdue, and then
  * the old proc should run
-*/
+*
 bool short_who_finishes_his_trials() {
 	int relevantPids[2];
 	int dad_pid = getpid();
@@ -807,3 +812,4 @@ return true;
 }
 
 
+*/

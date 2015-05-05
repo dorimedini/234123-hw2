@@ -58,6 +58,71 @@ enum SWITCH_REASONS {
 	SWITCH_SLICE		// 7: The previous task ran out of time
 };
 
+
+
+void doLongTask()
+{
+	long i;
+	for (i=1; i > 0; i++)
+	{
+		;
+	}
+}
+
+void doShortTask()
+{
+	short i;
+	for (i=1; i != 0; i++)
+	{
+		;
+	}
+}
+
+void doMediumTask()
+{
+	int j;
+	for(j=0; j<4000; j++)
+	{
+		doShortTask();
+	}
+}
+
+void initializeArray()
+{
+	int i=0;
+	for(i=0;i<150;i++){ 
+		info[i].previous_pid=0;
+		info[i].next_pid=0;
+		info[i].previous_policy=0; 
+		info[i].next_policy=0;
+		info[i].time=0; 
+		info[i].reason=SWITCH_UNKNOWN;
+	}
+}
+
+int check_monitor(int pid, int reason, int size){
+	if(size == -1)
+		return 0;
+	int i=0;
+	for(i=0; i< size; i++){
+		if(info[i].reason == reason && info[i].previous_pid == pid)
+			return 1;
+	}
+	return 0;
+}
+
+int check_monitor2(int pid, int reason, int size){
+	if(size == -1)
+		return 0;
+	int i=0;
+	for(i=0; i< size; i++){
+		if(info[i].reason == reason && info[i].next_pid == pid)
+			return 1;
+	}
+	return 0;
+}
+
+
 /**
  * Call this to create multiple processes with the
  * same policy, storing the PID of the process in pid.
@@ -225,5 +290,9 @@ bool checkTheReleventSwitches(int testProc, int someProc,struct switch_info* inf
 	}
 	return true;
 }
+
+
+
+
 
 #endif /* TEST_UTILS_H_ */
