@@ -92,16 +92,17 @@ bool testTaskBecomeOverDue(){
 	int id = fork();
 	int result;
 	if(id > 0){
+		printf("1");
 		EXIT_PROCS(getpid());
+		printf("2");
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
 		TEST_EQUALS(check_monitor(id, SWITCH_OVERDUE, result),1);
 	} else {
 		int thisPid = getpid();
 		CHANGE_TO_SHORT(thisPid,2000,4);
-		while(remaining_time(thisPid)!=0){
-			;
-		}
+		while(remaining_time(thisPid)>0){}
+		doShortTask();
 		_exit(0);
 	}
 	return true;
@@ -142,7 +143,7 @@ bool testMakeSonShort()
 		CHANGE_TO_SHORT(id, expected_requested_time, expected_trials);
 		TEST_TRUE(is_SHORT(id));
 		assert(sched_getparam(id, &param) == 0);
-		TEST_EQUALS(param.requested_time, expected_requested_time * HZ / 1000);
+		TEST_EQUALS(param.requested_time, expected_requested_time);
 		TEST_EQUALS(param.trial_num, expected_trials);
 		doShortTask();
 		result = get_scheduling_statistic(info);
@@ -543,13 +544,14 @@ bool testScheduleOtherShortWhoBecameOverdue()
 int main() {
 	RUN_TEST(testTaskEnded);
 	RUN_TEST(testTaskYield);
-	RUN_TEST(testTaskBecomeOverDue);
 	RUN_TEST(testTaskPreviousWait);
-	RUN_TEST(testMakeSonShort);
 	RUN_TEST(testBadParams);
 	RUN_TEST(testSysCalls);
+	RUN_TEST(testMakeSonShort);
+	RUN_TEST(testTaskBecomeOverDue);
 	RUN_TEST(testShortFork);
 	RUN_TEST(testOverdueFork);
+	RUN_TEST(testTaskBecomeOverDue);
 
 
 	// Those tests focus on the competition between to different policies.
