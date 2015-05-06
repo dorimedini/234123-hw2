@@ -1,7 +1,7 @@
 
 #include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
 
-#define REQUESTED 50
+#define REQUESTED 10
 
 
 /**
@@ -57,7 +57,7 @@ void set_to_SHORT(int pid, int requested, int trials) {
 	struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
 	if (is_SHORT(pid)) {
 		sched_setparam(pid, &param);
-		printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
+//		printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
 		return;
 	}
 	// Only an OTHER process can become a SHORT.
@@ -68,7 +68,7 @@ void set_to_SHORT(int pid, int requested, int trials) {
 		sched_setscheduler(pid, SCHED_OTHER, &param);
 	}
 	sched_setscheduler(pid, SCHED_SHORT, &param);
-	printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
+//	printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
 }
 
 /** Self explanatory */
