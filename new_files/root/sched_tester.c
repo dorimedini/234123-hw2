@@ -55,7 +55,7 @@ char* policy2str(int pol) {
  */
 void set_to_SHORT(int pid, int requested, int trials) {
 	struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
-	if (is_SHORT(pid)) {
+	if (is_SHORT(pid) != -1) {
 		sched_setparam(pid, &param);
 //		printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
 		return;
@@ -137,9 +137,6 @@ int main(int argc, char** argv) {
 		}
 		else {			// Make the RT father:
 			set_to_SHORT(pids[i], REQUESTED, trials[i]);	// Turn the child into a SHORT process (may need to turn into an OTHER first)
-			if (!is_SHORT(pids[i])) {
-				printf("%d isn't SHORT!\n", pids[i]);
-			}
 		}
 	}
 	

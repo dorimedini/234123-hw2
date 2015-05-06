@@ -7,8 +7,3 @@ gcc sched_tester.c -o sched_tester
 ./sched_tester 10 35 10 43 10 5 10 20
 dmesg > log
 
-# Facebook tester:
-#gcc code_test.c -o code_test
-#./code_test
-#dmesg > log
-
