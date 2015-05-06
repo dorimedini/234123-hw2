@@ -756,7 +756,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	p->remaining_trials = p->trial_num = (current->remaining_trials + 1) >> 1;
 	// This may be zero! We need to make it overdue if it is
 	if (current->remaining_trials) {
-		current->remaining_trials >> 1;
+		current->remaining_trials >>= 1;
 		// If the parent has just become overdue...
 		if (!current->remaining_trials) {
 			// ... let the tick handler take care of it.
