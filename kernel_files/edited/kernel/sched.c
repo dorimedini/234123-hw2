@@ -812,7 +812,12 @@ void wake_up_forked_process(task_t * p)
 void sched_exit(task_t * p)
 {
 	__cli();
-	if (p->first_time_slice) {
+	/**
+	 * HW2:
+	 *
+	 * Don't give daddy his time slice back!
+	 */
+	if (p->first_time_slice/** START HW2 */ && !is_short(p)/** END HW2 */) {
 		current->time_slice += p->time_slice;
 		if (unlikely(current->time_slice > MAX_TIMESLICE))
 			current->time_slice = MAX_TIMESLICE;
