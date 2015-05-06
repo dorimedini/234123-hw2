@@ -602,21 +602,25 @@ void testSHORTRoundRobinNew()
     {
         //this is the SHORT1 (son of manager)
         doLongTask();
+		int pid = getpid();
+		printf("After long task... task %d is SHORT? %d. TS=%d, RT=%d\n",pid,is_SHORT(pid), remaining_time(pid),remaining_trials(pid));
         int SHORT2 = fork(); //Create SHORT2
         int statusSHORT2;
         if(SHORT2 > 0)
         {
             //this is the SHORT1 (son of manager)
+ 			printf("Parent task... task %d is SHORT? %d. TS=%d, RT=%d\n",pid,is_SHORT(pid), remaining_time(pid),remaining_trials(pid));
             struct sched_param param;
             param.requested_time = 5000;
             param.trial_num = 50;
  			param.sched_priority = 0;
-            to_short(SHORT2, SCHED_SHORT, &param); //make the son (SHORT2) a short    
+//            to_short(SHORT2, SCHED_SHORT, &param); //make the son (SHORT2) a short    
             
             int i;
             for (i=0; i < 4; i++)
             {
                 doLongTask();
+				printf("SHORT1 did long task, is_SHORT==%d, ts=%d, rt=%d\n",is_SHORT(getpid()),remaining_time(getpid()),remaining_trials(getpid()));
                 if(is_SHORT(getpid()) == 1)
                 {
                     printf("\t\tSHORT1 is in RR mode, rtr=%d and rti=%d\n",remaining_trials(getpid()),remaining_time(getpid()));
@@ -633,12 +637,15 @@ void testSHORTRoundRobinNew()
         else if (SHORT2 == 0)
         {
             //this is the SHORT2 (son of SHORT1)
+			pid = getpid();
+			printf("Child task... task %d is SHORT? %d. TS=%d, RT=%d\n",pid,is_SHORT(pid), remaining_time(pid),remaining_trials(pid));
 
 
             int i;
             for (i=0; i < 4; i++)
             {
                 doLongTask();
+				printf("SHORT2 did long task, is_SHORT==%d, ts=%d, rt=%d\n",is_SHORT(getpid()),remaining_time(getpid()),remaining_trials(getpid()));
                 if(is_SHORT(getpid()) == 1)
                 {
                     printf("SHORT2 is in RR mode, rtr=%d and rti=%d\n",remaining_trials(getpid()),remaining_time(getpid()));
@@ -710,7 +717,7 @@ int main()
 
     printf("Testing SHORT processes Round-Robin... \n");
     testSHORTRoundRobinNew();
-
+return 0;
     printf("testChangeRequestedTimeForShort... ");
     testChangeRequestedTimeForShort();
 
