@@ -1279,14 +1279,14 @@ void scheduler_tick(int user_tick, int system)
 			/**/
 			// END DEBUG CODE
 			// START "GOOD" CODE (OR NOT)
-			/*
+			/**/
 			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
 				INIT_LIST_HEAD(&p->run_list);				// If we don't do this, hw2_enqueue will think it's enqueued already
 				UPDATE_REASON(p, SWITCH_OVERDUE);
 				p->remaining_trials = p->time_slice = 0;
 			}
 			hw2_enqueue(p,rq,1);							// Re insert into the runqueue (works for new overdue as well)
-			*/
+			/**/
 			// END "GOOD" CODE 
 		}
 	}
