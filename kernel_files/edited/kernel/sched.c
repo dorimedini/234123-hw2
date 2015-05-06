@@ -1262,8 +1262,8 @@ void scheduler_tick(int user_tick, int system)
 			// START DEBUG CODE:
 			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
 				INIT_LIST_HEAD(&p->run_list);	// If we don't do this, hw2_enqueue will think it's enqueued already
-			//	p->remaining_trials=1;
-			//	p->time_slice=100;
+				//p->remaining_trials=0;
+				//p->time_slice=0;
 				PRINT_NO_TICK("BECAME OVERDUE: pid=%d. &runlist=%p, runlist.next=%p, runlist.prev=%p. The answer to is_queued is %s\n", p->pid, &p->run_list, p->run_list.next, p->run_list.prev, is_queued(p)? "YES" : "NO");
 				UPDATE_REASON(p, SWITCH_OVERDUE);
 				list_add(&p->run_list,&rq->overdue_SHORT);
@@ -1281,6 +1281,7 @@ void scheduler_tick(int user_tick, int system)
 			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
 				INIT_LIST_HEAD(&p->run_list);				// If we don't do this, hw2_enqueue will think it's enqueued already
 				UPDATE_REASON(p, SWITCH_OVERDUE);
+				p->remaining_trials = p->time_slice = 0;
 			}
 			hw2_enqueue(p,rq,1);							// Re insert into the runqueue (works for new overdue as well)
 			*/
