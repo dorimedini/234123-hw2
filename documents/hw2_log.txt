@@ -1,4 +1,3 @@
-
 Going to calculate the following Fibonacci numbers (#:trials-number):
 #0:1-10   #1:50-5   #2:40-43   #3:50-10   
 Participating SHORTs:
