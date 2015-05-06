@@ -1356,6 +1356,10 @@ pick_next_task:
 	}
 	
 	
+	PRINT_IF(is_short(prev),"In SCHEDULE, Daddy SHORT (pid=%d) has %d remaining time and %d trials\n",
+						prev->pid,prev->time_slice,prev->remaining_trials);
+
+	
 	array = rq->active;								// Get a pointer to the active array.
 													// We may need to change thins because there are other runnable tasks
 													// not in rq->active
@@ -1484,6 +1488,10 @@ pick_next_task:
 	}
 	/** END HW2 */
 	
+	PRINT_IF(is_short(prev) && prev==next,"In SCHEDULE, Daddy SHORT (pid=%d) has %d remaining time and %d trials and no switch\n",
+						prev->pid,prev->time_slice,prev->remaining_trials);
+	PRINT_IF(is_short(prev) && prev!=next,"In SCHEDULE, Daddy SHORT (pid=%d) has %d remaining time and %d trials and switching to pid=%d, ts=%d, rt=%d\n",
+						prev->pid,prev->time_slice,prev->remaining_trials,next->pid,next->time_slice,next->remaining_trials);
 	
 switch_tasks:
 	prefetch(next);

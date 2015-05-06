@@ -858,6 +858,9 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	/** END HW2 */	
 	PRINT_NO_TICK(" CHILD PID=%d",p->pid);
 	
+	PRINT("Daddy SHORT (pid=%d) has %d remaining time and %d trials, while child (%d) has %d and %d\n",
+						current->pid,current->time_slice,current->remaining_trials,p->pid,p->time_slice,p->remaining_trials);
+	
 fork_out:
 	PRINT_NO_TICK("\n");
 	return retval;
