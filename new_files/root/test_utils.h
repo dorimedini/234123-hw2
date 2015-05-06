@@ -8,24 +8,28 @@
 #ifndef TEST_UTILS_H_
 #define TEST_UTILS_H_
 
-#define HZ 100
+#define HZ 512
 
 #include <stdio.h>
 
 
 #define TEST_EQUALS(a, b) if (((a) != (b))) { \
+								printf("LINE %d: ",__LINE__); \
 								return 0; \
 							}
 
 #define TEST_DIFFERENT(a, b) if (((a) == (b))) { \
+								printf("LINE %d: ",__LINE__); \
 								return 0; \
 							}
 
 #define TEST_TRUE(bool) if ((!(bool))) { \
+								printf("LINE %d: ",__LINE__); \
 								return 0; \
 							}
 
 #define TEST_FALSE(bool) if ((bool)) { \
+								printf("LINE %d: ",__LINE__); \
 								return 0; \
 							}
 
@@ -40,11 +44,13 @@
 
 
 #define SWITCH(proc1,proc2) if ((should_switch((proc1),(proc2)) != 1)) { \
+									printf("LINE %d: ",__LINE__); \
 									return 0; \
 								}
 
 
 #define NO_SWITCH(proc1,proc2) if ((should_switch((proc1),(proc2)) != 0)) { \
+									printf("LINE %d: ",__LINE__); \
 									return 0; \
 								}
 
@@ -155,7 +161,7 @@ void doMediumTask()
  *
 */
 #define EXIT_PROCS(pid) do { \
-		int status;
+		int status; \
 		if (!pid) exit(0); \
 		else while(wait(&status) != -1); \
 	} while(0)
@@ -168,7 +174,8 @@ void doMediumTask()
 
 #define CHANGE_TO_SHORT(pid,requested,trials) do { \
 		struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials}; \
-		sched_setscheduler(pid, is_SHORT(pid) ? -1 : SCHED_SHORT, &param); \
+		if (sched_getscheduler(pid) != SCHED_OTHER) sched_setscheduler(pid,SCHED_OTHER,&param); \
+		sched_setscheduler(pid, is_SHORT(pid)!=-1 ? -1 : SCHED_SHORT, &param); \
 	} while(0)
 
 #define BEST_SHORT(pid) do { \

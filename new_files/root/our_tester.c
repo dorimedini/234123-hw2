@@ -92,16 +92,19 @@ bool testTaskBecomeOverDue(){
 	int id = fork();
 	int result;
 	if(id > 0){
-		printf("1");
-		EXIT_PROCS(getpid());
-		printf("2");
+//		printf("1");
+//		EXIT_PROCS(getpid());
+//		printf("2");
+		while(is_SHORT(id) != 0);	// Wait for son to overdue
 		result = get_scheduling_statistic(info);
 		TEST_DIFFERENT(result,-1);
 		TEST_EQUALS(check_monitor(id, SWITCH_OVERDUE, result),1);
+		EXIT_PROCS(getpid());
 	} else {
 		int thisPid = getpid();
 		CHANGE_TO_SHORT(thisPid,2000,4);
-		while(remaining_time(thisPid)>0){}
+		while(remaining_trials(thisPid)>0);
+		while(remaining_time(thisPid)>0);
 		doShortTask();
 		_exit(0);
 	}
@@ -141,7 +144,7 @@ bool testMakeSonShort()
 	int expected_trials = 30;
 	if (id > 0) {	
 		CHANGE_TO_SHORT(id, expected_requested_time, expected_trials);
-		TEST_TRUE(is_SHORT(id));
+		TEST_EQUALS(is_SHORT(id),1);
 		assert(sched_getparam(id, &param) == 0);
 		TEST_EQUALS(param.requested_time, expected_requested_time);
 		TEST_EQUALS(param.trial_num, expected_trials);
@@ -226,7 +229,7 @@ bool testSysCalls()
 		TEST_EQUALS(errno,EINVAL);
 		TEST_EQUALS(remaining_trials(id),-1);
 		TEST_EQUALS(errno, EINVAL);
-		TEST_FALSE(is_SHORT(id));
+		TEST_EQUALS(is_SHORT(id),-1);
 
 		EXIT_PROCS(getpid());
 
@@ -236,7 +239,7 @@ bool testSysCalls()
 		int expected_requested_time = 3000;
 		int expected_trials = 10;
 		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);
-		TEST_TRUE(is_SHORT(getpid()));
+		TEST_EQUALS(is_SHORT(getpid()),1);
 		TEST_TRUE(remaining_time(pid) <= expected_requested_time);
 		TEST_TRUE(remaining_trials(pid) <= expected_trials);
 		
