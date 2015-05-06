@@ -126,7 +126,6 @@ int main(int argc, char** argv) {
 		}
 	}
 	
-	
 	// Create processes
 	int pids[total];
 	for (i=0; i<total; ++i) {
@@ -146,6 +145,16 @@ int main(int argc, char** argv) {
 	
 	// Get the statistics
 	int num_switches = get_scheduling_statistic(info);
+	
+	// Output basic info
+	printf("\nGoing to calculate the following Fibonacci numbers (#:trials-number):\n");
+	for (i=0; i<total; ++i) {
+		printf("#%d:%d-%d   ",i,trials[i],numbers[i]);
+	}
+	printf("\nParticipating SHORTs:\n");
+	for (i=0;i<total;++i) {
+		printf("#%d:%d   ",i,pids[i]);
+	}
 	
 	// Print them
 	print_info(info, num_switches);

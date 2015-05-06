@@ -1,0 +1,483 @@
+
+Going to calculate the following Fibonacci numbers (#:trials-number):
+#0:1-10   #1:50-5   #2:40-43   #3:50-10   
+Participating SHORTs:
+#0:1366   #1:1367   #2:1368   #3:1369   
+START PRINTING 150 SWITCHES:
+===================================================================
+     PREV-PID - NEXT-PID - PREV-POL - NEXT-POL -   TIME   -  REASON
+  0:     427  |    1349  |    OTHER |    OTHER |  392839  | STARTED WAITING
+  1:    1349  |     427  |    OTHER |    OTHER |  392839  | STARTED WAITING
+  2:     427  |    1349  |    OTHER |    OTHER |  392840  | STARTED WAITING
+  3:    1349  |     427  |    OTHER |    OTHER |  392840  | STARTED WAITING
+  4:     427  |    1349  |    OTHER |    OTHER |  392840  | STARTED WAITING
+  5:    1349  |     427  |    OTHER |    OTHER |  392840  | STARTED WAITING
+  6:     427  |    1349  |    OTHER |    OTHER |  392840  | STARTED WAITING
+  7:    1349  |     427  |    OTHER |    OTHER |  392840  | STARTED WAITING
+  8:     427  |    1349  |    OTHER |    OTHER |  392840  | STARTED WAITING
+  9:    1349  |     427  |    OTHER |    OTHER |  392840  | STARTED WAITING
+ 10:     427  |    1349  |    OTHER |    OTHER |  392840  | STARTED WAITING
+ 11:    1349  |     427  |    OTHER |    OTHER |  392840  | STARTED WAITING
+ 12:     427  |    1349  |    OTHER |    OTHER |  392840  | STARTED WAITING
+ 13:    1349  |     427  |    OTHER |    OTHER |  392840  | STARTED WAITING
+ 14:     427  |     988  |    OTHER |    OTHER |  392841  | HIGHER PRIO ARRIVED
+ 15:     988  |     427  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 16:     427  |    1349  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 17:    1349  |     427  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 18:     427  |    1349  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 19:    1349  |     427  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 20:    1349  |    1358  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 21:    1358  |     427  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 22:     427  |    1358  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 23:    1358  |     427  |    OTHER |    OTHER |  392841  | STARTED WAITING
+ 24:     427  |    1358  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 25:    1358  |     427  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 26:     427  |    1358  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 27:    1358  |     427  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 28:     427  |    1358  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 29:    1358  |     427  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 30:     427  |    1358  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 31:    1358  |     427  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 32:     427  |    1358  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 33:    1358  |     427  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 34:     427  |    1358  |    OTHER |    OTHER |  392842  | STARTED WAITING
+ 35:    1358  |     427  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 36:     427  |    1358  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 37:    1358  |     427  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 38:     427  |    1358  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 39:    1358  |     427  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 40:     427  |    1358  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 41:    1358  |     427  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 42:     427  |    1358  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 43:    1358  |     427  |    OTHER |    OTHER |  392843  | STARTED WAITING
+ 44:     427  |    1358  |    OTHER |    OTHER |  392844  | STARTED WAITING
+ 45:    1358  |     427  |    OTHER |    OTHER |  392844  | STARTED WAITING
+ 46:     427  |    1358  |    OTHER |    OTHER |  392844  | STARTED WAITING
+ 47:    1358  |     427  |    OTHER |    OTHER |  392844  | STARTED WAITING
+ 48:     427  |    1358  |    OTHER |    OTHER |  392844  | STARTED WAITING
+ 49:    1358  |     427  |    OTHER |    OTHER |  392844  | STARTED WAITING
+ 50:    1358  |    1349  |    OTHER |    OTHER |  392910  | ENDED
+ 51:    1349  |     427  |    OTHER |    OTHER |  392910  | STARTED WAITING
+ 52:     427  |    1349  |    OTHER |    OTHER |  392910  | STARTED WAITING
+ 53:    1349  |     427  |    OTHER |    OTHER |  392910  | STARTED WAITING
+ 54:     427  |    1349  |    OTHER |    OTHER |  392910  | STARTED WAITING
+ 55:    1349  |     427  |    OTHER |    OTHER |  392910  | STARTED WAITING
+ 56:     427  |    1349  |    OTHER |    OTHER |  392910  | STARTED WAITING
+ 57:    1349  |     427  |    OTHER |    OTHER |  392910  | STARTED WAITING
+ 58:     427  |    1349  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 59:    1349  |     427  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 60:     427  |    1349  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 61:    1349  |     427  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 62:     427  |    1349  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 63:    1349  |     427  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 64:     427  |    1349  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 65:    1349  |     427  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 66:     427  |    1349  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 67:    1349  |     427  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 68:     427  |    1349  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 69:    1349  |     427  |    OTHER |    OTHER |  392911  | STARTED WAITING
+ 70:     427  |    1349  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 71:    1349  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 72:     427  |    1349  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 73:    1349  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 74:     427  |    1349  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 75:    1349  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 76:     427  |    1349  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 77:    1349  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 78:     427  |    1349  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 79:    1349  |    1359  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 80:    1359  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 81:     427  |    1359  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 82:    1359  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 83:     427  |    1359  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 84:    1359  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+ 85:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 86:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 87:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 88:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 89:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 90:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 91:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 92:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 93:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 94:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 95:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 96:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 97:     427  |     988  |    OTHER |    OTHER |  392914  | HIGHER PRIO ARRIVED
+ 98:     988  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 99:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+100:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+101:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+102:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+103:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+104:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+105:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+106:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+107:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+108:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+109:    1359  |    1349  |    OTHER |    OTHER |  393011  | ENDED
+110:    1349  |     427  |    OTHER |    OTHER |  393011  | STARTED WAITING
+111:     427  |    1349  |    OTHER |    OTHER |  393011  | STARTED WAITING
+112:    1349  |     427  |    OTHER |    OTHER |  393011  | STARTED WAITING
+113:     427  |    1349  |    OTHER |    OTHER |  393011  | STARTED WAITING
+114:    1349  |    1342  |    OTHER |    OTHER |  393011  | ENDED
+115:    1342  |    1360  |    OTHER |    OTHER |  393011  | STARTED WAITING
+116:    1360  |    1361  |    OTHER |    OTHER |  393011  | STARTED WAITING
+117:    1361  |     988  |    OTHER |    OTHER |  393015  | HIGHER PRIO ARRIVED
+118:     988  |    1361  |    OTHER |    OTHER |  393015  | STARTED WAITING
+119:    1361  |    1360  |    OTHER |    OTHER |  393019  | ENDED
+120:    1360  |    1362  |    OTHER |    OTHER |  393019  | STARTED WAITING
+121:    1362  |    1360  |    OTHER |    OTHER |  393021  | ENDED
+122:    1360  |    1363  |    OTHER |    OTHER |  393021  | STARTED WAITING
+123:    1363  |    1364  |    OTHER |    OTHER |  393021  | STARTED WAITING
+124:    1364  |    1363  |    OTHER |    OTHER |  393027  | ENDED
+125:    1363  |    1360  |    OTHER |    OTHER |  393027  | ENDED
+126:    1360  |    1342  |    OTHER |    OTHER |  393027  | ENDED
+127:    1342  |    1365  |    OTHER |    OTHER |  393027  | STARTED WAITING
+128:    1365  |    1366  |       RT |    SHORT |  393027  | STARTED WAITING
+129:    1366  |    1365  |    SHORT |       RT |  393027  | ENDED
+130:    1365  |    1367  |       RT |    SHORT |  393027  | STARTED WAITING
+131:    1367  |    1365  |    SHORT |       RT |  393027  | ENDED
+132:    1365  |    1368  |       RT |    SHORT |  393027  | STARTED WAITING
+133:    1368  |    1369  |    SHORT |    SHORT |  393078  | OUT OF TIME
+134:    1369  |    1365  |    SHORT |       RT |  393078  | ENDED
+135:    1365  |    1368  |       RT |    SHORT |  393078  | STARTED WAITING
+136:    1368  |     988  |    SHORT |    OTHER |  393227  | OVERDUE
+137:     988  |    1105  |    OTHER |    OTHER |  393227  | STARTED WAITING
+138:    1105  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+139:     988  |    1105  |    OTHER |    OTHER |  393227  | STARTED WAITING
+140:    1105  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+141:     988  |    1105  |    OTHER |    OTHER |  393227  | STARTED WAITING
+142:    1105  |    1124  |    OTHER |    OTHER |  393227  | STARTED WAITING
+143:    1124  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+144:     988  |    1124  |    OTHER |    OTHER |  393227  | STARTED WAITING
+145:    1124  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+146:     988  |    1124  |    OTHER |    OTHER |  393227  | STARTED WAITING
+147:    1124  |     427  |    OTHER |    OTHER |  393227  | STARTED WAITING
+148:     427  |    1368  |    OTHER |    SHORT |  393227  | STARTED WAITING
+149:    1368  |    1365  |    SHORT |       RT |  397265  | ENDED
+===================================================================
+END PRINT
+
+
+Going to calculate the following Fibonacci numbers (#:trials-number):
+#0:3-45   #1:1-5   #2:50-7   
+Participating SHORTs:
+#0:1371   #1:1372   #2:1373   
+START PRINTING 150 SWITCHES:
+===================================================================
+     PREV-PID - NEXT-PID - PREV-POL - NEXT-POL -   TIME   -  REASON
+  0:     427  |    1349  |    OTHER |    OTHER |  392912  | STARTED WAITING
+  1:    1349  |    1359  |    OTHER |    OTHER |  392912  | STARTED WAITING
+  2:    1359  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+  3:     427  |    1359  |    OTHER |    OTHER |  392912  | STARTED WAITING
+  4:    1359  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+  5:     427  |    1359  |    OTHER |    OTHER |  392912  | STARTED WAITING
+  6:    1359  |     427  |    OTHER |    OTHER |  392912  | STARTED WAITING
+  7:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+  8:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+  9:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 10:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 11:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 12:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 13:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 14:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 15:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 16:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 17:     427  |    1359  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 18:    1359  |     427  |    OTHER |    OTHER |  392913  | STARTED WAITING
+ 19:     427  |     988  |    OTHER |    OTHER |  392914  | HIGHER PRIO ARRIVED
+ 20:     988  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 21:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 22:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 23:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 24:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 25:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 26:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 27:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 28:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 29:     427  |    1359  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 30:    1359  |     427  |    OTHER |    OTHER |  392914  | STARTED WAITING
+ 31:    1359  |    1349  |    OTHER |    OTHER |  393011  | ENDED
+ 32:    1349  |     427  |    OTHER |    OTHER |  393011  | STARTED WAITING
+ 33:     427  |    1349  |    OTHER |    OTHER |  393011  | STARTED WAITING
+ 34:    1349  |     427  |    OTHER |    OTHER |  393011  | STARTED WAITING
+ 35:     427  |    1349  |    OTHER |    OTHER |  393011  | STARTED WAITING
+ 36:    1349  |    1342  |    OTHER |    OTHER |  393011  | ENDED
+ 37:    1342  |    1360  |    OTHER |    OTHER |  393011  | STARTED WAITING
+ 38:    1360  |    1361  |    OTHER |    OTHER |  393011  | STARTED WAITING
+ 39:    1361  |     988  |    OTHER |    OTHER |  393015  | HIGHER PRIO ARRIVED
+ 40:     988  |    1361  |    OTHER |    OTHER |  393015  | STARTED WAITING
+ 41:    1361  |    1360  |    OTHER |    OTHER |  393019  | ENDED
+ 42:    1360  |    1362  |    OTHER |    OTHER |  393019  | STARTED WAITING
+ 43:    1362  |    1360  |    OTHER |    OTHER |  393021  | ENDED
+ 44:    1360  |    1363  |    OTHER |    OTHER |  393021  | STARTED WAITING
+ 45:    1363  |    1364  |    OTHER |    OTHER |  393021  | STARTED WAITING
+ 46:    1364  |    1363  |    OTHER |    OTHER |  393027  | ENDED
+ 47:    1363  |    1360  |    OTHER |    OTHER |  393027  | ENDED
+ 48:    1360  |    1342  |    OTHER |    OTHER |  393027  | ENDED
+ 49:    1342  |    1365  |    OTHER |    OTHER |  393027  | STARTED WAITING
+ 50:    1365  |    1366  |       RT |    SHORT |  393027  | STARTED WAITING
+ 51:    1366  |    1365  |    SHORT |       RT |  393027  | ENDED
+ 52:    1365  |    1367  |       RT |    SHORT |  393027  | STARTED WAITING
+ 53:    1367  |    1365  |    SHORT |       RT |  393027  | ENDED
+ 54:    1365  |    1368  |       RT |    SHORT |  393027  | STARTED WAITING
+ 55:    1368  |    1369  |    SHORT |    SHORT |  393078  | OUT OF TIME
+ 56:    1369  |    1365  |    SHORT |       RT |  393078  | ENDED
+ 57:    1365  |    1368  |       RT |    SHORT |  393078  | STARTED WAITING
+ 58:    1368  |     988  |    SHORT |    OTHER |  393227  | OVERDUE
+ 59:     988  |    1105  |    OTHER |    OTHER |  393227  | STARTED WAITING
+ 60:    1105  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+ 61:     988  |    1105  |    OTHER |    OTHER |  393227  | STARTED WAITING
+ 62:    1105  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+ 63:     988  |    1105  |    OTHER |    OTHER |  393227  | STARTED WAITING
+ 64:    1105  |    1124  |    OTHER |    OTHER |  393227  | STARTED WAITING
+ 65:    1124  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+ 66:     988  |    1124  |    OTHER |    OTHER |  393227  | STARTED WAITING
+ 67:    1124  |     988  |    OTHER |    OTHER |  393227  | HIGHER PRIO ARRIVED
+ 68:     988  |    1124  |    OTHER |    OTHER |  393227  | STARTED WAITING
+ 69:    1124  |     427  |    OTHER |    OTHER |  393227  | STARTED WAITING
+ 70:     427  |    1368  |    OTHER |    SHORT |  393227  | STARTED WAITING
+ 71:    1368  |    1365  |    SHORT |       RT |  397265  | ENDED
+ 72:    1365  |     988  |       RT |    OTHER |  397265  | ENDED
+ 73:     988  |       3  |    OTHER |    OTHER |  397265  | STARTED WAITING
+ 74:       3  |       5  |    OTHER |    OTHER |  397265  | STARTED WAITING
+ 75:       5  |    1107  |    OTHER |    OTHER |  397265  | STARTED WAITING
+ 76:    1107  |     869  |    OTHER |    OTHER |  397265  | STARTED WAITING
+ 77:     869  |    1099  |    OTHER |    OTHER |  397265  | STARTED WAITING
+ 78:    1099  |    1101  |    OTHER |    OTHER |  397265  | STARTED WAITING
+ 79:    1101  |    1105  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 80:    1105  |     988  |    OTHER |    OTHER |  397267  | HIGHER PRIO ARRIVED
+ 81:     988  |    1105  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 82:    1105  |     988  |    OTHER |    OTHER |  397267  | HIGHER PRIO ARRIVED
+ 83:     988  |    1105  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 84:    1105  |     427  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 85:     427  |    1124  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 86:    1124  |     988  |    OTHER |    OTHER |  397267  | HIGHER PRIO ARRIVED
+ 87:     988  |    1124  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 88:    1124  |     988  |    OTHER |    OTHER |  397267  | HIGHER PRIO ARRIVED
+ 89:     988  |    1124  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 90:    1124  |       2  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 91:       2  |     988  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 92:     988  |       1  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 93:       1  |       7  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 94:       7  |    1106  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 95:    1106  |      16  |    OTHER |    OTHER |  397267  | STARTED WAITING
+ 96:      16  |    1085  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 97:    1085  |    1342  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 98:    1342  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 99:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+100:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+101:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+102:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+103:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+104:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+105:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+106:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+107:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+108:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+109:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+110:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+111:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+112:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+113:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+114:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+115:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+116:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+117:    1006  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+118:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+119:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+120:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+121:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+122:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+123:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+124:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+125:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+126:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+127:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+128:    1370  |    1371  |       RT |    SHORT |  397269  | STARTED WAITING
+129:    1371  |    1372  |    SHORT |    SHORT |  397320  | OUT OF TIME
+130:    1372  |    1370  |    SHORT |       RT |  397320  | ENDED
+131:    1370  |    1373  |       RT |    SHORT |  397320  | STARTED WAITING
+132:    1373  |    1370  |    SHORT |       RT |  397320  | ENDED
+133:    1370  |    1371  |       RT |    SHORT |  397320  | STARTED WAITING
+134:    1371  |     988  |    SHORT |    OTHER |  397362  | OVERDUE
+135:     988  |    1101  |    OTHER |    OTHER |  397362  | STARTED WAITING
+136:    1101  |     988  |    OTHER |    OTHER |  397362  | HIGHER PRIO ARRIVED
+137:     988  |    1101  |    OTHER |    OTHER |  397362  | STARTED WAITING
+138:    1101  |      16  |    OTHER |    OTHER |  397362  | STARTED WAITING
+139:      16  |    1105  |    OTHER |    OTHER |  397362  | STARTED WAITING
+140:    1105  |     988  |    OTHER |    OTHER |  397362  | HIGHER PRIO ARRIVED
+141:     988  |    1105  |    OTHER |    OTHER |  397362  | STARTED WAITING
+142:    1105  |     988  |    OTHER |    OTHER |  397362  | HIGHER PRIO ARRIVED
+143:     988  |    1105  |    OTHER |    OTHER |  397362  | STARTED WAITING
+144:    1105  |     427  |    OTHER |    OTHER |  397362  | STARTED WAITING
+145:     427  |    1097  |    OTHER |    OTHER |  397362  | STARTED WAITING
+146:    1097  |    1064  |    OTHER |    OTHER |  397362  | STARTED WAITING
+147:    1064  |    1374  |    OTHER |    OTHER |  397362  | STARTED WAITING
+148:    1374  |    1371  |    OTHER |    SHORT |  397362  | STARTED WAITING
+149:    1371  |    1370  |    SHORT |       RT |  408306  | ENDED
+===================================================================
+END PRINT
+
+
+Going to calculate the following Fibonacci numbers (#:trials-number):
+#0:44-10   #1:43-20   #2:2-25   #3:3-30   #4:50-35   #5:4-40   #6:5-45   
+Participating SHORTs:
+#0:1378   #1:1379   #2:1380   #3:1381   #4:1382   #5:1383   #6:1384   
+START PRINTING 150 SWITCHES:
+===================================================================
+     PREV-PID - NEXT-PID - PREV-POL - NEXT-POL -   TIME   -  REASON
+  0:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+  1:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+  2:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+  3:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+  4:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+  5:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+  6:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+  7:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+  8:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+  9:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 10:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 11:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 12:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 13:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 14:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 15:    1006  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 16:     988  |    1006  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 17:    1006  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 18:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 19:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 20:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 21:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 22:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 23:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 24:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 25:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 26:    1082  |     988  |    OTHER |    OTHER |  397268  | HIGHER PRIO ARRIVED
+ 27:     988  |    1082  |    OTHER |    OTHER |  397268  | STARTED WAITING
+ 28:    1370  |    1371  |       RT |    SHORT |  397269  | STARTED WAITING
+ 29:    1371  |    1372  |    SHORT |    SHORT |  397320  | OUT OF TIME
+ 30:    1372  |    1370  |    SHORT |       RT |  397320  | ENDED
+ 31:    1370  |    1373  |       RT |    SHORT |  397320  | STARTED WAITING
+ 32:    1373  |    1370  |    SHORT |       RT |  397320  | ENDED
+ 33:    1370  |    1371  |       RT |    SHORT |  397320  | STARTED WAITING
+ 34:    1371  |     988  |    SHORT |    OTHER |  397362  | OVERDUE
+ 35:     988  |    1101  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 36:    1101  |     988  |    OTHER |    OTHER |  397362  | HIGHER PRIO ARRIVED
+ 37:     988  |    1101  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 38:    1101  |      16  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 39:      16  |    1105  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 40:    1105  |     988  |    OTHER |    OTHER |  397362  | HIGHER PRIO ARRIVED
+ 41:     988  |    1105  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 42:    1105  |     988  |    OTHER |    OTHER |  397362  | HIGHER PRIO ARRIVED
+ 43:     988  |    1105  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 44:    1105  |     427  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 45:     427  |    1097  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 46:    1097  |    1064  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 47:    1064  |    1374  |    OTHER |    OTHER |  397362  | STARTED WAITING
+ 48:    1374  |    1371  |    OTHER |    SHORT |  397362  | STARTED WAITING
+ 49:    1371  |    1370  |    SHORT |       RT |  408306  | ENDED
+ 50:    1370  |     988  |       RT |    OTHER |  408306  | STARTED WAITING
+ 51:     988  |      16  |    OTHER |    OTHER |  408306  | STARTED WAITING
+ 52:      16  |    1370  |    OTHER |       RT |  408306  | HIGHER PRIO ARRIVED
+ 53:    1370  |      16  |       RT |    OTHER |  408306  | STARTED WAITING
+ 54:      16  |    1370  |    OTHER |       RT |  408307  | STARTED WAITING
+ 55:    1370  |    1105  |       RT |    OTHER |  408307  | ENDED
+ 56:    1105  |     988  |    OTHER |    OTHER |  408307  | HIGHER PRIO ARRIVED
+ 57:     988  |    1105  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 58:    1105  |     988  |    OTHER |    OTHER |  408307  | HIGHER PRIO ARRIVED
+ 59:     988  |    1105  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 60:    1105  |    1124  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 61:    1124  |     988  |    OTHER |    OTHER |  408307  | HIGHER PRIO ARRIVED
+ 62:     988  |    1124  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 63:    1124  |     988  |    OTHER |    OTHER |  408307  | HIGHER PRIO ARRIVED
+ 64:     988  |    1124  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 65:    1124  |       3  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 66:       3  |       5  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 67:       5  |    1107  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 68:    1107  |     869  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 69:     869  |    1099  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 70:    1099  |    1101  |    OTHER |    OTHER |  408307  | STARTED WAITING
+ 71:    1101  |    1085  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 72:    1085  |       1  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 73:       1  |       7  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 74:       7  |    1106  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 75:    1106  |    1064  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 76:    1064  |    1097  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 77:    1097  |     682  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 78:     682  |    1374  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 79:    1374  |      16  |    OTHER |    OTHER |  408308  | STARTED WAITING
+ 80:      16  |    1342  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 81:    1342  |    1101  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 82:    1101  |    1103  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 83:    1103  |     427  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 84:     427  |      16  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 85:      16  |    1106  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 86:    1106  |    1342  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 87:    1342  |      16  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 88:      16  |    1375  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 89:    1375  |    1374  |    OTHER |    OTHER |  408309  | ENDED
+ 90:    1374  |    1376  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 91:    1376  |     427  |    OTHER |    OTHER |  408309  | HIGHER PRIO ARRIVED
+ 92:     427  |    1376  |    OTHER |    OTHER |  408309  | STARTED WAITING
+ 93:    1376  |    1374  |    OTHER |    OTHER |  408309  | ENDED
+ 94:    1374  |     427  |    OTHER |    OTHER |  408309  | ENDED
+ 95:     427  |    1377  |    OTHER |    OTHER |  408310  | STARTED WAITING
+ 96:    1377  |    1378  |       RT |    SHORT |  408310  | STARTED WAITING
+ 97:    1378  |    1377  |    SHORT |       RT |  408310  | ENDED
+ 98:    1377  |    1379  |       RT |    SHORT |  408310  | STARTED WAITING
+ 99:    1379  |    1377  |    SHORT |       RT |  408310  | ENDED
+100:    1377  |    1380  |       RT |    SHORT |  408310  | STARTED WAITING
+101:    1380  |    1377  |    SHORT |       RT |  408311  | ENDED
+102:    1377  |    1381  |       RT |    SHORT |  408311  | STARTED WAITING
+103:    1381  |    1377  |    SHORT |       RT |  408319  | ENDED
+104:    1377  |    1382  |       RT |    SHORT |  408319  | STARTED WAITING
+105:    1382  |    1383  |    SHORT |    SHORT |  408370  | OUT OF TIME
+106:    1383  |    1384  |    SHORT |    SHORT |  408421  | OUT OF TIME
+107:    1384  |    1382  |    SHORT |    SHORT |  408472  | OUT OF TIME
+108:    1382  |    1383  |    SHORT |    SHORT |  408497  | OUT OF TIME
+109:    1383  |    1384  |    SHORT |    SHORT |  408522  | OUT OF TIME
+110:    1384  |    1382  |    SHORT |    SHORT |  408547  | OUT OF TIME
+111:    1382  |    1377  |    SHORT |       RT |  408563  | ENDED
+112:    1377  |    1383  |       RT |    SHORT |  408563  | STARTED WAITING
+113:    1383  |    1384  |    SHORT |    SHORT |  408580  | OUT OF TIME
+114:    1384  |    1383  |    SHORT |    SHORT |  408597  | OUT OF TIME
+115:    1383  |    1384  |    SHORT |    SHORT |  408609  | OVERDUE
+116:    1384  |     988  |    SHORT |    OTHER |  408631  | OVERDUE
+117:     988  |    1105  |    OTHER |    OTHER |  408631  | STARTED WAITING
+118:    1105  |     988  |    OTHER |    OTHER |  408631  | HIGHER PRIO ARRIVED
+119:     988  |    1105  |    OTHER |    OTHER |  408631  | STARTED WAITING
+120:    1105  |     988  |    OTHER |    OTHER |  408631  | HIGHER PRIO ARRIVED
+121:     988  |    1105  |    OTHER |    OTHER |  408631  | STARTED WAITING
+122:    1105  |     427  |    OTHER |    OTHER |  408631  | STARTED WAITING
+123:     427  |    1124  |    OTHER |    OTHER |  408631  | STARTED WAITING
+124:    1124  |     988  |    OTHER |    OTHER |  408631  | HIGHER PRIO ARRIVED
+125:     988  |    1124  |    OTHER |    OTHER |  408631  | STARTED WAITING
+126:    1124  |     988  |    OTHER |    OTHER |  408631  | HIGHER PRIO ARRIVED
+127:     988  |    1124  |    OTHER |    OTHER |  408631  | STARTED WAITING
+128:    1124  |    1383  |    OTHER |    SHORT |  408631  | STARTED WAITING
+129:    1383  |    1377  |    SHORT |       RT |  409515  | ENDED
+130:    1377  |     988  |       RT |    OTHER |  409515  | STARTED WAITING
+131:     988  |    1105  |    OTHER |    OTHER |  409515  | STARTED WAITING
+132:    1105  |     988  |    OTHER |    OTHER |  409516  | HIGHER PRIO ARRIVED
+133:     988  |    1105  |    OTHER |    OTHER |  409516  | STARTED WAITING
+134:    1105  |     988  |    OTHER |    OTHER |  409516  | HIGHER PRIO ARRIVED
+135:     988  |    1105  |    OTHER |    OTHER |  409516  | STARTED WAITING
+136:    1105  |     427  |    OTHER |    OTHER |  409516  | STARTED WAITING
+137:     427  |       3  |    OTHER |    OTHER |  409516  | STARTED WAITING
+138:       3  |       5  |    OTHER |    OTHER |  409516  | STARTED WAITING
+139:       5  |    1124  |    OTHER |    OTHER |  409516  | STARTED WAITING
+140:    1124  |     988  |    OTHER |    OTHER |  409516  | HIGHER PRIO ARRIVED
+141:     988  |    1124  |    OTHER |    OTHER |  409516  | STARTED WAITING
+142:    1124  |     988  |    OTHER |    OTHER |  409516  | HIGHER PRIO ARRIVED
+143:     988  |    1124  |    OTHER |    OTHER |  409516  | STARTED WAITING
+144:    1124  |    1107  |    OTHER |    OTHER |  409516  | STARTED WAITING
+145:    1107  |     869  |    OTHER |    OTHER |  409516  | STARTED WAITING
+146:     869  |    1099  |    OTHER |    OTHER |  409516  | STARTED WAITING
+147:    1099  |    1101  |    OTHER |    OTHER |  409516  | STARTED WAITING
+148:    1101  |    1384  |    OTHER |    SHORT |  409518  | STARTED WAITING
+149:    1384  |    1377  |    SHORT |       RT |  420855  | ENDED
+===================================================================
+END PRINT
+
