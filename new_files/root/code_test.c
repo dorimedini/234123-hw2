@@ -720,7 +720,6 @@ int main()
 
     printf("Testing race: SHORT vs. OTHER (SHORT is supposed to win)\n");
     testScheduleShortOverOther();
-	return 0;
  
     printf("Testing race: OTHER vs. OVERDUE #2(OTHER is supposed to win)\n");
     printf("The OVERDUE process was created as SHORT and consumed all of it's Trials...\n");
