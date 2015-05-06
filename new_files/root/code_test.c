@@ -4,6 +4,16 @@
 
 #define HZ 512
 
+#define THIS_POL SCHED_RR
+
+int to_short(int pid, int policy, struct sched_param* param) {
+	int ret;
+	if (sched_getscheduler(pid) != SCHED_OTHER) {
+		ret = sched_setscheduler(pid,SCHED_OTHER,param);
+		if (ret < 0) return ret;
+	}
+	return sched_setscheduler(pid,SCHED_SHORT,param);
+}
 
 void printMonitoringUsage(int reason){
     printf("\n the integer value of reason should be between 0 to 7\n, reason value is:\t %d", reason);
@@ -42,27 +52,20 @@ void printMonitoringUsage(int reason){
 void doLongTask()
 {
         long i;
-        for (i=1; i > 0; i++)
-        {
-                ;
-        }
+        for (i=1; i > 0; i++);
 }
 
 void doShortTask()
 {
         short i;
-        for (i=1; i != 0; i++)
-        {
-                ;
-        }
+        for (i=1; i != 0; i++);
 }
 
 void doMediumTask()
 {
         int j;
-        for(j=0; j<1000; j++)
-        {
-                doShortTask();
+        for(j=0; j<1000; j++) {
+            doShortTask();
         }
 }
 
@@ -77,7 +80,8 @@ void testBadParams()
         int expected_trials = 51;
         param.requested_time = expected_requested_time;
         param.trial_num = expected_trials;
-        assert(sched_setscheduler(id, SCHED_SHORT, &param) == -1);
+		param.sched_priority = 0;
+        assert(to_short(id, SCHED_SHORT, &param) == -1);
         assert(errno = 22);
         assert(sched_getscheduler(id) == 0);
 
@@ -85,7 +89,8 @@ void testBadParams()
         expected_trials = 7;
         param.requested_time = expected_requested_time;
         param.trial_num = expected_trials;
-        assert(sched_setscheduler(id, SCHED_SHORT, &param) == -1);
+		param.sched_priority = 0;
+        assert(to_short(id, SCHED_SHORT, &param) == -1);
         assert(errno = 22);
         assert(sched_getscheduler(id) == 0);
         wait(&status);
@@ -99,7 +104,7 @@ void testBadParams()
 void testOther()
 {
         int thisId = getpid();
-        assert(sched_getscheduler(thisId) == 0);
+        assert(sched_getscheduler(thisId) == THIS_POL);
         assert(is_SHORT(thisId) == -1);             //This means it a SCHED_OTHER process
         assert(errno == 22);
         assert(remaining_time(thisId) == -1);
@@ -127,7 +132,8 @@ void testSysCalls()
             int expected_trials = 8;
             param.requested_time = expected_requested_time;
             param.trial_num = expected_trials;
-            sched_setscheduler(id, SCHED_SHORT, &param);
+			param.sched_priority = 0;
+            to_short(id, SCHED_SHORT, &param);
             int remaining_time1 = remaining_time(id);
             int remaining_trials1 = remaining_trials(id);
             assert(remaining_time1 <= expected_requested_time);
@@ -152,7 +158,8 @@ void testMakeSonShort()
             int expected_trials = 8;
             inputParam.requested_time = expected_requested_time;
             inputParam.trial_num = expected_trials;
-            sched_setscheduler(id, SCHED_SHORT, &inputParam);
+			inputParam.sched_priority = 0;
+            to_short(id, SCHED_SHORT, &inputParam);
             assert(sched_getscheduler(id) == SCHED_SHORT);
             assert(sched_getparam(id, &outputParam) == 0);
             assert(outputParam.requested_time == expected_requested_time);
@@ -175,7 +182,8 @@ void testFork()
                 int expected_trials = 8;
                 inputParam.requested_time = expected_requested_time;
                 inputParam.trial_num = expected_trials;
-                sched_setscheduler(id, SCHED_SHORT, &inputParam);
+				inputParam.sched_priority = 0;
+                to_short(id, SCHED_SHORT, &inputParam);
                 assert(sched_getscheduler(id) == SCHED_SHORT);
                 assert(sched_getparam(id, &outputParam) == 0);
                 assert(outputParam.requested_time == expected_requested_time);
@@ -209,18 +217,19 @@ void testBecomingOverdueBecauseOfTrials()
         int status;
         if (id > 0) {
                 struct sched_param param;
-                int expected_requested_time =60;
-                int expected_trials = 2;
+                int expected_requested_time =5000;
+                int expected_trials = 10;
                 param.requested_time = expected_requested_time;
                 param.trial_num = expected_trials;
-                sched_setscheduler(id, SCHED_SHORT, &param);
+				param.sched_priority = 0;
+                assert(to_short(id, SCHED_SHORT, &param) != -1);
                 assert(sched_getscheduler(id) == SCHED_SHORT);
                 assert(sched_getparam(id, &param) == 0);
                 assert(param.trial_num == expected_trials);
                 wait(&status);
                 printf("OK\n");
         } else if (id == 0) {
-                doLongTask();
+               doLongTask();
                 _exit(0);
         }
 }
@@ -235,7 +244,8 @@ void testBecomingOverdueBecauseOfTime()
                 int expected_trials = 50;
                 param.requested_time = expected_requested_time;
                 param.trial_num = expected_trials;
-                sched_setscheduler(id, SCHED_SHORT, &param);
+				param.sched_priority = 0;
+                to_short(id, SCHED_SHORT, &param);
                 assert(sched_getscheduler(id) == SCHED_SHORT);
                 assert(sched_getparam(id, &param) == 0);
                 assert(param.trial_num == expected_trials);
@@ -243,12 +253,15 @@ void testBecomingOverdueBecauseOfTime()
                 printf("OK\n");
         } else if (id == 0) {
                 int myId = getpid();
-                int i = remaining_time(myId);
-                for (i; i < 2; )
-                {
-                        i = remaining_time(myId);
-                        doShortTask();
-                }
+				int rtr, rti;
+				printf("\nEXPECTED: TRIALS=50,RTI=5. GOT: TRIALS=%d, RTI=%d\n",remaining_trials(myId),remaining_time(myId));
+                for(rtr =remaining_trials(myId); rtr > 30; rtr =remaining_trials(myId));	// After this: one jiffy left
+				printf("EXPECTED: TRIALS=49,RTI=1. GOT: TRIALS=%d, RTI=%d\n",rtr,remaining_time(myId));
+                for(rti =remaining_time(myId); rti > 0; rti =remaining_time(myId));	// After this: one jiffy left
+				printf("EXPECTED: TRIALS=0,RTI=0. GOT: TRIALS=%d, RTI=%d\n",rtr,rti);
+				doShortTask();
+				printf("EXPECTED: TRIALS=0,RTI=0. GOT: TRIALS=%d, RTI=%d\n",rtr,rti);
+				assert(is_SHORT(myId) == 0);
                 _exit(0);
         }
 }
@@ -259,46 +272,46 @@ void testChangeRequestedTimeForShort()
     int id = fork();
     int status;
     if (id > 0) {
-    //the father
-    struct sched_param paramIn, paramOut ;
-    int expected_requested_time =2000;
-    int expected_trials = 50;
-    paramIn.requested_time = expected_requested_time;
-    paramIn.trial_num = expected_trials;
+		//the father
+		struct sched_param paramIn, paramOut ;
+		int expected_requested_time =2000;
+		int expected_trials = 50;
+		paramIn.requested_time = expected_requested_time;
+		paramIn.trial_num = expected_trials;
 
-    sched_setscheduler(id, SCHED_SHORT, &paramIn); //make son short
-    assert(sched_getscheduler(id) == SCHED_SHORT);
+		to_short(id, SCHED_SHORT, &paramIn); //make son short
+		assert(sched_getscheduler(id) == SCHED_SHORT);
 
-    assert(sched_getparam(id, &paramOut) == 0);
-    assert(paramOut.requested_time == expected_requested_time); //should be 2000
+		assert(sched_getparam(id, &paramOut) == 0);
+		assert(paramOut.requested_time == expected_requested_time); //should be 2000
 
-    //change requested_time fail
-    paramIn.requested_time = 3000;
-    assert(sched_setparam(id, &paramIn) == -1);
+		//change requested_time fail
+		paramIn.requested_time = 3000;
+		assert(sched_setparam(id, &paramIn) == -1);
 
-    assert(sched_getparam(id, &paramOut) == 0);       
-    assert(paramOut.requested_time == expected_requested_time); //should be 2000
+		assert(sched_getparam(id, &paramOut) == 0);       
+		assert(paramOut.requested_time == expected_requested_time); //should be 2000
 
-    int new_expected_requested_time =1000;
-    //change requested_time fail because of different trial_num
-    paramIn.requested_time = new_expected_requested_time;
-    paramIn.trial_num = 40;
-    assert(sched_setparam(id, &paramIn) ==-1);
+		int new_expected_requested_time =1000;
+		//change requested_time fail because of different trial_num
+		paramIn.requested_time = new_expected_requested_time;
+		paramIn.trial_num = 40;
+		assert(sched_setparam(id, &paramIn) ==-1);
 
-    assert(sched_getparam(id, &paramOut) == 0);       
-    assert(paramOut.requested_time == expected_requested_time); //should be 2000
+		assert(sched_getparam(id, &paramOut) == 0);       
+		assert(paramOut.requested_time == expected_requested_time); //should be 2000
 
 
-    //change requested_time success
-    paramIn.requested_time = new_expected_requested_time;
-    paramIn.trial_num = expected_trials;
-    assert(sched_setparam(id, &paramIn) == 0);
+		//change requested_time success
+		paramIn.requested_time = new_expected_requested_time;
+		paramIn.trial_num = expected_trials;
+		assert(sched_setparam(id, &paramIn) == 0);
 
-    assert(sched_getparam(id, &paramOut) == 0);       
-    assert(paramOut.requested_time == new_expected_requested_time); //should be 1000
+		assert(sched_getparam(id, &paramOut) == 0);       
+		assert(paramOut.requested_time == new_expected_requested_time); //should be 1000
 
-    wait(&status);
-    printf("OK\n");
+		wait(&status);
+		printf("OK\n");
     } else if (id == 0) {
         _exit(0);
     }
@@ -342,7 +355,7 @@ void testScheduleRealTimeOverShort()
                 {
                         struct sched_param param2;
                         param2.sched_priority = 1;
-                        sched_setscheduler(id, SCHED_SHORT, &param1); // SHORT process
+                        to_short(id, SCHED_SHORT, &param1); // SHORT process
                         sched_setscheduler(id2, 1, &param2);                     //FIFO RealTime process
                 }
                 wait(&status);
@@ -381,7 +394,7 @@ void testScheduleShortOverOther()
                 struct sched_param param2;
                 param2.sched_priority = 1;
                 sched_setscheduler(id, 0, &param2);             // regular SCHED_OTHER
-                sched_setscheduler(id2, SCHED_SHORT, &param1);         // SHORT process
+                to_short(id2, SCHED_SHORT, &param1);         // SHORT process
             }
             wait(&status);
             wait(&status);
@@ -415,7 +428,7 @@ void testScheduleShortOverOther2()
                 struct sched_param param2;
                 param2.sched_priority = 1;
                 sched_setscheduler(id2, 0, &param2);            // regular SCHED_OTHER
-                sched_setscheduler(id, SCHED_SHORT, &param1);          // SHORT process
+                to_short(id, SCHED_SHORT, &param1);          // SHORT process
             }
             wait(&status);
             wait(&status);
@@ -451,7 +464,7 @@ void testScheduleOtherOverOVERDUEBecauseOfTrials()
                         struct sched_param param2;
                         param2.sched_priority = 1;
                         sched_setscheduler(id, 0, &param2);             // regular SCHED_OTHER
-                        sched_setscheduler(id2, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
+                        to_short(id2, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
                 }
                 wait(&status);
                 wait(&status);
@@ -486,7 +499,7 @@ void testScheduleOtherOverOVERDUEBecauseOfTrials2()
                         struct sched_param param2;
                         param2.sched_priority = 1;
                         sched_setscheduler(id2, 0, &param2);             // regular SCHED_OTHER
-                        sched_setscheduler(id, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
+                        to_short(id, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
                 }
                 wait(&status);
                 wait(&status);
@@ -521,7 +534,7 @@ void testScheduleOtherOverOVERDUEBecauseOfTime()
                         struct sched_param param2;
                         param2.sched_priority = 1;
                         sched_setscheduler(id, 0, &param2);             // regular SCHED_OTHER
-                        sched_setscheduler(id2, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
+                        to_short(id2, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
                 }
                 wait(&status);
                 wait(&status);
@@ -556,7 +569,7 @@ void testScheduleOtherOverOVERDUEBecauseOfTime2()
                         struct sched_param param2;
                         param2.sched_priority = 1;
                         sched_setscheduler(id2, 0, &param2);             // regular SCHED_OTHER
-                        sched_setscheduler(id, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
+                        to_short(id, SCHED_SHORT, &param1);         // SHORT_OVERDUE process
                 }
                 wait(&status);
                 wait(&status);
@@ -580,7 +593,8 @@ void testSHORTRoundRobinNew()
         struct sched_param param;
         param.requested_time = 5000;
         param.trial_num = 50;
-        sched_setscheduler(Manager, SCHED_SHORT, &param); //make the son (SHORT1) a short
+ 		param.sched_priority = 0;
+        to_short(Manager, SCHED_SHORT, &param); //make the son (SHORT1) a short
         wait(&statusManager);
         printf("OK\n");
     }
@@ -596,7 +610,8 @@ void testSHORTRoundRobinNew()
             struct sched_param param;
             param.requested_time = 5000;
             param.trial_num = 50;
-            sched_setscheduler(SHORT2, SCHED_SHORT, &param); //make the son (SHORT2) a short    
+ 			param.sched_priority = 0;
+           to_short(SHORT2, SCHED_SHORT, &param); //make the son (SHORT2) a short    
             
             int i;
             for (i=0; i < 4; i++)
@@ -649,7 +664,7 @@ void testMakeShort()
         int expected_trial_num = 8;
         inputParam.requested_time = expected_requested_time;
         inputParam.trial_num = expected_trial_num;
-        sched_setscheduler(thisId, SCHED_SHORT, &inputParam);
+        to_short(thisId, SCHED_SHORT, &inputParam);
         assert(sched_getscheduler(thisId) == SCHED_SHORT);
         assert(sched_getparam(thisId, &outputParam) == 0);
         assert(outputParam.requested_time == expected_requested_time);
@@ -666,7 +681,11 @@ void testMakeShort()
 
 int main()
 {
-    
+	// Try making the father RT first
+	struct sched_param param;
+	param.sched_priority = 50;
+	assert(sched_setscheduler(getpid(), SCHED_RR, &param) != -1);
+	
     printf("Testing bad parameters... ");
     testBadParams();
 
@@ -684,10 +703,12 @@ int main()
 
     printf("Testing becoming overdue because of Trials... ");
     testBecomingOverdueBecauseOfTrials();
-
+	
+	
     printf("Testing becoming overdue because of Time... ");
     testBecomingOverdueBecauseOfTime();
 
+	return 0;
     printf("Testing SHORT processes Round-Robin... \n");
     testSHORTRoundRobinNew();
 
@@ -718,6 +739,9 @@ int main()
     printf("Testing making this process SHORT... ");
     testMakeShort();
     
+	int status;
+	while(wait(&status) != -1);
+	
     printf("Success!\n");
         
     return 0;

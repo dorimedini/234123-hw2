@@ -1,7 +1,7 @@
 
 #include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
 
-#define REQUESTED 10
+#define REQUESTED 100
 
 
 /**
@@ -137,6 +137,9 @@ int main(int argc, char** argv) {
 		}
 		else {			// Make the RT father:
 			set_to_SHORT(pids[i], REQUESTED, trials[i]);	// Turn the child into a SHORT process (may need to turn into an OTHER first)
+			if (!is_SHORT(pids[i])) {
+				printf("%d isn't SHORT!\n", pids[i]);
+			}
 		}
 	}
 	

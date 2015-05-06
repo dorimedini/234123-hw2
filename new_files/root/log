@@ -1,0 +1,192 @@
+Linux version 2.4.18-14custom (root@localhost.localdomain) (gcc version 3.2 20020903 (Red Hat Linux 8.0 3.2-7)) #3 Wed May 6 13:36:44 IDT 2015
+BIOS-provided physical RAM map:
+ BIOS-e820: 0000000000000000 - 000000000009f800 (usable)
+ BIOS-e820: 000000000009f800 - 00000000000a0000 (reserved)
+ BIOS-e820: 00000000000ca000 - 00000000000cc000 (reserved)
+ BIOS-e820: 00000000000dc000 - 0000000000100000 (reserved)
+ BIOS-e820: 0000000000100000 - 000000000fef0000 (usable)
+ BIOS-e820: 000000000fef0000 - 000000000feff000 (ACPI data)
+ BIOS-e820: 000000000feff000 - 000000000ff00000 (ACPI NVS)
+ BIOS-e820: 000000000ff00000 - 0000000010000000 (usable)
+ BIOS-e820: 00000000e0000000 - 00000000f0000000 (reserved)
+ BIOS-e820: 00000000fec00000 - 00000000fec10000 (reserved)
+ BIOS-e820: 00000000fee00000 - 00000000fee01000 (reserved)
+ BIOS-e820: 00000000fffe0000 - 0000000100000000 (reserved)
+0MB HIGHMEM available.
+256MB LOWMEM available.
+On node 0 totalpages: 65536
+zone(0): 4096 pages.
+zone(1): 61440 pages.
+zone(2): 0 pages.
+Kernel command line: ro root=LABEL=/
+Initializing CPU#0
+Detected 2393.076 MHz processor.
+Console: colour VGA+ 80x25
+Calibrating delay loop... 4717.44 BogoMIPS
+Memory: 253004k/262144k available (1300k kernel code, 6640k reserved, 959k data, 172k init, 0k highmem)
+Dentry cache hash table entries: 32768 (order: 6, 262144 bytes)
+Inode cache hash table entries: 16384 (order: 5, 131072 bytes)
+Mount cache hash table entries: 4096 (order: 3, 32768 bytes)
+ramfs: mounted with options: <defaults>
+ramfs: max_pages=31881 max_file_pages=0 max_inodes=0 max_dentries=31881
+Buffer cache hash table entries: 16384 (order: 4, 65536 bytes)
+Page-cache hash table entries: 65536 (order: 6, 262144 bytes)
+CPU: Before vendor init, caps: 0fabfbff 28100000 00000000, vendor = 0
+CPU: After vendor init, caps: 0fabfbff 28100000 00000000 00000000
+Intel machine check architecture supported.
+Intel machine check reporting enabled on CPU#0.
+CPU:     After generic, caps: 0fabfbff 28100000 00000000 00000000
+CPU:             Common caps: 0fabfbff 28100000 00000000 00000000
+CPU: Intel Celeron (Covington) stepping 05
+Enabling fast FPU save and restore... done.
+Enabling unmasked SIMD FPU exception support... done.
+Checking 'hlt' instruction... OK.
+POSIX conformance testing by UNIFIX
+mtrr: v1.40 (20010327) Richard Gooch (rgooch@atnf.csiro.au)
+mtrr: detected mtrr type: Intel
+PCI: PCI BIOS revision 2.10 entry at 0xfd8a0, last bus=34
+PCI: Using configuration type 1
+PCI: Probing PCI hardware
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 1: assuming transparent
+Unknown bridge resource 2: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+Unknown bridge resource 0: assuming transparent
+PCI: Using IRQ router PIIX [8086/7110] at 00:07.0
+Limiting direct PCI/PCI transfers.
+isapnp: Scanning for PnP cards...
+isapnp: No Plug & Play device found
+Linux NET4.0 for Linux 2.4
+Based upon Swansea University Computer Society NET3.039
+Initializing RT netlink socket
+apm: BIOS version 1.2 Flags 0x03 (Driver version 1.16)
+Starting kswapd
+VFS: Diskquotas version dquot_6.5.0 initialized
+pty: 2048 Unix98 ptys configured
+Serial driver version 5.05c (2001-07-08) with MANY_PORTS MULTIPORT SHARE_IRQ SERIAL_PCI ISAPNP enabled
+ttyS0 at 0x03f8 (irq = 4) is a 16550A
+ttyS1 at 0x02f8 (irq = 3) is a 16550A
+Real Time Clock Driver v1.10e
+oprofile: mapping APIC.
+oprofile: no local P6 APIC. Falling back to RTC mode.
+Your CPU does not have a local APIC, e.g. mobile P6. Falling back to RTC mode.
+oprofile: can't get RTC I/O Ports
+block: 480 slots per queue, batch=120
+Uniform Multi-Platform E-IDE driver Revision: 6.31
+ide: Assuming 33MHz system bus speed for PIO modes; override with idebus=xx
+PIIX4: IDE controller on PCI bus 00 dev 39
+PIIX4: chipset revision 1
+PIIX4: not 100% native mode: will probe irqs later
+    ide0: BM-DMA at 0x10e0-0x10e7, BIOS settings: hda:pio, hdb:pio
+    ide1: BM-DMA at 0x10e8-0x10ef, BIOS settings: hdc:DMA, hdd:pio
+hdc: VMware Virtual IDE CDROM Drive, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+ide-floppy driver 0.99.newide
+Floppy drive(s): fd0 is 1.44M
+FDC 0 is a post-1991 82077
+NET4: Frame Diverter 0.46
+RAMDISK driver initialized: 16 RAM disks of 4096K size 1024 blocksize
+ide-floppy driver 0.99.newide
+md: md driver 0.90.0 MAX_MD_DEVS=256, MD_SB_DISKS=27
+md: Autodetecting RAID arrays.
+md: autorun ...
+md: ... autorun DONE.
+NET4: Linux TCP/IP 1.0 for NET4.0
+IP Protocols: ICMP, UDP, TCP, IGMP
+IP: routing cache hash table of 2048 buckets, 16Kbytes
+TCP: Hash tables configured (established 16384 bind 32768)
+Linux IP multicast router 0.06 plus PIM-SM
+NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
+RAMDISK: Compressed image found at block 0
+Freeing initrd memory: 230k freed
+VFS: Mounted root (ext2 filesystem).
+SCSI subsystem driver Revision: 1.00
+kmod: failed to exec /sbin/modprobe -s -k scsi_hostadapter, errno = 2
+PCI: Found IRQ 11 for device 00:10.0
+scsi: ***** BusLogic SCSI Driver Version 2.1.15 of 17 August 1998 *****
+scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+scsi0:   Firmware Version: 5.07B, I/O Address: 0x10C0, IRQ Channel: 11/Level
+scsi0:   PCI Bus: 0, Device: 16, Address: 0xC8002000, Host Adapter SCSI ID: 7
+scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+scsi0:   Tagged Queue Depth: Automatic, Untagged Queue Depth: 3
+scsi0:   Error Recovery Strategy: Default, SCSI Bus Reset: Enabled
+scsi0: *** BusLogic BT-958 Initialized Successfully ***
+scsi0 : BusLogic BT-958
+  Vendor: VMware,   Model: VMware Virtual S  Rev: 1.0 
+  Type:   Direct-Access                      ANSI SCSI revision: 02
+scsi0: Target 0: Queue Depth 28, Asynchronous
+Attached scsi disk sda at scsi0, channel 0, id 0, lun 0
+SCSI device sda: 8388608 512-byte hdwr sectors (4295 MB)
+Partition check:
+ sda: sda1 sda2 sda3
+Journalled Block Device driver loaded
+kjournald starting.  Commit interval 5 seconds
+EXT3-fs: mounted filesystem with ordered data mode.
+Freeing unused kernel memory: 172k freed
+scsi0: Tagged Queuing now active for Target 0
+usb.c: registered new driver usbdevfs
+usb.c: registered new driver hub
+usb-uhci.c: $Revision: 1.275 $ time 07:47:23 Oct 23 2003
+usb-uhci.c: High bandwidth mode enabled
+usb-uhci.c: USB UHCI at I/O 0x20c0, IRQ 10
+usb-uhci.c: Detected 2 ports
+usb.c: new USB bus registered, assigned bus number 1
+hub.c: USB hub found
+hub.c: 2 ports detected
+usb-uhci.c: v1.275:USB Universal Host Controller Interface driver
+hcd.c: ehci-hcd @ 02:03.0, PCI device 15ad:0770 (VMWare Inc)
+hcd.c: irq 11, pci mem d088d000
+usb.c: new USB bus registered, assigned bus number 2
+ehci-hcd.c: USB 2.0 support enabled, EHCI rev 1. 0
+hub.c: USB hub found
+hub.c: 6 ports detected
+usb.c: registered new driver hid
+hid-core.c: v1.8.1 Andreas Gal, Vojtech Pavlik <vojtech@suse.cz>
+hid-core.c: USB HID support drivers
+mice: PS/2 mouse device common for all mice
+EXT3 FS 2.4-0.9.18, 14 May 2002 on sd(8,2), internal journal
+Adding Swap: 321292k swap-space (priority -1)
+hub.c: USB new device connect on bus1/1, assigned device number 2
+hiddev0: USB HID v1.10 Mouse [VMware VMware Virtual USB Mouse] on usb1:2.0
+hiddev0: USB HID v1.10 Mouse [VMware VMware Virtual USB Mouse] on usb1:2.1
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS 2.4-0.9.18, 14 May 2002 on sd(8,1), internal journal
+EXT3-fs: mounted filesystem with ordered data mode.
+hub.c: USB new device connect on bus1/2, assigned device number 3
+hub.c: USB hub found
+hub.c: 7 ports detected
+parport0: PC-style at 0x378 [PCSPP,TRISTATE]
+ohci1394: pci_module_init failed
+ide-floppy driver 0.99.newide
+hdc: ATAPI 1X DVD-ROM DVD-R-RAM CD-R/RW drive, 32kB Cache
+Uniform CD-ROM driver Revision: 3.12
+ip_tables: (C) 2000-2002 Netfilter core team
+pcnet32.c:v1.27a 10.02.2002 tsbogend@alpha.franken.de
+pcnet32: PCnet/PCI II 79C970A at 0x2000, 00 0c 29 6a c4 81 assigned IRQ 5.
+divert: allocating divert_blk for eth0
+eth0: registered as PCnet/PCI II 79C970A
+pcnet32: 1 cards_found.
+cdrom: This disc doesn't have any tracks I recognize!

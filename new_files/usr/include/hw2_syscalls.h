@@ -45,8 +45,10 @@ int get_scheduling_statistic(struct switch_info*);
 // If a system call returns in error, it will return the correct
 // value of ERRNO in negative format.
 long convert_to_errno(long res) {
+//	printf("LINE %d: RETURNING FROM SYSCALL, RES=%d\n",__LINE__,res);
 	if ((unsigned long)(res) >= (unsigned long)(-125)) {
 		errno = -(res); res = -1;
+//		printf("LINE %d: RET VALUE BECAME %d\n",__LINE__,res);
 	}
 	return res;
 }
