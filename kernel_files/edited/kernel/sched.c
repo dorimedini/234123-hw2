@@ -1260,10 +1260,11 @@ void scheduler_tick(int user_tick, int system)
 			 * fix the bug
 			 */
 			// START DEBUG CODE:
+			/**
 			if (!p->remaining_trials || !p->time_slice) {	// If it became overdue
 				INIT_LIST_HEAD(&p->run_list);	// If we don't do this, hw2_enqueue will think it's enqueued already
-				//p->remaining_trials=0;
-				//p->time_slice=0;
+				p->remaining_trials=0;
+				p->time_slice=0;
 				PRINT_NO_TICK("BECAME OVERDUE: pid=%d. &runlist=%p, runlist.next=%p, runlist.prev=%p. The answer to is_queued is %s\n", p->pid, &p->run_list, p->run_list.next, p->run_list.prev, is_queued(p)? "YES" : "NO");
 				UPDATE_REASON(p, SWITCH_OVERDUE);
 				list_add(&p->run_list,&rq->overdue_SHORT);
@@ -1275,6 +1276,7 @@ void scheduler_tick(int user_tick, int system)
 			else {
 				hw2_enqueue(p,rq,1);
 			}
+			/**/
 			// END DEBUG CODE
 			// START "GOOD" CODE (OR NOT)
 			/*
@@ -1921,7 +1923,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		PRINT_NO_TICK("TRIED TO CHANGE SHORT SHORT TO SHORT: PID=%d",p->pid);
 		goto out_unlock;
 	}
-	if (p->policy != SCHED_OTHER && policy == SCHED_SHORT) {
+	if (p->policy != SCHED_OTHER && policy == SCHED_SHORT && !no_change) {
 		PRINT_NO_TICK("TRIED TO CHANGE NON-OTHER TO SHORT: PID=%d",p->pid);
 		goto out_unlock;
 	}
@@ -1944,18 +1946,19 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		
 		// Only set this if the old policy wasn't SHORT
 		if (p->policy != SCHED_SHORT) {
+		
 			p->trial_num = p->remaining_trials = lp.trial_num;
+			
 			// Requested time is also the first time slice
-			p->time_slice = hw2_ms_to_ticks(lp.requested_time);
+			p->time_slice = (hw2_ms_to_ticks(lp.requested_time) == 0) ? 1 : hw2_ms_to_ticks(lp.requested_time);
+			
+			// Assaf said that we should resched the process
+			// after becoming SHORT, that it should happen in
+			// this function but doesn't (it does in later
+			// versions of the kernel). Question 146 in Piazza
+			current->need_resched = 1;
+			UPDATE_REASON(current, SWITCH_PRIO);
 		}
-		
-		// Assaf said that we should resched the process
-		// after becoming SHORT, that it should happen in
-		// this function but doesn't (it does in later
-		// versions of the kernel). Question 146 in Piazza
-		current->need_resched = 1;
-		UPDATE_REASON(current, SWITCH_PRIO);
-		
 	}
 	/** END HW2 */
 	
