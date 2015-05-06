@@ -31,15 +31,8 @@ int sys_is_SHORT(int pid) {
 
 	// Get the task and return the policy
 	task_t* task = find_task_by_pid(pid);
-	if (task->policy == SCHED_SHORT && task->remaining_trials) {
-		return 1;
-	} else if (task->policy == SCHED_SHORT && !task->remaining_trials) {
-		return 0;
-	} else {
-		return -EINVAL;
-		return -1;
-	}
-	
+	if (task->policy != SCHED_SHORT) return -EINVAL;
+	return task->remaining_trials ? 1 : 0;
 }
 
 
