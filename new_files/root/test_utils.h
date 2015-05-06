@@ -155,8 +155,9 @@ void doMediumTask()
  *
 */
 #define EXIT_PROCS(pid) do { \
+		int status;
 		if (!pid) exit(0); \
-		else while(wait() != -1); \
+		else while(wait(&status) != -1); \
 	} while(0)
 
 /*
