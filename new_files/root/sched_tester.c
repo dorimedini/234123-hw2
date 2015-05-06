@@ -83,15 +83,15 @@ long calculate_fibo(long num) {
  */
 void print_info(struct switch_info* info, int total) {
 	int i;
-	printf("START PRINTING %d SWITCHES:\n", total);
-	printf("===========================\n", total);
+	printf("\nSTART PRINTING %d SWITCHES:\n", total);
+	printf("===================================================================\n");
 	printf("     PREV-PID - NEXT-PID - PREV-POL - NEXT-POL -   TIME   -  REASON\n");
 	for (i=0; i<total; ++i) {
 		printf("%3d: %7d  | %7d  | %8s | %8s | %7d  | %s\n",
 				i, info[i].previous_pid, info[i].next_pid, policy2str(info[i].previous_policy), policy2str(info[i].next_policy), info[i].time, reason2str(info[i].reason));
 	}
-	printf("=========\n", total);
-	printf("END PRINT\n");
+	printf("===================================================================\n");
+	printf("END PRINT\n\n");
 }
 
 
@@ -148,9 +148,6 @@ int main(int argc, char** argv) {
 	int num_switches = get_scheduling_statistic(info);
 	
 	// Print them
-	printf("PIDs participating (children): ");
-	for (i=0; i<total; ++i) printf("%d ",pids[i]);
-	printf("\n");
 	print_info(info, num_switches);
 	
 	return 0;
