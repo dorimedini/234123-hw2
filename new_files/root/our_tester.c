@@ -92,17 +92,15 @@ bool testTaskBecomeOverDue(){
 	int id = fork();
 	int result;
 	if(id > 0){
-//		printf("1");
-//		EXIT_PROCS(getpid());
-//		printf("2");
+		CHANGE_TO_SHORT(id,2000,4);
 		while(is_SHORT(id) != 0);	// Wait for son to overdue
-		result = get_scheduling_statistic(info);
-		TEST_DIFFERENT(result,-1);
-		TEST_EQUALS(check_monitor(id, SWITCH_OVERDUE, result),1);
 		EXIT_PROCS(getpid());
+		result = get_scheduling_statistic(info);
+		assert(result != -1);
+		assert(check_monitor(id, SWITCH_OVERDUE, result) == 1);
 	} else {
 		int thisPid = getpid();
-		CHANGE_TO_SHORT(thisPid,2000,4);
+		while (is_SHORT(thisPid) != 1);
 		while(remaining_trials(thisPid)>0);
 		while(remaining_time(thisPid)>0);
 		doShortTask();
@@ -253,38 +251,38 @@ bool testSysCalls()
 /* A short Proc is created and the forked. We check if all the parameters calculated correctly */
 bool testShortFork()
 {
+	struct sched_param param;
 	int expected_requested_time = 5000;
 	int expected_trials = 40;
 	int id = fork();
 	if (id > 0) {
-		struct sched_param param;
 		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);
-		assert(sched_getparam(id, &param) == 0);
-		TEST_EQUALS(param.requested_time, (expected_requested_time * HZ / 1000));
-		TEST_EQUALS(param.trial_num, expected_trials);
+
 		EXIT_PROCS(getpid());
 
 	} else {
 		while(!is_SHORT(getpid())) {;}	// wait until your dad set you to SHORT
-
-		TEST_EQUALS(remaining_time(getpid()), expected_requested_time);
+		assert(remaining_time(getpid()) == expected_requested_time);
+		assert(sched_getparam(id, &param) == 0);
+		assert(param.requested_time == (expected_requested_time));
+		assert(param.trial_num == expected_trials);
 		expected_trials = remaining_trials(getpid());
 		int son = fork();
 		if (son == 0)
 		{
 			int grandson_initial_time = remaining_time(getpid());
-			TEST_TRUE(grandson_initial_time <= expected_requested_time/2);
-			TEST_TRUE(grandson_initial_time > 0);
-			TEST_TRUE(is_SHORT(getpid()));
-			TEST_EQUALS(remaining_trials(getpid()), expected_trials/2);
+			assert(grandson_initial_time <= expected_requested_time/2);
+			assert(grandson_initial_time > 0);
+			assert(is_SHORT(getpid()));
+			assert(remaining_trials(getpid()) == (expected_trials/2));
 			doMediumTask();
-			TEST_TRUE(remaining_time(getpid()) < grandson_initial_time);
+			assert(remaining_time(getpid()) < grandson_initial_time);
 			_exit(0);
 		}
 		else
 		{
-			TEST_TRUE(remaining_time(getpid()) <= expected_requested_time/2);
-			TEST_EQUALS(remaining_trials(getpid()), expected_trials/2);
+			assert(remaining_time(getpid()) <= expected_requested_time/2);
+			assert(remaining_trials(getpid()) == (expected_trials/2));
 			EXIT_PROCS(getpid());
 			_exit(0);
 		}
@@ -301,19 +299,20 @@ bool testOverdueFork()
 	int id = fork();
 	if (id > 0) {
 		CHANGE_TO_SHORT(id,expected_requested_time,expected_trials);		// become overdue here
-		TEST_FALSE(is_SHORT(id));
-		TEST_EQUALS(remaining_time, 0);
+		doMediumTask();
+		assert(is_SHORT(id) == 0);
+		assert(remaining_time(id) == 0);
 		EXIT_PROCS(getpid());
-
 	} else {
-		doShortTask();
+		while(is_SHORT(getpid()) == -1 || is_SHORT(getpid()) == 1);
+		assert(!remaining_trials(getpid()));
 		int son = fork();
 		if (son == 0)
 		{
-			TEST_FALSE(remaining_trials(getpid()));
+			assert(!remaining_trials(getpid()));
 			doShortTask();
-			TEST_FALSE(remaining_time(getpid()));
-			TEST_FALSE(is_SHORT(getpid()));
+			assert(!remaining_time(getpid()));
+			assert(!is_SHORT(getpid()));
 			_exit(0);
 		}
 		else
@@ -554,8 +553,6 @@ int main() {
 	RUN_TEST(testTaskBecomeOverDue);
 	RUN_TEST(testShortFork);
 	RUN_TEST(testOverdueFork);
-	RUN_TEST(testTaskBecomeOverDue);
-
 
 	// Those tests focus on the competition between to different policies.
 	// we just print who won
@@ -568,6 +565,7 @@ int main() {
 	printf("Testing race: SHORT vs. OTHER (SHORT is supposed to win)\n");
 	testScheduleShortOverOther();
 
+	return 0;
 	printf("Testing race: SHORT vs. OTHER #2(SHORT is supposed to win)\n");
 	testScheduleShortOverOther2();
 

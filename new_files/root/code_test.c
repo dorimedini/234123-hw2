@@ -717,7 +717,7 @@ int main()
 
     printf("Testing SHORT processes Round-Robin... \n");
     testSHORTRoundRobinNew();
-return 0;
+
     printf("testChangeRequestedTimeForShort... ");
     testChangeRequestedTimeForShort();
 
