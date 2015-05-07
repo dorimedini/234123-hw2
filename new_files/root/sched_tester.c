@@ -1,9 +1,6 @@
 
 #include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
-
-#define REQUESTED 100
-
-
+	
 /**
  * Stringify the reason number
  */
@@ -57,7 +54,6 @@ void set_to_SHORT(int pid, int requested, int trials) {
 	struct sched_param param = { .sched_priority = 0, .requested_time = requested, .trial_num = trials};
 	if (is_SHORT(pid) != -1) {
 		sched_setparam(pid, &param);
-//		printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
 		return;
 	}
 	// Only an OTHER process can become a SHORT.
@@ -68,7 +64,6 @@ void set_to_SHORT(int pid, int requested, int trials) {
 		sched_setscheduler(pid, SCHED_OTHER, &param);
 	}
 	sched_setscheduler(pid, SCHED_SHORT, &param);
-//	printf("Setting process #%d to SHORT; did we succeed? %s\n", pid, is_SHORT(pid) ? "YES" : "NO");
 }
 
 /** Self explanatory */
@@ -135,16 +130,13 @@ int main(int argc, char** argv) {
 			exit(0);
 		}
 		else {			// Make the RT father:
-			set_to_SHORT(pids[i], REQUESTED, trials[i]);	// Turn the child into a SHORT process (may need to turn into an OTHER first)
+			set_to_SHORT(pids[i], 100, trials[i]);	// Turn the child into a SHORT process (may need to turn into an OTHER first)
 		}
 	}
 	
 	// Wait for them
 	int status;
 	while (wait(&status) != -1);
-	
-	// Get the statistics
-	int num_switches = get_scheduling_statistic(info);
 	
 	// Output basic info
 	printf("\nGoing to calculate the following Fibonacci numbers (#:trials-number):\n");
@@ -155,6 +147,9 @@ int main(int argc, char** argv) {
 	for (i=0;i<total;++i) {
 		printf("#%d:%d   ",i,pids[i]);
 	}
+	
+	// Get the statistics
+	int num_switches = get_scheduling_statistic(info);
 	
 	// Print them
 	print_info(info, num_switches);
