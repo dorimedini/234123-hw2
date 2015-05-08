@@ -43,7 +43,7 @@
 // Does nothing if the process is overdue
 // or not SHORT
 #define REACH_TRIAL(num) do { \
-		while(remaining_trials(getpid())>num && is_SHORT(pid)==1); \
+		while(remaining_trials(getpid())>num && is_SHORT(getpid())==1); \
 	} while(0)
 
 // Run until a specific time slice value is
@@ -51,7 +51,7 @@
 // Does nothing if the process is overdue
 // or not SHORT
 #define REACH_TIME(num) do { \
-		while(remaining_time(getpid())>num && is_SHORT(pid)==1); \
+		while(remaining_time(getpid())>num && is_SHORT(getpid())==1); \
 	} while(0)
 
 
