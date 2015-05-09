@@ -12,9 +12,9 @@
 #include <unistd.h>
 
 
-struct switch_info {
-	int arr[6];
-};
+//struct switch_info {
+//	int arr[6];
+//};
 
 
 #define is_short(pid) syscall(243, pid)

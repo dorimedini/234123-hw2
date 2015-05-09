@@ -1,8 +1,9 @@
 
 #include <hw2_syscalls.h>	// For get_scheduling_statistic and some definitions
+#include <errno.h>			// In case these aren't included from hw2_syscalls.h
+#include <sched.h>			// MAKE SURE THE USERSPACE VERSION OF THIS FILE DECLARES SCHED_PARAM CORRECTLY
 
-#define REQUESTED 100
-#define PRIO_PROCESS 0
+#define PRIO_PROCESS 0		// This constant is needed for setting the nice() value of a different process
 
 // Wait for all children
 #define WAIT() do { \
@@ -63,17 +64,17 @@
 // - PRINT_EACH_TRIAL_UNTIL(10,"process %d has finished a trial!",getpid());
 // Does nothing if the process is overdue
 // or not SHORT
-#define PRINT_EACH_TRIAL_UNTIL(trial,str,...) do { \
+#define PRINT_EACH_TRIAL_UNTIL(trial,...) do { \
 		int i, tr = remaining_trials(getpid()); \
-		for (i=tr-1;i>trial;i--) { \
-			printf("TRIAL %d: " str,i,##__VA_ARGS__); \
+		for (i=tr-1;i>=trial;i--) { \
 			REACH_TRIAL(i); \
+			printf(##__VA_ARGS__); \
 		} \
 	} while(0)
 
 // Like the above, but runs until we become overdue
-#define PRINT_EACH_TRIAL(str,...) do { \
-		PRINT_EACH_TRIAL_UNTIL(0,str,##__VA_ARGS__); \
+#define PRINT_EACH_TRIAL(...) do { \
+		PRINT_EACH_TRIAL_UNTIL(0,##__VA_ARGS__); \
 	} while(0)
 
 // This function returns TRUE if the caller
