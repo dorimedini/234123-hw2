@@ -754,6 +754,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	current->time_slice >>= 1;
 	/** START HW2 */
 	p->remaining_trials = p->trial_num = (current->remaining_trials + 1) >> 1;
+	p->current_trial = 1;
 	// This may be zero! We need to make it overdue if it is
 	if (current->remaining_trials) {
 		current->remaining_trials >>= 1;

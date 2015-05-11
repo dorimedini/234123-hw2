@@ -593,6 +593,13 @@ struct task_struct {
 	/**
 	 * HW2:
 	 *
+	 * Keep track of the current trial
+	 */
+	int current_trial;
+
+	/**
+	 * HW2:
+	 *
 	 * Keep track of the number of trials left
 	 */
 	int remaining_trials;
