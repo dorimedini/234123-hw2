@@ -2049,7 +2049,7 @@ asmlinkage long sys_sched_getparam(pid_t pid, struct sched_param *param)
 		goto out_unlock;
 	lp.sched_priority = p->rt_priority;
 	/** START HW2 */
-	lp.trial_num = p->remaining_trials;
+	lp.trial_num = p->trial_num;
 	lp.requested_time = p->requested_time;
 	/** END HW2 */
 	read_unlock(&tasklist_lock);
