@@ -68,7 +68,7 @@
 		int i, tr = remaining_trials(getpid()); \
 		for (i=tr-1;i>=trial;i--) { \
 			REACH_TRIAL(i); \
-			printf(##__VA_ARGS__); \
+			printf(__VA_ARGS__); \
 		} \
 	} while(0)
 
