@@ -68,7 +68,7 @@
 		int i, tr = remaining_trials(getpid()); \
 		for (i=tr-1;i>=trial;i--) { \
 			REACH_TRIAL(i); \
-			printf(##__VA_ARGS__); \
+			printf(__VA_ARGS__); \
 		} \
 	} while(0)
 
@@ -282,7 +282,7 @@ void onetwo() {
 		// less than one second, but the total time takes more than one second.
 		// This is because the RT parent needs to sleep for a bit
 		set_all_to_SHORT(pids,3,600,8);
-		sleep(1);
+		sleep(4);
 		printf("\tBecoming high prio #1 (%d)\n",getpid());
 		setpriority(PRIO_PROCESS,pids[0],-10);
 		printf("\tBecoming high prio #2 (%d)\n",getpid());
@@ -291,21 +291,21 @@ void onetwo() {
 	else if(!pids[0]) { // First child
 		WAIT_UNTIL_SHORT();
 		printf("\tNormal prio #1 (%d) starting\n", getpid());
-		PRINT_EACH_TRIAL("\tHigh prio #1 (%d) got to trial %d\n",getpid(),remaining_trials(getpid()));
+		PRINT_EACH_TRIAL("\tHigh prio #1 (%d) got to trial %d, time slice %d\n",getpid(),remaining_trials(getpid()),remaining_time(getpid()));
 		printf("\tHigh prio #1 (%d) done\n",getpid());
 		exit(0);
 	}
 	else if(!pids[1]) {	// Second child
 		WAIT_UNTIL_SHORT();
 		printf("\tNormal prio #2 (%d) starting\n", getpid());
-		PRINT_EACH_TRIAL("\tHigh prio #2 (%d) got to trial %d\n",getpid(),remaining_trials(getpid()));
+		PRINT_EACH_TRIAL("\tHigh prio #2 (%d) got to trial %d, time slice %d\n",getpid(),remaining_trials(getpid()),remaining_time(getpid()));
 		printf("\tHigh prio #2 (%d) done\n",getpid());
 		exit(0);
 	}
 	else {				// Third child
 		WAIT_UNTIL_SHORT();
 		printf("\tLow prio (%d) starting\n", getpid());
-		PRINT_EACH_TRIAL("\tLow prio (%d) got to trial %d\n",getpid(),remaining_trials(getpid()));
+		PRINT_EACH_TRIAL("\tLow prio (%d) got to trial %d, time slice %d\n",getpid(),remaining_trials(getpid()),remaining_time(getpid()));
 		printf("\tLow prio (%d) done\n",getpid());
 		exit(0);
 	}

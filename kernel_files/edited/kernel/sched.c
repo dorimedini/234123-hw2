@@ -1257,7 +1257,8 @@ void scheduler_tick(int user_tick, int system)
 			// because to get in here we checked the value
 			// of p->remaining_trials
 			--p->remaining_trials;
-			p->time_slice = (hw2_ms_to_ticks(p->requested_time)) / (p->trial_num - p->remaining_trials + 1);
+			++p->current_trial;
+			p->time_slice = (hw2_ms_to_ticks(p->requested_time)) / (p->current_trial);
 			/**
 			 * HW2 DEBUGGING:
 			 *
@@ -1961,6 +1962,7 @@ static int setscheduler(pid_t pid, int policy, struct sched_param *param)
 		if (p->policy != SCHED_SHORT) {
 		
 			p->trial_num = p->remaining_trials = lp.trial_num;
+			p->current_trial = 1;
 			
 			// Requested time is also the first time slice
 			p->time_slice = (hw2_ms_to_ticks(lp.requested_time) == 0) ? 1 : hw2_ms_to_ticks(lp.requested_time);
@@ -2049,7 +2051,7 @@ asmlinkage long sys_sched_getparam(pid_t pid, struct sched_param *param)
 		goto out_unlock;
 	lp.sched_priority = p->rt_priority;
 	/** START HW2 */
-	lp.trial_num = p->remaining_trials;
+	lp.trial_num = p->trial_num;
 	lp.requested_time = p->requested_time;
 	/** END HW2 */
 	read_unlock(&tasklist_lock);
