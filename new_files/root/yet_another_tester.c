@@ -34,9 +34,23 @@
 // BE CAREFUL!
 // Only continues execution after this
 // command if the process is SHORT!
+#define WAIT_UNTIL_SHORT_PID(pid) do { \
+		while(is_SHORT(pid) == -1); \
+	} while(0)
+	
 #define WAIT_UNTIL_SHORT() do { \
 		int pid = getpid(); \
-		while(is_SHORT(pid) == -1); \
+		WAIT_UNTIL_SHORT_PID(pid); \
+	} while(0)
+	
+#define WAIT_UNTIL_OVERDUE_PID(pid) do { \
+		WAIT_UNTIL_SHORT_PID(pid); \
+		while(is_SHORT(pid) == 1); \
+	} while(0)
+
+#define WAIT_UNTIL_OVERDUE() do { \
+		int pid = getpid(); \
+		WAIT_UNTIL_OVERDUE_PID(pid); \
 	} while(0)
 
 // Run until a specific trial number is
@@ -188,6 +202,10 @@ void print_info(struct switch_info* info, int total) {
 	printf("END PRINT\n\n");
 }
 
+/*******************************************
+ ================= TESTS ===================
+ ******************************************/
+
 void oneone() {
 	FORK_PIDS(2);	// Now have an array pids[] with two sons
 	if (is_father(pids,2)) {
@@ -312,6 +330,57 @@ void onetwo() {
 	WAIT();
 }
 
+// SHORTs should be pushed back on fork. Make sure this happens.
+// I'm going to assume all children all successfully SHORTified
+void queue_order() {
+	
+	FORK_PIDS(3);
+	if (is_father(pids,3)) {	// Father
+		set_all_to_SHORT(pids,3,1000,8);
+	}
+	else { 					// Same code for all children
+		WAIT_UNTIL_SHORT();
+		printf("\tSHORT #%d forking, shouldn't print 'done forking' until it's brothers have forked\n",getpid());
+		int pid = fork();
+		if (pid) {
+			printf("\tSHORT #%d has fathered a child (%d) and got the CPU to brag about it\n",getpid(),pid);
+			WAIT();
+			exit(0);
+		}
+		else {
+			printf("\tI am the child (pid=%d) and got the CPU\n",getpid());
+			exit(0);
+		}
+	}
+	WAIT();
+}
+
+// Same thing, for OVERDUEs
+void queue_order_overdue() {
+	
+	FORK_PIDS(3);
+	if (is_father(pids,3)) {	// Father
+		set_all_to_SHORT(pids,3,1,1);
+	}
+	else { 					// Same code for all children
+		WAIT_UNTIL_SHORT();
+		printf("\tSHORT #%d waiting to become overdue...\n",getpid());
+		WAIT_UNTIL_OVERDUE();
+		printf("\tOVERDUE SHORT (trials==%d, time==%d) #%d forking, shouldn't print 'done forking' until it's brothers have forked\n",remaining_trials(getpid()),remaining_time(getpid()),getpid());
+		int pid = fork();
+		printf("\tDual print! ID=%d, returned pid=%d\n",getpid(),pid);
+		if (pid) {
+			printf("\tOVERDUE SHORT #%d has fathered a child (%d) and got the CPU to brag about it\n",getpid(),pid);
+			WAIT();
+			exit(0);
+		}
+		else {
+			printf("\tOVERDUE I am the child (pid=%d) and got the CPU\n",getpid());
+			exit(0);
+		}
+	}
+	WAIT();
+}
 
 /**
  * Arguments should be passed like so:
@@ -336,12 +405,19 @@ int main(int argc, char** argv) {
 	twoone();
 	printf("Three SHORTs, two become more important during the run\n");
 	onetwo();
+	printf("Three SHORTs, each one fork()s, make sure the queue is correct\n");
+	queue_order();
+	printf("Same thing, but for OVERDUE processes\n");
+	queue_order_overdue();
+	
+	printf("\nDONE\n");
+	
 	
 	// Get the statistics
 	int num_switches = get_scheduling_statistic(info);
 	
 	// Print them
-	print_info(info, num_switches);
+//	print_info(info, num_switches);
 	
 	return 0;
 }
