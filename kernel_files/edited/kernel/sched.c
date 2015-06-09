@@ -1397,6 +1397,40 @@ pick_next_task:
 	/**
 	 * HW2:
 	 *
+	 * If a SHORT task was forked, the parent must
+	 * go to the end of the queue (weird, but true...)
+	 *
+	 * This is also true for overdue SHORTs as well,
+	 * in any case (if an overdue process is swapped
+	 * for a different one it needs to go to the back
+	 * of the queue). However, if an overdue process
+	 * got here via waiting OR exiting, it has already
+	 * been kicked from the queue so no need to do
+	 * anything.
+	 *
+	 * We need to make sure the task is in RUNNING state
+	 * before we do this, otherwise we may push a dead
+	 * process back to the queue...
+	 *
+	 * NOTE: This function call does hw2_dequeue() and
+	 * hw2_enqueue()
+	 */
+	/** START HW2 */
+	if (!hw2_debug && prev->state == TASK_RUNNING) {
+		if (is_overdue(prev)) {
+			PRINT_NO_TICK("PUSHING OVERDUE BACK\n");
+			hw2_back_of_the_queue(prev, rq);
+			PRINT_IF_NO_TICK(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, PUSHING BACK\n",__LINE__);
+		}
+		else if (is_short(prev) && prev->switch_reason == SWITCH_CREATED) {
+			hw2_back_of_the_queue(prev, rq);
+		}
+	}
+	/** END HW2 */
+	
+	/**
+	 * HW2:
+	 *
 	 * Check if there are no real-time tasks to run.
 	 * If this is the case, we need to check if there are SHORT
 	 * tasks to run instead of OTHER tasks.
@@ -1461,36 +1495,6 @@ pick_next_task:
 		queue = array->queue + idx;
 		next = list_entry(queue->next, task_t, run_list);
 		PRINT_IF_NO_TICK(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, ORIGINAL CODE!\n",__LINE__);
-	}
-	
-	/**
-	 * If a SHORT task was forked, the parent must
-	 * go to the end of the queue (weird, but true...)
-	 *
-	 * This is also true for overdue SHORTs as well,
-	 * in any case (if an overdue process is swapped
-	 * for a different one it needs to go to the back
-	 * of the queue). However, if an overdue process
-	 * got here via waiting OR exiting, it has already
-	 * been kicked from the queue so no need to do
-	 * anything.
-	 *
-	 * We need to make sure the task is in RUNNING state
-	 * before we do this, otherwise we may push a dead
-	 * process back to the queue...
-	 *
-	 * NOTE: This function call does hw2_dequeue() and
-	 * hw2_enqueue()
-	 */
-	if (!hw2_debug && next != prev && prev->state == TASK_RUNNING) {
-		if (is_overdue(prev)) {
-			PRINT_NO_TICK("PUSHING OVERDUE BACK\n");
-			hw2_back_of_the_queue(prev, rq);
-			PRINT_IF_NO_TICK(is_overdue(prev),"OVERDUE SCHEDULE: LINE %d, PUSHING BACK\n",__LINE__);
-		}
-		else if (is_short(prev) && prev->switch_reason == SWITCH_CREATED) {
-			hw2_back_of_the_queue(prev, rq);
-		}
 	}
 	/** END HW2 */
 	
