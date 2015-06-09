@@ -732,8 +732,14 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	 */
 	__save_flags(flags);
 	__cli();
-	if (!current->time_slice)
+	/**
+	 * HW2:
+	 *
+	 * OVERDUE processes may have zero timeslice, it's OK
+	 */
+	if (!current->time_slice /** START HW2 */&& current->policy != SCHED_SHORT /** END HW2 */)
 		BUG();
+	
 	/**
 	 * HW2:
 	 *
@@ -777,6 +783,13 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		 * This case is rare, it happens when the parent has only
 		 * a single jiffy left from its timeslice. Taking the
 		 * runqueue lock is not a problem.
+		 */
+		/**
+		 * HW2:
+		 *
+		 * If the parent is OVERDUE, scheduler_tick() won't do anything to
+		 * it - it'll just decrease the timeslice by 1. No rescheduling,
+		 * no nothing. This is OK.
 		 */
 		current->time_slice = 1;
 		scheduler_tick(0,0);
