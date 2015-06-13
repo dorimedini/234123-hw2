@@ -1416,7 +1416,7 @@ pick_next_task:
 	 * hw2_enqueue()
 	 */
 	/** START HW2 */
-	if (!hw2_debug && next != prev && prev->state == TASK_RUNNING) {
+	if (!hw2_debug && prev->state == TASK_RUNNING) {
 		if (is_overdue(prev)) {
 			PRINT_NO_TICK("PUSHING OVERDUE BACK\n");
 			hw2_back_of_the_queue(prev, rq);

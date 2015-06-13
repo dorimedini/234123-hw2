@@ -732,7 +732,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	 */
 	__save_flags(flags);
 	__cli();
-	if (!current->time_slice)
+	if (!current->time_slice/** START HW2 */ && current->policy != SCHED_SHORT/** END HW2 */)
 		BUG();
 	/**
 	 * HW2:
