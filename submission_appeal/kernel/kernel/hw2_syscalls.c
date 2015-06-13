@@ -30,6 +30,7 @@ int sys_get_scheduling_statistic(struct switch_info*);
 int sys_is_SHORT(int pid) {
 
 	// Get the task and return the policy
+	if(pid<0) return -EINVAL;
 	task_t* task = find_task_by_pid(pid);
 	if (task->policy != SCHED_SHORT) return -EINVAL;
 	return task->remaining_trials ? 1 : 0;
@@ -39,6 +40,7 @@ int sys_is_SHORT(int pid) {
 int sys_remaining_time(int pid) {
 	
 	// Get the task
+	if(pid<0) return -EINVAL;
 	task_t* task = find_task_by_pid(pid);
 	if (!task) return NO_SUCH_PROC;
 	
@@ -57,6 +59,7 @@ int sys_remaining_time(int pid) {
 int sys_remaining_trials(int pid) {
 	
 	// Get the task
+	if(pid<0) return -EINVAL;
 	task_t* task = find_task_by_pid(pid);
 	if (!task) return NO_SUCH_PROC;
 	
