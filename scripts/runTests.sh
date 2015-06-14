@@ -4,8 +4,9 @@
 i=1
 mkdir /mnt/hgfs/HW/234123-hw2/scripts/Test_Objects
 
-for test in /mnt/hgfs/HW/234123-hw2/appeal_test/*;
+for test in `ls ;
 	do
+		echo $test
 		gcc $test -o /mnt/hgfs/HW/234123-hw2/scripts/Test_Objects/test${i}
 		let i++
 		
