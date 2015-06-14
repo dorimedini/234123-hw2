@@ -5,11 +5,11 @@
 #include <errno.h>
 #include <string.h>
 
-struct sched_param {
+/*struct sched_param {
 	int sched_priority;
 	int requested_time;
 	int trial_num;
-};
+}; */
 
 int sched_setscheduler(pid_t pid, int policy, const struct sched_param *param);
 
